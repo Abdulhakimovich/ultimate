@@ -1,0 +1,289 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* === DARK ELECTRIC BLUE THEME === */
+
+  /* Backgrounds */
+  --color-bg-primary:    #080C14;
+  --color-bg-secondary:  #0D1420;
+  --color-bg-card:       #111827;
+  --color-bg-card-alt:   #1A2235;
+  --color-bg-elevated:   #1E2A3E;
+  --color-bg-header:     #0F1929;
+  --color-bg-glass:      rgba(14, 24, 40, 0.85);
+
+  /* Electric Blue Accents */
+  --color-electric:      #00D4FF;
+  --color-electric-dim:  #0098C8;
+  --color-electric-glow: rgba(0, 212, 255, 0.15);
+  --color-electric-muted: rgba(0, 212, 255, 0.4);
+  --color-blue-mid:      #1E90FF;
+  --color-blue-deep:     #0066CC;
+  --color-blue-neon:     #00BFFF;
+
+  /* Accent colors */
+  --color-accent-green:  #00FF88;
+  --color-accent-green-dim: #00C66A;
+  --color-accent-purple: #7B2FFF;
+  --color-accent-orange: #FF6B00;
+  --color-accent-red:    #FF3366;
+  --color-accent-gold:   #FFD700;
+
+  /* Text */
+  --color-text-primary:  #E8F4FF;
+  --color-text-secondary: #7BA7CC;
+  --color-text-muted:    #3D5A7A;
+  --color-text-on-dark:  #E8F4FF;
+  --color-text-bright:   #FFFFFF;
+
+  /* Borders */
+  --color-border:        rgba(0, 212, 255, 0.12);
+  --color-border-bright: rgba(0, 212, 255, 0.35);
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+
+  /* Donut ring colors by day — electric palette */
+  --color-ring-mon: #00D4FF;
+  --color-ring-tue: #1E90FF;
+  --color-ring-wed: #7B2FFF;
+  --color-ring-thu: #00FF88;
+  --color-ring-fri: #00BFFF;
+  --color-ring-sat: #FFD700;
+  --color-ring-sun: #FF6B00;
+
+  /* Header colors by weekday for planner */
+  --color-header-weekday: #0F1929;
+  --color-header-weekend: #1A0D2E;
+
+  /* Font families */
+  --font-sans:    'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ===================== BASE ===================== */
+html {
+  font-size: 14px;
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* ===================== SCROLLBAR ===================== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--color-bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--color-electric-dim); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-electric); }
+
+/* ===================== FOCUS ===================== */
+*:focus-visible {
+  outline: 2px solid var(--color-electric);
+  outline-offset: 2px;
+}
+
+/* ===================== SELECTION ===================== */
+::selection {
+  background: var(--color-electric-glow);
+  color: var(--color-electric);
+}
+
+/* ===================== SHIMMER ===================== */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.skeleton-shimmer,
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-card) 25%,
+    var(--color-bg-card-alt) 37%,
+    var(--color-bg-card) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ===================== GLOW ANIMATIONS ===================== */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px var(--color-electric-glow); }
+  50%       { box-shadow: 0 0 24px var(--color-electric-muted), 0 0 48px var(--color-electric-glow); }
+}
+
+@keyframes float-up {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes electric-border {
+  0%   { border-color: rgba(0, 212, 255, 0.3); }
+  50%  { border-color: rgba(0, 212, 255, 0.8); }
+  100% { border-color: rgba(0, 212, 255, 0.3); }
+}
+
+@keyframes scan-line {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes neon-flicker {
+  0%, 100% { opacity: 1; }
+  92%       { opacity: 1; }
+  93%       { opacity: 0.6; }
+  94%       { opacity: 1; }
+  96%       { opacity: 0.8; }
+  97%       { opacity: 1; }
+}
+
+.animate-pulse-glow  { animation: pulse-glow 2.5s ease-in-out infinite; }
+.animate-float       { animation: float-up 3s ease-in-out infinite; }
+.animate-neon-flicker { animation: neon-flicker 4s ease-in-out infinite; }
+
+/* ===================== GLASS CARD ===================== */
+.glass-card {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+}
+
+/* ===================== ELECTRIC BUTTON ===================== */
+.btn-electric {
+  background: linear-gradient(135deg, var(--color-electric), var(--color-blue-mid));
+  color: var(--color-bg-primary);
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 16px var(--color-electric-glow);
+}
+.btn-electric:hover {
+  box-shadow: 0 0 32px var(--color-electric-muted);
+  transform: translateY(-1px);
+}
+
+/* ===================== TRACKER CHECKBOX ===================== */
+.tracker-checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--color-text-muted);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: transparent;
+}
+.tracker-checkbox:hover {
+  border-color: var(--color-electric);
+  background: var(--color-electric-glow);
+}
+.tracker-checkbox.checked {
+  background: var(--color-electric);
+  border-color: var(--color-electric);
+  box-shadow: 0 0 8px var(--color-electric-glow);
+}
+.tracker-checkbox.checked::after {
+  content: '✓';
+  color: var(--color-bg-primary);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* ===================== PROGRESS BAR ===================== */
+.progress-bar-track {
+  background: var(--color-bg-elevated);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  background: linear-gradient(90deg, var(--color-electric-dim), var(--color-electric), var(--color-blue-neon));
+  border-radius: 999px;
+  box-shadow: 0 0 8px var(--color-electric-glow);
+  transition: width 0.6s ease;
+}
+.progress-bar-fill.green {
+  background: linear-gradient(90deg, var(--color-accent-green-dim), var(--color-accent-green));
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+/* ===================== WEEK HEADER ===================== */
+.week-header {
+  background: linear-gradient(90deg, #0A1628, var(--color-bg-elevated));
+  border-top: 1px solid var(--color-border);
+  color: var(--color-electric);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+/* ===================== STAT BADGE ===================== */
+.stat-badge {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+}
+.stat-badge .label { font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.stat-badge .value { font-size: 18px; font-weight: 800; color: var(--color-electric); font-family: var(--font-mono); }
+
+/* ===================== GRID LINES ===================== */
+.tracker-grid-line {
+  border-right: 1px solid var(--color-border-subtle);
+}
+.tracker-grid-line:last-child { border-right: none; }
+
+/* ===================== PRINT ===================== */
+@media print {
+  body { background: white; color: black; font-size: 11px; }
+  .no-print { display: none !important; }
+}
+
+/* ===================== SCROLLABLE TABLE ===================== */
+.tracker-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tracker-scroll::-webkit-scrollbar { height: 4px; }
+
+/* ===================== INSPIRATIONAL QUOTE ===================== */
+.quote-text {
+  font-family: var(--font-display);
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--color-electric), var(--color-blue-neon), var(--color-accent-purple));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===================== ANALYSIS TABLE ===================== */
+.analysis-table th {
+  background: linear-gradient(90deg, #0A2010, #0D2A18);
+  color: var(--color-accent-green);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+}
+.analysis-table td {
+  padding: 3px 8px;
+  font-size: 11px;
+  border: 1px solid var(--color-border-subtle);
+  font-family: var(--font-mono);
+}
+.analysis-table .progress-cell {
+  min-width: 80px;
+}
