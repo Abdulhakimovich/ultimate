@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,7 +12,6 @@ import {
   Zap,
   Star,
   Award,
-  Smile,
   Activity,
   Calendar as CalendarIcon,
 } from 'lucide-react';
@@ -43,17 +42,25 @@ import {
   calculateAverageProgress,
   calculateDailyCompletion,
 } from '@/lib/utils/calculations';
-import { getMentalRatings, setMentalRating, type MentalRatings } from '@/lib/storage';
+import type { Habit } from '@/lib/types';
 import AddHabitModal from './AddHabitModal';
 import { useToast } from '@/hooks/useToast';
-import type { Habit } from '@/lib/types';
+
+/* ------------------------------------------------------------------ */
+/* Recharts CSS-var helper (SVG doesn't support CSS vars natively)     */
+/* ------------------------------------------------------------------ */
+
+function getCSSVar(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
 
 function getDayOfWeek(date: Date): number {
-  return (date.getDay() + 6) % 7; // Mon=0 … Sun=6
+  return (date.getDay() + 6) % 7; // Mon=0 вЂ¦ Sun=6
 }
 
 function getWeekLabel(weekIdx: number, tr: ReturnType<typeof t>): string {
@@ -77,23 +84,30 @@ function ElectricCheckbox({
     <button
       type="button"
       onClick={onChange}
-      aria-label={checked ? 'Отмечено' : 'Не отмечено'}
+      aria-label={checked ? 'РћС‚РјРµС‡РµРЅРѕ' : 'РќРµ РѕС‚РјРµС‡РµРЅРѕ'}
       className={`
         w-[18px] h-[18px] rounded-[3px] flex items-center justify-center
         transition-all duration-150 cursor-pointer border
         ${checked
-          ? 'bg-[#00D4FF] border-[#00D4FF] shadow-[0_0_8px_rgba(0,212,255,0.7)] scale-100'
+          ? 'border-[var(--electric)] shadow-[0_0_8px_rgba(0,212,255,0.7)] scale-100'
           : todayFlag
-            ? 'border-[#00D4FF] bg-[rgba(0,212,255,0.08)] hover:bg-[rgba(0,212,255,0.2)]'
-            : 'border-[#3D5A7A] bg-transparent hover:border-[#00D4FF] hover:bg-[rgba(0,212,255,0.1)]'
+            ? 'border-[var(--electric)] hover:border-[var(--electric)]'
+            : 'border-[var(--text-muted)] bg-transparent hover:border-[var(--electric)]'
         }
       `}
+      style={
+        checked
+          ? { background: 'var(--electric)' }
+          : todayFlag
+            ? { background: 'var(--electric-glow)' }
+            : { background: 'transparent' }
+      }
     >
       {checked && (
         <svg width="11" height="8" viewBox="0 0 11 8" fill="none">
           <path
             d="M1 4L4 7L10 1"
-            stroke="#080C14"
+            stroke="var(--bg-primary)"
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -114,10 +128,10 @@ function ProgressBarElectric({
   color?: 'electric' | 'green' | 'purple' | 'gold';
 }) {
   const gradients: Record<string, string> = {
-    electric: 'linear-gradient(90deg, #0098C8, #00D4FF, #00BFFF)',
-    green:    'linear-gradient(90deg, #00C66A, #00FF88)',
-    purple:   'linear-gradient(90deg, #5B10CC, #7B2FFF)',
-    gold:     'linear-gradient(90deg, #CC9900, #FFD700)',
+    electric: 'linear-gradient(90deg, var(--electric-dim), var(--electric), var(--blue-neon))',
+    green:    'linear-gradient(90deg, var(--accent-green-dim), var(--accent-green))',
+    purple:   'linear-gradient(90deg, #5B10CC, var(--accent-purple))',
+    gold:     'linear-gradient(90deg, #CC9900, var(--accent-gold))',
   };
   const glows: Record<string, string> = {
     electric: 'rgba(0,212,255,0.5)',
@@ -131,7 +145,7 @@ function ProgressBarElectric({
   return (
     <div
       className="rounded-full overflow-hidden w-full"
-      style={{ height, background: '#1E2A3E' }}
+      style={{ height, background: 'var(--bg-elevated)' }}
     >
       <div
         style={{
@@ -151,7 +165,7 @@ function StatBadge({
   label,
   value,
   unit,
-  color = '#00D4FF',
+  color = 'var(--electric)',
   icon: Icon,
 }: {
   label: string;
@@ -164,20 +178,20 @@ function StatBadge({
     <div
       className="rounded-xl p-3 flex flex-col gap-1 transition-transform hover:-translate-y-0.5"
       style={{
-        background: 'linear-gradient(135deg, #111827 0%, #152033 100%)',
-        border: '1px solid rgba(0,212,255,0.15)',
+        background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-alt) 100%)',
+        border: '1px solid var(--border)',
         boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
       }}
     >
       <div className="flex items-center gap-1.5">
         {Icon && <Icon size={13} style={{ color }} />}
-        <span className="text-[9px] uppercase tracking-widest font-semibold" style={{ color: '#7BA7CC' }}>
+        <span className="text-[9px] uppercase tracking-widest font-semibold" style={{ color: 'var(--text-secondary)' }}>
           {label}
         </span>
       </div>
       <div className="font-mono font-bold text-xl leading-none mt-0.5" style={{ color }}>
         {value}
-        {unit && <span className="text-xs ml-0.5 font-normal" style={{ color: '#7BA7CC' }}>{unit}</span>}
+        {unit && <span className="text-xs ml-0.5 font-normal" style={{ color: 'var(--text-secondary)' }}>{unit}</span>}
       </div>
     </div>
   );
@@ -211,7 +225,6 @@ export default function UltimateMonthlyTracker() {
   const [editingHabit, setEditingHabit]   = useState<Habit | null>(null);
   const [quoteIdx, setQuoteIdx]           = useState(0);
   const [mounted, setMounted]             = useState(false);
-  const [mentalRatings, setMentalState]   = useState<MentalRatings>({ mood: {}, motivation: {} });
   const { toast } = useToast();
 
   const year  = currentMonth.getFullYear();
@@ -219,7 +232,6 @@ export default function UltimateMonthlyTracker() {
 
   useEffect(() => {
     setMounted(true);
-    setMentalState(getMentalRatings());
   }, []);
 
   useEffect(() => {
@@ -266,7 +278,7 @@ export default function UltimateMonthlyTracker() {
     });
   }, [allDays, habits, completions]);
 
-  // Analysis data per habit (matches "Анализ" in photo 2)
+  // Analysis data per habit (matches "РђРЅР°Р»РёР·" in photo 2)
   const analysisData = useMemo(() => {
     return habits.map((habit) => {
       const fact = countCompletionsInRange(completions, habit.id, startStr, endStr);
@@ -311,10 +323,10 @@ export default function UltimateMonthlyTracker() {
 
   // Motivation level calculation
   const motivationLevel = useMemo(() => {
-    if (overallPct >= 80) return language === 'ru' ? 'Легенда Дисциплины' : language === 'uz' ? 'Intizom Afsonasi' : 'Discipline Legend';
-    if (overallPct >= 60) return language === 'ru' ? 'Мастер Продуктивности' : language === 'uz' ? 'Mahorat Cho‘qqisi' : 'Productivity Master';
-    if (overallPct >= 40) return language === 'ru' ? 'Уверенный Темп' : language === 'uz' ? 'Barqaror Qadam' : 'Steady Momentum';
-    return language === 'ru' ? 'Начало Пути' : language === 'uz' ? 'Boshlang‘ich Bosqich' : 'Path Starter';
+    if (overallPct >= 80) return language === 'ru' ? 'Р›РµРіРµРЅРґР° Р”РёСЃС†РёРїР»РёРЅС‹' : language === 'uz' ? 'Intizom Afsonasi' : 'Discipline Legend';
+    if (overallPct >= 60) return language === 'ru' ? 'РњР°СЃС‚РµСЂ РџСЂРѕРґСѓРєС‚РёРІРЅРѕСЃС‚Рё' : language === 'uz' ? "Mahorat Cho'qqisi" : 'Productivity Master';
+    if (overallPct >= 40) return language === 'ru' ? 'РЈРІРµСЂРµРЅРЅС‹Р№ РўРµРјРї' : language === 'uz' ? 'Barqaror Qadam' : 'Steady Momentum';
+    return language === 'ru' ? 'РќР°С‡Р°Р»Рѕ РџСѓС‚Рё' : language === 'uz' ? "Boshlang'ich Bosqich" : 'Path Starter';
   }, [overallPct, language]);
 
   const handleSaveHabit = useCallback(
@@ -337,18 +349,10 @@ export default function UltimateMonthlyTracker() {
   const handleDeleteHabit = useCallback(
     (habit: Habit) => {
       deleteHabit(habit.id);
-      toast({ message: `«${habit.name}» ${tr.toast.habitDeleted}`, variant: 'info' });
+      toast({ message: `В«${habit.name}В» ${tr.toast.habitDeleted}`, variant: 'info' });
     },
     [deleteHabit, toast, tr],
   );
-
-  const handleRatingClick = useCallback((dateStr: string, type: 'mood' | 'motivation') => {
-    const currentVal = mentalRatings[type][dateStr] || 0;
-    // Cycle 0 -> 7 -> 8 -> 9 -> 10 -> 0
-    const nextVal = currentVal >= 10 ? 0 : currentVal === 0 ? 7 : currentVal + 1;
-    const updated = setMentalRating(dateStr, type, nextVal);
-    setMentalState({ ...updated });
-  }, [mentalRatings]);
 
   const handleMonthTabSelect = useCallback((targetMonthIdx: number) => {
     const newDate = new Date(year, targetMonthIdx, 1);
@@ -373,15 +377,15 @@ export default function UltimateMonthlyTracker() {
       <div
         className="rounded-2xl p-5 relative overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, #070B12 0%, #0D192E 50%, #080C14 100%)',
-          border: '1px solid rgba(0,212,255,0.22)',
+          background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-card-alt) 50%, var(--bg-primary) 100%)',
+          border: '1px solid var(--border-bright)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.6), inset 0 0 32px rgba(0,212,255,0.03)',
         }}
       >
         {/* Animated glowing decorative lines */}
         <div className="absolute inset-0 pointer-events-none opacity-20">
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00D4FF] to-transparent animate-pulse" />
-          <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#00FF88] to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--electric)] to-transparent animate-pulse" />
+          <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--accent-green)] to-transparent" />
         </div>
 
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -391,16 +395,16 @@ export default function UltimateMonthlyTracker() {
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
                 style={{
-                  background: 'linear-gradient(135deg, #00D4FF, #1E90FF)',
-                  boxShadow: '0 0 16px rgba(0,212,255,0.6)',
+                  background: 'linear-gradient(135deg, var(--electric), var(--blue-mid))',
+                  boxShadow: '0 0 16px var(--electric-muted)',
                 }}
               >
-                <Zap size={18} style={{ color: '#080C14' }} />
+                <Zap size={18} style={{ color: 'var(--bg-primary)' }} />
               </div>
               <h1
                 className="font-display font-black text-2xl tracking-tight"
                 style={{
-                  background: 'linear-gradient(90deg, #FFFFFF 0%, #00D4FF 100%)',
+                  background: 'linear-gradient(90deg, var(--text-bright) 0%, var(--electric) 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}
@@ -410,9 +414,9 @@ export default function UltimateMonthlyTracker() {
               <span
                 className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono"
                 style={{
-                  background: 'rgba(0,212,255,0.12)',
-                  color: '#00D4FF',
-                  border: '1px solid rgba(0,212,255,0.3)',
+                  background: 'var(--border)',
+                  color: 'var(--electric)',
+                  border: '1px solid var(--border-bright)',
                 }}
               >
                 {motivationLevel}
@@ -428,7 +432,7 @@ export default function UltimateMonthlyTracker() {
                 transition={{ duration: 0.35 }}
                 className="text-xs font-semibold quote-text max-w-2xl"
               >
-                ✨ {tr.tracker.inspirational[quoteIdx]}
+                вњЁ {tr.tracker.inspirational[quoteIdx]}
               </motion.p>
             </AnimatePresence>
           </div>
@@ -439,9 +443,9 @@ export default function UltimateMonthlyTracker() {
               onClick={() => navigateMonth('prev')}
               className="p-2 rounded-xl transition-all hover:scale-105 active:scale-95"
               style={{
-                background: '#111827',
-                border: '1px solid rgba(0,212,255,0.2)',
-                color: '#00D4FF',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-bright)',
+                color: 'var(--electric)',
               }}
               aria-label={tr.tracker.prevMonth}
             >
@@ -450,9 +454,9 @@ export default function UltimateMonthlyTracker() {
             <div
               className="px-4 py-1.5 rounded-xl font-display font-bold text-sm min-w-[140px] text-center"
               style={{
-                background: '#111827',
-                border: '1px solid rgba(0,212,255,0.2)',
-                color: '#E8F4FF',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-bright)',
+                color: 'var(--text-primary)',
               }}
             >
               {monthLabel}
@@ -461,9 +465,9 @@ export default function UltimateMonthlyTracker() {
               onClick={() => navigateMonth('next')}
               className="p-2 rounded-xl transition-all hover:scale-105 active:scale-95"
               style={{
-                background: '#111827',
-                border: '1px solid rgba(0,212,255,0.2)',
-                color: '#00D4FF',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-bright)',
+                color: 'var(--electric)',
               }}
               aria-label={tr.tracker.nextMonth}
             >
@@ -472,25 +476,25 @@ export default function UltimateMonthlyTracker() {
           </div>
         </div>
 
-        {/* Top Progress bar exactly matching photo 2: "Привычки | Прогресс | Прогресс в %" */}
+        {/* Top Progress bar exactly matching photo 2: "РџСЂРёРІС‹С‡РєРё | РџСЂРѕРіСЂРµСЃСЃ | РџСЂРѕРіСЂРµСЃСЃ РІ %" */}
         <div
           className="mt-4 pt-3 rounded-xl px-4 py-2.5 flex flex-col sm:flex-row sm:items-center gap-3 justify-between"
           style={{
-            background: 'rgba(10, 20, 35, 0.7)',
-            border: '1px solid rgba(0,212,255,0.15)',
+            background: 'var(--bg-glass)',
+            border: '1px solid var(--border)',
           }}
         >
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#E8F4FF' }}>
+            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
               {tr.tracker.habits}
             </span>
-            <span className="text-xs font-mono" style={{ color: '#7BA7CC' }}>
+            <span className="text-xs font-mono" style={{ color: 'var(--text-secondary)' }}>
               ({habits.length})
             </span>
           </div>
 
           <div className="flex-1 max-w-xl flex items-center gap-3">
-            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#7BA7CC' }}>
+            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>
               {tr.tracker.progress}:
             </span>
             <div className="flex-1">
@@ -499,15 +503,15 @@ export default function UltimateMonthlyTracker() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#7BA7CC' }}>
+            <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>
               {tr.tracker.progressPct}:
             </span>
             <span
               className="font-mono font-black text-lg px-2.5 py-0.5 rounded-lg"
               style={{
-                color: '#00D4FF',
-                background: 'rgba(0,212,255,0.1)',
-                border: '1px solid rgba(0,212,255,0.3)',
+                color: 'var(--electric)',
+                background: 'var(--electric-glow)',
+                border: '1px solid var(--border-bright)',
               }}
             >
               {overallPct.toFixed(2)}%
@@ -521,7 +525,7 @@ export default function UltimateMonthlyTracker() {
         <StatBadge
           label={tr.tracker.monthProgress}
           value={`${overallPct}%`}
-          color="#00D4FF"
+          color="var(--electric)"
           icon={TrendingUp}
         />
         <StatBadge
@@ -531,20 +535,20 @@ export default function UltimateMonthlyTracker() {
               Math.max(1, dayStats.filter((d) => d.pct > 0).length)
           )}
           unit="%"
-          color="#00FF88"
+          color="var(--accent-green)"
           icon={Target}
         />
         <StatBadge
           label={tr.tracker.streakDays}
           value={bestStreak}
           unit={tr.tracker.days}
-          color="#FFD700"
+          color="var(--accent-gold)"
           icon={Flame}
         />
         <StatBadge
           label={tr.tracker.totalHabits}
           value={habits.length}
-          color="#7B2FFF"
+          color="var(--accent-purple)"
           icon={Award}
         />
       </div>
@@ -557,8 +561,8 @@ export default function UltimateMonthlyTracker() {
           <div
             className="rounded-xl overflow-hidden"
             style={{
-              border: '1px solid rgba(0,212,255,0.18)',
-              background: '#111827',
+              border: '1px solid var(--border-bright)',
+              background: 'var(--bg-card)',
               boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
             }}
           >
@@ -567,22 +571,22 @@ export default function UltimateMonthlyTracker() {
               className="px-3 py-2.5 font-bold text-[11px] uppercase tracking-wider flex items-center justify-between"
               style={{
                 background: 'linear-gradient(90deg, #0A2416 0%, #0E3520 100%)',
-                color: '#00FF88',
+                color: 'var(--accent-green)',
                 borderBottom: '2px solid rgba(0,255,136,0.3)',
               }}
             >
               <span>{tr.tracker.habits}</span>
-              <Activity size={13} style={{ color: '#00FF88' }} />
+              <Activity size={13} style={{ color: 'var(--accent-green)' }} />
             </div>
 
             {/* Habit Rows */}
             {habits.length === 0 ? (
               <div className="p-6 text-center">
-                <div className="text-3xl mb-2">✨</div>
-                <p className="text-xs font-semibold" style={{ color: '#00D4FF' }}>
+                <div className="text-3xl mb-2">вњЁ</div>
+                <p className="text-xs font-semibold" style={{ color: 'var(--electric)' }}>
                   {tr.tracker.noHabits}
                 </p>
-                <p className="text-[10px] mt-1" style={{ color: '#7BA7CC' }}>
+                <p className="text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
                   {tr.tracker.noHabitsDesc}
                 </p>
               </div>
@@ -593,21 +597,21 @@ export default function UltimateMonthlyTracker() {
                     key={habit.id}
                     className="group flex items-center gap-2 px-3 h-[34px] cursor-pointer transition-colors"
                     style={{
-                      borderBottom: '1px solid rgba(255,255,255,0.04)',
-                      background: hIdx % 2 === 0 ? 'transparent' : 'rgba(14,24,40,0.5)',
+                      borderBottom: '1px solid var(--border-subtle)',
+                      background: hIdx % 2 === 0 ? 'transparent' : 'var(--bg-glass)',
                     }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLDivElement).style.background = 'rgba(0,212,255,0.08)';
+                      (e.currentTarget as HTMLDivElement).style.background = 'var(--electric-glow)';
                     }}
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLDivElement).style.background =
-                        hIdx % 2 === 0 ? 'transparent' : 'rgba(14,24,40,0.5)';
+                        hIdx % 2 === 0 ? 'transparent' : 'var(--bg-glass)';
                     }}
                   >
                     <span className="text-sm flex-shrink-0">{habit.icon}</span>
                     <span
                       className="text-xs font-semibold truncate flex-1"
-                      style={{ color: '#E8F4FF' }}
+                      style={{ color: 'var(--text-primary)' }}
                       title={habit.name}
                     >
                       {habit.name}
@@ -621,11 +625,11 @@ export default function UltimateMonthlyTracker() {
                           setEditingHabit(habit);
                           setShowModal(true);
                         }}
-                        className="p-1 rounded text-[10px] hover:text-[#00D4FF]"
-                        style={{ color: '#7BA7CC' }}
+                        className="p-1 rounded text-[10px] hover:text-[var(--electric)]"
+                        style={{ color: 'var(--text-secondary)' }}
                         title={tr.tracker.editHabit}
                       >
-                        ✎
+                        вњЋ
                       </button>
                       <button
                         type="button"
@@ -634,10 +638,10 @@ export default function UltimateMonthlyTracker() {
                           handleDeleteHabit(habit);
                         }}
                         className="p-1 rounded text-[10px] hover:text-red-400"
-                        style={{ color: '#7BA7CC' }}
+                        style={{ color: 'var(--text-secondary)' }}
                         title={tr.tracker.deleteHabit}
                       >
-                        ✕
+                        вњ•
                       </button>
                     </div>
                   </div>
@@ -648,9 +652,9 @@ export default function UltimateMonthlyTracker() {
                   className="px-3 h-[28px] flex items-center text-[10px] font-bold uppercase tracking-wider"
                   style={{
                     background: 'linear-gradient(90deg, #0A1628, #0F203A)',
-                    color: '#00D4FF',
-                    borderTop: '2px solid rgba(0,212,255,0.25)',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    color: 'var(--electric)',
+                    borderTop: '2px solid var(--border-bright)',
+                    borderBottom: '1px solid var(--border-subtle)',
                   }}
                 >
                   {tr.tracker.progress}
@@ -659,8 +663,8 @@ export default function UltimateMonthlyTracker() {
                   className="px-3 h-[26px] flex items-center text-[10px] font-bold uppercase tracking-wider"
                   style={{
                     background: 'linear-gradient(90deg, #091C12, #0D261A)',
-                    color: '#00FF88',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    color: 'var(--accent-green)',
+                    borderBottom: '1px solid var(--border-subtle)',
                   }}
                 >
                   {tr.tracker.completed}
@@ -669,8 +673,8 @@ export default function UltimateMonthlyTracker() {
                   className="px-3 h-[26px] flex items-center text-[10px] font-bold uppercase tracking-wider"
                   style={{
                     background: 'linear-gradient(90deg, #1C0A12, #260D1A)',
-                    color: '#FF3366',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    color: 'var(--accent-red)',
+                    borderBottom: '1px solid var(--border-subtle)',
                   }}
                 >
                   {tr.tracker.notCompleted}
@@ -687,15 +691,15 @@ export default function UltimateMonthlyTracker() {
               }}
               className="w-full px-3 py-2 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
               style={{
-                color: '#00D4FF',
-                background: 'rgba(0,212,255,0.05)',
-                borderTop: '1px solid rgba(0,212,255,0.15)',
+                color: 'var(--electric)',
+                background: 'var(--electric-glow)',
+                borderTop: '1px solid var(--border)',
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,212,255,0.12)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--border)';
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,212,255,0.05)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'var(--electric-glow)';
               }}
             >
               <Plus size={14} />
@@ -709,8 +713,8 @@ export default function UltimateMonthlyTracker() {
           <div
             className="tracker-scroll rounded-xl overflow-x-auto"
             style={{
-              border: '1px solid rgba(0,212,255,0.18)',
-              background: '#111827',
+              border: '1px solid var(--border-bright)',
+              background: 'var(--bg-card)',
               boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
             }}
           >
@@ -719,7 +723,7 @@ export default function UltimateMonthlyTracker() {
               style={{
                 minWidth: 'max-content',
                 width: '100%',
-                background: '#111827',
+                background: 'var(--bg-card)',
               }}
             >
               {/* Columns for all days */}
@@ -730,7 +734,7 @@ export default function UltimateMonthlyTracker() {
               </colgroup>
 
               <thead>
-                {/* 1. Week group headers banner (Неделя 1, Неделя 2, etc.) */}
+                {/* 1. Week group headers banner (РќРµРґРµР»СЏ 1, РќРµРґРµР»СЏ 2, etc.) */}
                 <tr>
                   {weeks.map((weekDays, wIdx) => (
                     <th
@@ -742,7 +746,7 @@ export default function UltimateMonthlyTracker() {
                           wIdx % 2 === 0
                             ? 'linear-gradient(90deg, #092015 0%, #0E3322 100%)'
                             : 'linear-gradient(90deg, #0B2519 0%, #0F3825 100%)',
-                        color: '#00FF88',
+                        color: 'var(--accent-green)',
                         borderRight: '1px solid rgba(0,255,136,0.25)',
                         borderBottom: '1px solid rgba(0,255,136,0.3)',
                       }}
@@ -752,7 +756,7 @@ export default function UltimateMonthlyTracker() {
                   ))}
                 </tr>
 
-                {/* 2. Days of week abbreviations (пн вт ср чт пт сб вс) */}
+                {/* 2. Days of week abbreviations (РїРЅ РІС‚ СЃСЂ С‡С‚ РїС‚ СЃР± РІСЃ) */}
                 <tr>
                   {weeks.map((weekDays) =>
                     weekDays.map((day) => {
@@ -765,17 +769,17 @@ export default function UltimateMonthlyTracker() {
                           className="text-center py-1 text-[9px] font-bold"
                           style={{
                             background: today
-                              ? 'rgba(0,212,255,0.2)'
+                              ? 'var(--border-bright)'
                               : isWeekend
-                                ? '#0D1624'
+                                ? 'var(--bg-secondary)'
                                 : 'transparent',
                             color: today
-                              ? '#00D4FF'
+                              ? 'var(--electric)'
                               : isWeekend
-                                ? '#00FF88'
-                                : '#7BA7CC',
-                            borderBottom: '1px solid rgba(0,212,255,0.1)',
-                            borderRight: '1px solid rgba(255,255,255,0.04)',
+                                ? 'var(--accent-green)'
+                                : 'var(--text-secondary)',
+                            borderBottom: '1px solid var(--border)',
+                            borderRight: '1px solid var(--border-subtle)',
                           }}
                         >
                           {tr.tracker.weekdays[dowIdx]}
@@ -797,14 +801,14 @@ export default function UltimateMonthlyTracker() {
                           key={`num-${toDateString(day)}`}
                           className="text-center py-1 font-mono font-bold text-[10px]"
                           style={{
-                            background: today ? 'rgba(0,212,255,0.15)' : 'transparent',
+                            background: today ? 'var(--electric-glow)' : 'transparent',
                             color: today
-                              ? '#00D4FF'
+                              ? 'var(--electric)'
                               : isWeekend
-                                ? '#7BA7CC'
-                                : '#E8F4FF',
-                            borderBottom: '2px solid rgba(0,212,255,0.25)',
-                            borderRight: '1px solid rgba(255,255,255,0.04)',
+                                ? 'var(--text-secondary)'
+                                : 'var(--text-primary)',
+                            borderBottom: '2px solid var(--border-bright)',
+                            borderRight: '1px solid var(--border-subtle)',
                           }}
                         >
                           {day.getDate()}
@@ -822,7 +826,7 @@ export default function UltimateMonthlyTracker() {
                     key={habit.id}
                     style={{
                       height: '34px',
-                      background: hIdx % 2 === 0 ? 'transparent' : 'rgba(14,24,40,0.5)',
+                      background: hIdx % 2 === 0 ? 'transparent' : 'var(--bg-glass)',
                     }}
                   >
                     {allDays.map((day) => {
@@ -834,8 +838,8 @@ export default function UltimateMonthlyTracker() {
                           key={dateStr}
                           className="p-0 text-center"
                           style={{
-                            borderRight: '1px solid rgba(255,255,255,0.04)',
-                            borderBottom: '1px solid rgba(255,255,255,0.04)',
+                            borderRight: '1px solid var(--border-subtle)',
+                            borderBottom: '1px solid var(--border-subtle)',
                             background: today ? 'rgba(0,212,255,0.04)' : undefined,
                           }}
                         >
@@ -859,7 +863,7 @@ export default function UltimateMonthlyTracker() {
                     <tr
                       style={{
                         height: '28px',
-                        borderTop: '2px solid rgba(0,212,255,0.25)',
+                        borderTop: '2px solid var(--border-bright)',
                         background: '#0A1628',
                       }}
                     >
@@ -873,13 +877,13 @@ export default function UltimateMonthlyTracker() {
                             style={{
                               color:
                                 pct === 100
-                                  ? '#00FF88'
+                                  ? 'var(--accent-green)'
                                   : pct >= 50
-                                    ? '#00D4FF'
+                                    ? 'var(--electric)'
                                     : pct > 0
-                                      ? '#7BA7CC'
-                                      : '#3D5A7A',
-                              borderRight: '1px solid rgba(255,255,255,0.04)',
+                                      ? 'var(--text-secondary)'
+                                      : 'var(--text-muted)',
+                              borderRight: '1px solid var(--border-subtle)',
                             }}
                           >
                             {pct > 0 ? `${pct}%` : '0%'}
@@ -897,8 +901,8 @@ export default function UltimateMonthlyTracker() {
                             key={`done-${day.getDate()}`}
                             className="text-center font-mono font-semibold text-[9px]"
                             style={{
-                              color: '#00FF88',
-                              borderRight: '1px solid rgba(255,255,255,0.04)',
+                              color: 'var(--accent-green)',
+                              borderRight: '1px solid var(--border-subtle)',
                             }}
                           >
                             {stat?.done ?? 0}
@@ -916,8 +920,8 @@ export default function UltimateMonthlyTracker() {
                             key={`miss-${day.getDate()}`}
                             className="text-center font-mono font-semibold text-[9px]"
                             style={{
-                              color: '#FF3366',
-                              borderRight: '1px solid rgba(255,255,255,0.04)',
+                              color: 'var(--accent-red)',
+                              borderRight: '1px solid var(--border-subtle)',
                             }}
                           >
                             {stat?.notDone ?? 0}
@@ -939,23 +943,23 @@ export default function UltimateMonthlyTracker() {
               className="rounded-xl overflow-hidden"
               style={{
                 border: '1px solid rgba(0,255,136,0.3)',
-                background: '#111827',
+                background: 'var(--bg-card)',
                 boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
               }}
             >
-              {/* Header: "АНАЛИЗ" */}
+              {/* Header: "РђРќРђР›РР—" */}
               <div
                 className="text-center py-2.5 font-black text-xs uppercase tracking-wider"
                 style={{
                   background: 'linear-gradient(90deg, #0A2416 0%, #0E3520 100%)',
-                  color: '#00FF88',
+                  color: 'var(--accent-green)',
                   borderBottom: '2px solid rgba(0,255,136,0.3)',
                 }}
               >
                 {tr.tracker.analysis}
               </div>
 
-              {/* Sub-headers: Цель | Факт | Прогресс */}
+              {/* Sub-headers: Р¦РµР»СЊ | Р¤Р°РєС‚ | РџСЂРѕРіСЂРµСЃСЃ */}
               <div
                 className="grid grid-cols-3 text-center border-b"
                 style={{ borderColor: 'rgba(0,255,136,0.2)' }}
@@ -964,7 +968,7 @@ export default function UltimateMonthlyTracker() {
                   className="py-1 text-[9px] font-black uppercase tracking-wider"
                   style={{
                     background: 'rgba(0,255,136,0.08)',
-                    color: '#00C66A',
+                    color: 'var(--accent-green-dim)',
                     borderRight: '1px solid rgba(0,255,136,0.15)',
                   }}
                 >
@@ -974,7 +978,7 @@ export default function UltimateMonthlyTracker() {
                   className="py-1 text-[9px] font-black uppercase tracking-wider"
                   style={{
                     background: 'rgba(0,255,136,0.08)',
-                    color: '#00C66A',
+                    color: 'var(--accent-green-dim)',
                     borderRight: '1px solid rgba(0,255,136,0.15)',
                   }}
                 >
@@ -984,7 +988,7 @@ export default function UltimateMonthlyTracker() {
                   className="py-1 text-[9px] font-black uppercase tracking-wider"
                   style={{
                     background: 'rgba(0,255,136,0.08)',
-                    color: '#00C66A',
+                    color: 'var(--accent-green-dim)',
                   }}
                 >
                   {tr.tracker.progressCol}
@@ -997,15 +1001,15 @@ export default function UltimateMonthlyTracker() {
                   key={habit.id}
                   className="grid grid-cols-3 items-center border-b h-[34px]"
                   style={{
-                    borderColor: 'rgba(255,255,255,0.04)',
-                    background: idx % 2 === 0 ? 'transparent' : 'rgba(14,24,40,0.5)',
+                    borderColor: 'var(--border-subtle)',
+                    background: idx % 2 === 0 ? 'transparent' : 'var(--bg-glass)',
                   }}
                 >
                   <div
                     className="text-center font-mono text-[11px] font-bold"
                     style={{
-                      color: '#7BA7CC',
-                      borderRight: '1px solid rgba(255,255,255,0.04)',
+                      color: 'var(--text-secondary)',
+                      borderRight: '1px solid var(--border-subtle)',
                     }}
                   >
                     {goal}
@@ -1013,8 +1017,8 @@ export default function UltimateMonthlyTracker() {
                   <div
                     className="text-center font-mono text-[11px] font-bold"
                     style={{
-                      color: fact >= goal ? '#00FF88' : '#E8F4FF',
-                      borderRight: '1px solid rgba(255,255,255,0.04)',
+                      color: fact >= goal ? 'var(--accent-green)' : 'var(--text-primary)',
+                      borderRight: '1px solid var(--border-subtle)',
                     }}
                   >
                     {fact}
@@ -1034,7 +1038,7 @@ export default function UltimateMonthlyTracker() {
                 className="p-2 text-center text-[10px] font-mono font-semibold"
                 style={{
                   background: 'rgba(0,255,136,0.05)',
-                  color: '#00FF88',
+                  color: 'var(--accent-green)',
                   borderTop: '1px solid rgba(0,255,136,0.15)',
                 }}
               >
@@ -1045,23 +1049,23 @@ export default function UltimateMonthlyTracker() {
         )}
       </div>
 
-      {/* ===== BELOW TABLE: AREA CHART & MENTAL STATE (From Photo 1) ===== */}
+      {/* ===== BELOW TABLE: TREND AREA CHART ===== */}
       <div
         className="rounded-2xl p-5"
         style={{
-          background: 'linear-gradient(135deg, #0B1320 0%, #0F1A2D 100%)',
-          border: '1px solid rgba(0,212,255,0.18)',
+          background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-alt) 100%)',
+          border: '1px solid var(--border-bright)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
         }}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <TrendingUp size={16} style={{ color: '#00D4FF' }} />
-            <h3 className="font-display font-bold text-sm" style={{ color: '#E8F4FF' }}>
-              {tr.analytics.monthlyTrend} — {monthLabel}
+            <TrendingUp size={16} style={{ color: 'var(--electric)' }} />
+            <h3 className="font-display font-bold text-sm" style={{ color: 'var(--text-primary)' }}>
+              {tr.analytics.monthlyTrend} вЂ” {monthLabel}
             </h3>
           </div>
-          <span className="text-[10px] font-mono text-[#00D4FF]">
+          <span className="text-[10px] font-mono" style={{ color: 'var(--electric)' }}>
             25% / 50% / 75% / 100%
           </span>
         </div>
@@ -1077,17 +1081,17 @@ export default function UltimateMonthlyTracker() {
                   <stop offset="95%" stopColor="#00D4FF" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.08)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={getCSSVar('--border-subtle', 'rgba(255,255,255,0.05)')} vertical={false} />
               <XAxis
                 dataKey="day"
-                tick={{ fontSize: 9, fill: '#7BA7CC', fontFamily: 'JetBrains Mono' }}
+                tick={{ fontSize: 9, fill: getCSSVar('--text-secondary', '#7BA7CC'), fontFamily: 'JetBrains Mono' }}
                 axisLine={false}
                 tickLine={false}
                 interval={0}
               />
               <YAxis
                 domain={[0, 100]}
-                tick={{ fontSize: 9, fill: '#7BA7CC', fontFamily: 'JetBrains Mono' }}
+                tick={{ fontSize: 9, fill: getCSSVar('--text-secondary', '#7BA7CC'), fontFamily: 'JetBrains Mono' }}
                 axisLine={false}
                 tickLine={false}
                 ticks={[25, 50, 75, 100]}
@@ -1096,11 +1100,11 @@ export default function UltimateMonthlyTracker() {
               />
               <Tooltip
                 contentStyle={{
-                  background: '#111827',
-                  border: '1px solid rgba(0,212,255,0.3)',
+                  background: getCSSVar('--bg-card', '#111827'),
+                  border: `1px solid ${getCSSVar('--border-bright', 'rgba(0,212,255,0.3)')}`,
                   borderRadius: 8,
                   fontSize: 11,
-                  color: '#E8F4FF',
+                  color: getCSSVar('--text-primary', '#E8F4FF'),
                 }}
                 formatter={(val: any) => [`${val ?? 0}%`, tr.tracker.progress]}
                 labelFormatter={(lbl) => `${tr.tracker.todayDate}: ${lbl}`}
@@ -1113,111 +1117,23 @@ export default function UltimateMonthlyTracker() {
                 fill="url(#photoGreenGradient)"
                 animationDuration={900}
                 dot={{ r: 2, fill: '#00FF88', strokeWidth: 0 }}
-                activeDot={{ r: 5, fill: '#00D4FF' }}
+                activeDot={{ r: 5, fill: getCSSVar('--electric', '#00D4FF') }}
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-
-        {/* ===== MENTAL STATE SECTION (From Photo 1) ===== */}
-        <div className="mt-4 pt-3 border-t border-[rgba(0,212,255,0.1)]">
-          {/* Header */}
-          <div
-            className="px-3 py-1.5 rounded-lg text-center text-xs font-bold uppercase tracking-wider mb-2 flex items-center justify-center gap-2"
-            style={{
-              background: 'linear-gradient(90deg, #0A2416 0%, #0E3520 100%)',
-              color: '#00FF88',
-              border: '1px solid rgba(0,255,136,0.25)',
-            }}
-          >
-            <Smile size={14} />
-            <span>{tr.tracker.mentalState}</span>
-          </div>
-
-          <div className="tracker-scroll overflow-x-auto">
-            <table className="w-full border-collapse" style={{ minWidth: 'max-content' }}>
-              <tbody>
-                {/* Row: Настроение (Mood) */}
-                <tr className="border-b border-[rgba(255,255,255,0.04)]">
-                  <td
-                    className="px-3 py-1 text-xs font-semibold whitespace-nowrap"
-                    style={{
-                      width: '140px',
-                      color: '#00D4FF',
-                      background: 'rgba(0,212,255,0.06)',
-                    }}
-                  >
-                    😊 {tr.tracker.mood}
-                  </td>
-                  {allDays.map((day) => {
-                    const dateStr = toDateString(day);
-                    const val = mentalRatings.mood[dateStr] || 0;
-                    return (
-                      <td
-                        key={`mood-${dateStr}`}
-                        onClick={() => handleRatingClick(dateStr, 'mood')}
-                        className="text-center font-mono text-[10px] cursor-pointer hover:bg-[rgba(0,212,255,0.15)] transition-colors p-1"
-                        style={{
-                          width: '28px',
-                          color: val >= 9 ? '#00FF88' : val >= 7 ? '#00D4FF' : val > 0 ? '#FFD700' : '#3D5A7A',
-                          borderRight: '1px solid rgba(255,255,255,0.04)',
-                        }}
-                        title={`${tr.tracker.mood}: ${val}/10 (клик для изменения)`}
-                      >
-                        {val > 0 ? val : '·'}
-                      </td>
-                    );
-                  })}
-                </tr>
-
-                {/* Row: Мотивация (Motivation) */}
-                <tr>
-                  <td
-                    className="px-3 py-1 text-xs font-semibold whitespace-nowrap"
-                    style={{
-                      width: '140px',
-                      color: '#FFD700',
-                      background: 'rgba(255,215,0,0.06)',
-                    }}
-                  >
-                    ⚡ {tr.tracker.motivation}
-                  </td>
-                  {allDays.map((day) => {
-                    const dateStr = toDateString(day);
-                    const val = mentalRatings.motivation[dateStr] || 0;
-                    return (
-                      <td
-                        key={`mot-${dateStr}`}
-                        onClick={() => handleRatingClick(dateStr, 'motivation')}
-                        className="text-center font-mono text-[10px] cursor-pointer hover:bg-[rgba(255,215,0,0.15)] transition-colors p-1"
-                        style={{
-                          width: '28px',
-                          color: val >= 9 ? '#00FF88' : val >= 7 ? '#FFD700' : val > 0 ? '#7BA7CC' : '#3D5A7A',
-                          borderRight: '1px solid rgba(255,255,255,0.04)',
-                        }}
-                        title={`${tr.tracker.motivation}: ${val}/10 (клик для изменения)`}
-                      >
-                        {val > 0 ? val : '·'}
-                      </td>
-                    );
-                  })}
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
 
         {/* ===== BOTTOM MONTH NAVIGATION TABS (Exact match of Excel tabs at bottom of Photo 1 & 2) ===== */}
         <div
           className="mt-4 pt-3 flex items-center gap-1 overflow-x-auto border-t border-[rgba(0,212,255,0.12)]"
         >
-          {/* "Год" / "Year" Tab */}
+          {/* "Р“РѕРґ" / "Year" Tab */}
           <div
             className="px-3 py-1 rounded-t-lg text-xs font-bold flex items-center gap-1 cursor-default"
             style={{
-              background: '#080C14',
-              color: '#7BA7CC',
-              border: '1px solid rgba(0,212,255,0.15)',
+              background: 'var(--bg-primary)',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border)',
               borderBottom: 'none',
             }}
           >
@@ -1236,14 +1152,14 @@ export default function UltimateMonthlyTracker() {
                 className="px-3 py-1 rounded-t-lg text-xs font-semibold transition-all cursor-pointer"
                 style={{
                   background: isCurrent
-                    ? 'linear-gradient(180deg, #00D4FF22 0%, #080C14 100%)'
-                    : '#111827',
-                  color: isCurrent ? '#00D4FF' : '#7BA7CC',
+                    ? 'linear-gradient(180deg, var(--border) 0%, var(--bg-primary) 100%)'
+                    : 'var(--bg-card)',
+                  color: isCurrent ? 'var(--electric)' : 'var(--text-secondary)',
                   border: isCurrent
-                    ? '1px solid #00D4FF'
-                    : '1px solid rgba(255,255,255,0.06)',
-                  borderBottom: isCurrent ? '2px solid #00D4FF' : 'none',
-                  boxShadow: isCurrent ? '0 -2px 8px rgba(0,212,255,0.3)' : 'none',
+                    ? '1px solid var(--electric)'
+                    : '1px solid var(--border-subtle)',
+                  borderBottom: isCurrent ? '2px solid var(--electric)' : 'none',
+                  boxShadow: isCurrent ? '0 -2px 8px var(--electric-muted)' : 'none',
                 }}
               >
                 {mShort}

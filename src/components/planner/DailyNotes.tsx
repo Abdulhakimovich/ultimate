@@ -41,9 +41,9 @@ export default function DailyNotes({ title, dateStr, field, values }: DailyNotes
       <div
         className="text-[10px] font-semibold text-center mb-1 rounded py-0.5 tracking-wide"
         style={{
-          background: 'rgba(0,212,255,0.06)',
-          color: '#7BA7CC',
-          border: '1px solid rgba(0,212,255,0.1)',
+          background: 'var(--electric-glow)',
+          color: 'var(--text-secondary)',
+          border: '1px solid var(--border)',
         }}
       >
         {title}
@@ -51,7 +51,7 @@ export default function DailyNotes({ title, dateStr, field, values }: DailyNotes
       <div className="space-y-0.5">
         {localValues.slice(0, 4).map((val, i) => (
           <div key={i} className="flex items-center gap-1 px-1">
-            <span className="text-[9px] font-mono w-3 shrink-0" style={{ color: '#3D5A7A' }}>
+            <span className="text-[9px] font-mono w-3 shrink-0" style={{ color: 'var(--text-muted)' }}>
               {i + 1}.
             </span>
             <input

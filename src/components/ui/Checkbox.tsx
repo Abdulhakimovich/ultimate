@@ -32,9 +32,9 @@ export default function Checkbox({
       style={{
         width: dimensions,
         height: dimensions,
-        border: `1.5px solid ${checked ? '#00D4FF' : '#3D5A7A'}`,
-        background: checked ? '#00D4FF' : 'transparent',
-        boxShadow: checked ? '0 0 8px rgba(0,212,255,0.5)' : 'none',
+        border: `1.5px solid ${checked ? 'var(--electric)' : 'var(--text-muted)'}`,
+        background: checked ? 'var(--electric)' : 'transparent',
+        boxShadow: checked ? '0 0 8px var(--electric-glow)' : 'none',
       }}
     >
       {checked && (
@@ -50,7 +50,7 @@ export default function Checkbox({
         >
           <path
             d="M1.5 4.5L4.5 7.5L10.5 1.5"
-            stroke="#080C14"
+            stroke="var(--bg-primary)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"

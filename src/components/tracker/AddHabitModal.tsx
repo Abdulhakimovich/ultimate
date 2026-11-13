@@ -84,7 +84,7 @@ export default function AddHabitModal({
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Name */}
         <div>
-          <label className="block text-xs font-semibold mb-1" style={{ color: '#7BA7CC' }}>
+          <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>
             {tr.habits.name}
           </label>
           <input
@@ -93,20 +93,20 @@ export default function AddHabitModal({
             placeholder={tr.habits.namePlaceholder}
             className="w-full px-3 py-2 rounded-xl text-sm outline-none transition-colors"
             style={{
-              background: '#0B1320',
-              border: '1px solid rgba(0,212,255,0.25)',
-              color: '#E8F4FF',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-bright)',
+              color: 'var(--text-primary)',
             }}
             aria-label={tr.habits.name}
           />
           {errors.name && (
-            <p className="text-xs text-[#FF3366] mt-1">{errors.name.message}</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--accent-red)' }}>{errors.name.message}</p>
           )}
         </div>
 
         {/* Target */}
         <div>
-          <label className="block text-xs font-semibold mb-1" style={{ color: '#7BA7CC' }}>
+          <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>
             {tr.habits.target}
           </label>
           <div className="flex items-center gap-2">
@@ -117,27 +117,27 @@ export default function AddHabitModal({
               max={31}
               className="w-24 px-3 py-1.5 rounded-xl text-sm font-mono outline-none transition-colors"
               style={{
-                background: '#0B1320',
-                border: '1px solid rgba(0,212,255,0.25)',
-                color: '#00D4FF',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-bright)',
+                color: 'var(--electric)',
               }}
               aria-label={tr.habits.target}
             />
-            <span className="text-xs" style={{ color: '#7BA7CC' }}>
+            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
               {tr.habits.targetLabel}
             </span>
           </div>
           {errors.target && (
-            <p className="text-xs text-[#FF3366] mt-1">{errors.target.message}</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--accent-red)' }}>{errors.target.message}</p>
           )}
         </div>
 
         {/* Icon Picker */}
         <div>
-          <label className="block text-xs font-semibold mb-1" style={{ color: '#7BA7CC' }}>
+          <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>
             {tr.habits.icon}
           </label>
-          <div className="grid grid-cols-8 gap-1.5 p-2 rounded-xl" style={{ background: '#0B1320', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="grid grid-cols-8 gap-1.5 p-2 rounded-xl" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}>
             {HABIT_ICONS.map((icon) => (
               <button
                 key={icon.key}
@@ -148,8 +148,8 @@ export default function AddHabitModal({
                   transition-all border
                   ${
                     selectedIcon === icon.emoji
-                      ? 'border-[#00D4FF] bg-[rgba(0,212,255,0.2)] scale-110 shadow-[0_0_8px_rgba(0,212,255,0.4)]'
-                      : 'border-transparent hover:bg-[rgba(255,255,255,0.06)]'
+                      ? 'border-[var(--electric)] bg-[var(--border-bright)] scale-110 shadow-[0_0_8px_var(--electric-muted)]'
+                      : 'border-transparent hover:bg-[var(--border-subtle)]'
                   }
                 `}
                 title={icon.label}
@@ -163,10 +163,10 @@ export default function AddHabitModal({
 
         {/* Color Picker */}
         <div>
-          <label className="block text-xs font-semibold mb-1" style={{ color: '#7BA7CC' }}>
+          <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>
             {tr.habits.color}
           </label>
-          <div className="flex gap-2 flex-wrap p-2 rounded-xl" style={{ background: '#0B1320', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="flex gap-2 flex-wrap p-2 rounded-xl" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}>
             {HABIT_COLORS.map((color) => (
               <button
                 key={color}
@@ -176,7 +176,7 @@ export default function AddHabitModal({
                   w-6 h-6 rounded-full transition-all
                   ${
                     selectedColor === color
-                      ? 'ring-2 ring-[#00D4FF] ring-offset-2 ring-offset-[#111827] scale-110 shadow-[0_0_8px_rgba(0,212,255,0.6)]'
+                      ? 'ring-2 ring-[var(--electric)] ring-offset-2 ring-offset-[var(--bg-card)] scale-110 shadow-[0_0_8px_var(--electric-muted)]'
                       : 'hover:scale-105'
                   }
                 `}
@@ -188,7 +188,7 @@ export default function AddHabitModal({
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-2 pt-3 border-t border-[rgba(0,212,255,0.12)]">
+        <div className="flex justify-end gap-2 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
           <button
             type="button"
             onClick={() => {
@@ -196,7 +196,7 @@ export default function AddHabitModal({
               onClose();
             }}
             className="px-4 py-2 rounded-xl text-xs font-semibold transition-colors"
-            style={{ color: '#7BA7CC', background: 'rgba(255,255,255,0.05)' }}
+            style={{ color: 'var(--text-secondary)', background: 'var(--border-subtle)' }}
           >
             {tr.ui.cancel}
           </button>
@@ -204,9 +204,9 @@ export default function AddHabitModal({
             type="submit"
             className="px-5 py-2 rounded-xl text-xs font-bold transition-all"
             style={{
-              background: 'linear-gradient(135deg, #00D4FF 0%, #1E90FF 100%)',
-              color: '#080C14',
-              boxShadow: '0 0 16px rgba(0,212,255,0.5)',
+              background: 'linear-gradient(135deg, var(--electric) 0%, var(--blue-mid) 100%)',
+              color: 'var(--bg-primary)',
+              boxShadow: '0 0 16px var(--electric-muted)',
             }}
           >
             {tr.ui.save}

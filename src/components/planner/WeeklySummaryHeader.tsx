@@ -96,8 +96,8 @@ export default function WeeklySummaryHeader() {
     <div
       className="rounded-2xl p-5 mb-4"
       style={{
-        background: 'linear-gradient(135deg, #0B1320 0%, #111D30 100%)',
-        border: '1px solid rgba(0,212,255,0.18)',
+        background: 'linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%)',
+        border: '1px solid var(--border-bright)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
       }}
     >
@@ -110,7 +110,7 @@ export default function WeeklySummaryHeader() {
             <h1
               className="font-display text-2xl font-black tracking-tight"
               style={{
-                background: 'linear-gradient(90deg, #FFFFFF 0%, #00D4FF 100%)',
+                background: 'linear-gradient(90deg, var(--text-bright) 0%, var(--electric) 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
@@ -118,14 +118,14 @@ export default function WeeklySummaryHeader() {
               {tr.planner.title}
             </h1>
           </div>
-          <label className="text-xs mt-2 flex items-center gap-2 cursor-pointer w-fit" style={{ color: '#7BA7CC' }}>
+          <label className="text-xs mt-2 flex items-center gap-2 cursor-pointer w-fit" style={{ color: 'var(--text-secondary)' }}>
             <span>{tr.planner.weekStart}:</span>
             <span
               className="font-mono font-bold px-2.5 py-1 rounded-lg transition-all"
               style={{
-                background: 'rgba(0,212,255,0.1)',
-                color: '#00D4FF',
-                border: '1px solid rgba(0,212,255,0.3)',
+                background: 'var(--electric-glow)',
+                color: 'var(--electric)',
+                border: '1px solid var(--border-bright)',
               }}
             >
               {weekDays[0] && formatShortDotDate(weekDays[0])}
@@ -146,7 +146,7 @@ export default function WeeklySummaryHeader() {
 
         {/* Center: Overall Progress */}
         <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider mb-2 text-center" style={{ color: '#00D4FF' }}>
+          <h3 className="text-xs font-bold uppercase tracking-wider mb-2 text-center" style={{ color: 'var(--electric)' }}>
             {tr.planner.overallProgress}
           </h3>
           <div className="flex items-center gap-4">
@@ -168,11 +168,11 @@ export default function WeeklySummaryHeader() {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#111827',
-                      border: '1px solid rgba(0,212,255,0.3)',
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-bright)',
                       borderRadius: 8,
                       fontSize: 11,
-                      color: '#E8F4FF',
+                      color: 'var(--text-primary)',
                     }}
                     formatter={(value: any) => [value, tr.planner.completed]}
                   />
@@ -192,7 +192,7 @@ export default function WeeklySummaryHeader() {
                 size={76}
                 strokeWidth={7}
               />
-              <span className="text-[10px] font-mono font-semibold mt-1 text-center" style={{ color: '#00FF88' }}>
+              <span className="text-[10px] font-mono font-semibold mt-1 text-center" style={{ color: 'var(--accent-green)' }}>
                 {weeklyStats.totalCompleted} / {weeklyStats.totalTasks} {tr.planner.completed}
               </span>
             </div>
@@ -201,35 +201,35 @@ export default function WeeklySummaryHeader() {
 
         {/* Right: Habit Tracker for Week */}
         <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider mb-2 text-center" style={{ color: '#00FF88' }}>
+          <h3 className="text-xs font-bold uppercase tracking-wider mb-2 text-center" style={{ color: 'var(--accent-green)' }}>
             {tr.planner.habitTracker}
           </h3>
           {habits.length === 0 ? (
-            <p className="text-xs text-center py-4" style={{ color: '#7BA7CC' }}>
+            <p className="text-xs text-center py-4" style={{ color: 'var(--text-secondary)' }}>
               {tr.tracker.noHabits}
             </p>
           ) : (
             <div className="overflow-x-auto max-h-[120px] overflow-y-auto">
               <table className="w-full text-[10px]">
                 <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(0,212,255,0.1)' }}>
-                    <th className="text-left py-1 pr-1 font-semibold" style={{ color: '#7BA7CC' }}>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    <th className="text-left py-1 pr-1 font-semibold" style={{ color: 'var(--text-secondary)' }}>
                       {tr.tracker.habit}
                     </th>
                     {tr.tracker.weekdays.map((d) => (
-                      <th key={d} className="text-center py-1 px-0.5 font-semibold w-5" style={{ color: '#7BA7CC' }}>
+                      <th key={d} className="text-center py-1 px-0.5 font-semibold w-5" style={{ color: 'var(--text-secondary)' }}>
                         {d}
                       </th>
                     ))}
-                    <th className="text-center py-1 pl-1 font-semibold w-14" style={{ color: '#7BA7CC' }}>
+                    <th className="text-center py-1 pl-1 font-semibold w-14" style={{ color: 'var(--text-secondary)' }}>
                       {tr.tracker.progress}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {habitWeekData.map(({ habit, weekCompletions, progress }) => (
-                    <tr key={habit.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                      <td className="py-1 pr-1 truncate max-w-[80px]" style={{ color: '#E8F4FF' }}>
+                    <tr key={habit.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                      <td className="py-1 pr-1 truncate max-w-[80px]" style={{ color: 'var(--text-primary)' }}>
                         <span className="mr-1">{habit.icon}</span>
                         {habit.name}
                       </td>

@@ -119,7 +119,8 @@ export default function Modal({
           {/* Backdrop */}
           <motion.div
             key="modal-backdrop"
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 backdrop-blur-sm"
+            style={{ background: 'rgba(0,0,0,0.7)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -135,7 +136,12 @@ export default function Modal({
             role="dialog"
             aria-modal="true"
             aria-label={title ?? 'Диалоговое окно'}
-            className={`relative z-10 w-full ${sizeClasses[size]} mx-4 rounded-2xl bg-[#111827] p-6 border border-[rgba(0,212,255,0.25)] shadow-[0_16px_48px_rgba(0,0,0,0.8),0_0_24px_rgba(0,212,255,0.12)]`}
+            className={`relative z-10 w-full ${sizeClasses[size]} mx-4 rounded-2xl p-6`}
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-bright)',
+              boxShadow: '0 16px 48px rgba(0,0,0,0.8), 0 0 24px var(--border)',
+            }}
             initial={{ opacity: 0, scale: 0.92, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 12 }}

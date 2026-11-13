@@ -7,7 +7,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#080C14' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg-primary)' }}>
       <TopNav />
       <main className="flex-1 max-w-[1600px] w-full mx-auto px-3 py-4">
         {children}

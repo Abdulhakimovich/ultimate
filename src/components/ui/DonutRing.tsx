@@ -43,7 +43,10 @@ export default function DonutRing(props: DonutRingProps) {
   const radius      = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const center      = size / 2;
-  const bgColor     = backgroundColor ?? '#1E2A3E';
+  // backgroundColor prop still accepted for custom overrides; default to CSS var via style
+  const bgColorStyle = backgroundColor
+    ? { stroke: backgroundColor }
+    : { stroke: 'var(--bg-elevated)' };
 
   if (props.segments) {
     const totalValue  = props.segments.reduce((s, seg) => s + seg.value, 0);
@@ -67,7 +70,7 @@ export default function DonutRing(props: DonutRingProps) {
         aria-label={`Progress: ${Math.round(clamped)}%`}
       >
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
-          <circle cx={center} cy={center} r={radius} fill="none" stroke={bgColor} strokeWidth={strokeWidth} />
+          <circle cx={center} cy={center} r={radius} fill="none" strokeWidth={strokeWidth} style={bgColorStyle} />
           {segmentData.map((seg, i) => (
             <motion.circle
               key={`${i}-${seg.color}`}
@@ -86,7 +89,7 @@ export default function DonutRing(props: DonutRingProps) {
         </svg>
         <span
           className="absolute inset-0 flex items-center justify-center font-mono font-bold tabular-nums"
-          style={{ fontSize: size < 60 ? '10px' : '12px', color: '#00D4FF' }}
+          style={{ fontSize: size < 60 ? '10px' : '12px', color: 'var(--electric)' }}
         >
           {Math.round(clamped)}%
         </span>
@@ -95,7 +98,7 @@ export default function DonutRing(props: DonutRingProps) {
   }
 
   const percentage  = Math.max(0, Math.min(100, props.percentage ?? 0));
-  const fillColor   = props.color ?? '#00D4FF';
+  const fillColor   = props.color ?? 'var(--electric)';
   const dashOffset  = circumference - (percentage / 100) * circumference;
 
   return (
@@ -106,7 +109,7 @@ export default function DonutRing(props: DonutRingProps) {
       aria-label={`Progress: ${Math.round(percentage)}%`}
     >
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
-        <circle cx={center} cy={center} r={radius} fill="none" stroke={bgColor} strokeWidth={strokeWidth} />
+        <circle cx={center} cy={center} r={radius} fill="none" strokeWidth={strokeWidth} style={bgColorStyle} />
         <motion.circle
           cx={center} cy={center} r={radius}
           fill="none"

@@ -68,9 +68,9 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
     <div
       className="flex flex-col rounded-xl overflow-hidden transition-all"
       style={{
-        background: '#111827',
-        border: today ? '1px solid #00D4FF' : '1px solid rgba(0,212,255,0.12)',
-        boxShadow: today ? '0 0 16px rgba(0,212,255,0.25)' : '0 4px 16px rgba(0,0,0,0.3)',
+        background: 'var(--bg-card)',
+        border: today ? '1px solid var(--electric)' : '1px solid var(--border)',
+        boxShadow: today ? '0 0 16px var(--electric-glow)' : '0 4px 16px rgba(0,0,0,0.3)',
       }}
     >
       {/* Column Header */}
@@ -78,20 +78,20 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
         className="px-2 py-2 text-center"
         style={{
           background: today
-            ? 'linear-gradient(90deg, #00D4FF25 0%, #0098C825 100%)'
+            ? 'linear-gradient(90deg, rgba(0,212,255,0.145) 0%, rgba(0,152,200,0.145) 100%)'
             : isWeekend
               ? 'linear-gradient(90deg, #181133 0%, #24144F 100%)'
-              : 'linear-gradient(90deg, #0B192E 0%, #0F2544 100%)',
-          borderBottom: '1px solid rgba(0,212,255,0.15)',
+              : 'linear-gradient(90deg, var(--bg-header) 0%, var(--bg-elevated) 100%)',
+          borderBottom: '1px solid var(--electric-glow)',
         }}
       >
         <div
           className="font-bold text-sm tracking-wide"
-          style={{ color: today ? '#00D4FF' : isWeekend ? '#00FF88' : '#E8F4FF' }}
+          style={{ color: today ? 'var(--electric)' : isWeekend ? 'var(--accent-green)' : 'var(--text-primary)' }}
         >
           {tr.tracker.weekdays[dayIndex]}
         </div>
-        <div className="text-[10px] font-mono mt-0.5" style={{ color: '#7BA7CC' }}>
+        <div className="text-[10px] font-mono mt-0.5" style={{ color: 'var(--text-secondary)' }}>
           {formatDotDate(date)}
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
           strokeWidth={6}
           color={RING_COLOR_VALUES[dayIndex]}
         />
-        <span className="text-[9px] font-semibold mt-1" style={{ color: '#7BA7CC' }}>
+        <span className="text-[9px] font-semibold mt-1" style={{ color: 'var(--text-secondary)' }}>
           {tr.tracker.progress}
         </span>
       </div>
@@ -114,9 +114,9 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
         <div
           className="text-[10px] font-bold text-center py-1 rounded-md mb-1.5 uppercase tracking-wider"
           style={{
-            background: 'rgba(0,212,255,0.08)',
-            color: '#00D4FF',
-            border: '1px solid rgba(0,212,255,0.15)',
+            background: 'var(--electric-glow)',
+            color: 'var(--electric)',
+            border: '1px solid var(--electric-glow)',
           }}
         >
           {tr.planner.tasks}
@@ -155,9 +155,9 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
             >
               <div
                 className="w-[14px] h-[14px] rounded-[3px] border"
-                style={{ borderColor: 'rgba(61,90,122,0.4)' }}
+                style={{ borderColor: 'var(--text-muted)' }}
               />
-              <span className="text-[10px]" style={{ color: 'rgba(61,90,122,0.4)' }}>
+              <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
                 —
               </span>
             </div>
@@ -166,7 +166,7 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
           {/* New task input */}
           {showNewTask && (
             <div className="flex items-center gap-2 px-2 py-1">
-              <Plus size={12} style={{ color: '#00D4FF' }} className="shrink-0" />
+              <Plus size={12} style={{ color: 'var(--electric)' }} className="shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
@@ -176,7 +176,7 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
                 onKeyDown={handleNewTaskKeyDown}
                 placeholder={`${tr.planner.addTask}...`}
                 className="flex-1 text-xs bg-transparent border-b text-text-primary outline-none py-0.5 placeholder:text-text-muted/50"
-                style={{ borderColor: '#00D4FF' }}
+                style={{ borderColor: 'var(--electric)' }}
                 aria-label={tr.planner.addTask}
               />
             </div>
@@ -186,15 +186,15 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
         {/* Task Footer Stats */}
         <div
           className="flex justify-between text-[9px] mt-2 px-1 py-1 border-t"
-          style={{ borderColor: 'rgba(0,212,255,0.1)', color: '#7BA7CC' }}
+          style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
         >
           <span>
             {tr.planner.completed}{' '}
-            <strong style={{ color: '#00FF88' }}>{stats.completed}</strong>
+            <strong style={{ color: 'var(--accent-green)' }}>{stats.completed}</strong>
           </span>
           <span>
             {tr.planner.remaining}{' '}
-            <strong style={{ color: '#FF3366' }}>{stats.remaining}</strong>
+            <strong style={{ color: 'var(--accent-red)' }}>{stats.remaining}</strong>
           </span>
         </div>
       </div>

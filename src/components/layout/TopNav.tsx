@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Calendar, BarChart3, LayoutDashboard, Printer, RotateCcw, ChevronDown, Zap, Globe } from 'lucide-react';
+import { Calendar, BarChart3, LayoutDashboard, Printer, RotateCcw, ChevronDown, Zap, Globe, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguageStore } from '@/store/languageStore';
+import { useThemeStore } from '@/store/themeStore';
 import { t, type Language } from '@/lib/i18n';
 
 const LANGUAGE_OPTIONS: { code: Language; label: string; flag: string }[] = [
@@ -18,20 +19,22 @@ export default function TopNav() {
   const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [langOpen, setLangOpen]         = useState(false);
+  const [mounted, setMounted]           = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const langRef     = useRef<HTMLDivElement>(null);
 
   const language    = useLanguageStore((s) => s.language);
   const setLanguage = useLanguageStore((s) => s.setLanguage);
-  const tr          = t(language);
+  const theme       = useThemeStore((s) => s.theme);
+  const toggleTheme = useThemeStore((s) => s.toggleTheme);
 
-  const navItems = [
-    { href: '/tracker', label: tr.nav.tracker,   icon: Calendar },
-    { href: '/planner', label: tr.nav.planner,  icon: LayoutDashboard },
-    { href: '/analytics', label: tr.nav.analytics, icon: BarChart3 },
-  ];
+  // Use default ('ru') on first render to match SSR, switch to real values after mount
+  const displayLanguage = mounted ? language : 'ru';
+  const displayTheme    = mounted ? theme : 'dark';
+  const tr              = t(displayLanguage);
 
   useEffect(() => {
+    setMounted(true);
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setDropdownOpen(false);
       if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
@@ -40,16 +43,22 @@ export default function TopNav() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentLang = LANGUAGE_OPTIONS.find((l) => l.code === language)!;
+  const currentLang = LANGUAGE_OPTIONS.find((l) => l.code === displayLanguage)!;
+
+  const navItems = [
+    { href: '/tracker',   label: tr.nav.tracker,   icon: Calendar },
+    { href: '/planner',   label: tr.nav.planner,   icon: LayoutDashboard },
+    { href: '/analytics', label: tr.nav.analytics, icon: BarChart3 },
+  ];
 
   return (
     <header
       className="sticky top-0 z-50 h-[52px] no-print"
       style={{
-        background: 'rgba(8,12,20,0.95)',
+        background: 'var(--bg-glass)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(0,212,255,0.12)',
+        borderBottom: '1px solid var(--border)',
         boxShadow: '0 1px 24px rgba(0,0,0,0.5)',
       }}
     >
@@ -63,14 +72,14 @@ export default function TopNav() {
         >
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center transition-all group-hover:scale-110"
-            style={{ background: 'linear-gradient(135deg, #00D4FF, #1E90FF)', boxShadow: '0 0 12px rgba(0,212,255,0.4)' }}
+            style={{ background: 'linear-gradient(135deg, var(--electric), var(--blue-mid))', boxShadow: '0 0 12px var(--electric-muted)' }}
           >
-            <Zap size={14} style={{ color: '#080C14' }} />
+            <Zap size={14} style={{ color: 'var(--bg-primary)' }} />
           </div>
           <span
             className="font-display font-black text-base tracking-tight hidden sm:block"
             style={{
-              background: 'linear-gradient(90deg, #00D4FF, #1E90FF)',
+              background: 'linear-gradient(90deg, var(--electric), var(--blue-mid))',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -93,23 +102,24 @@ export default function TopNav() {
                 aria-current={isActive ? 'page' : undefined}
                 className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
                 style={{
-                  color: isActive ? '#00D4FF' : '#7BA7CC',
-                  background: isActive ? 'rgba(0,212,255,0.08)' : 'transparent',
+                  color: isActive ? 'var(--electric)' : 'var(--text-secondary)',
+                  background: isActive ? 'var(--electric-glow)' : 'transparent',
                 }}
+                suppressHydrationWarning
                 onMouseEnter={(e) => {
-                  if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = '#E8F4FF';
+                  if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-primary)';
                 }}
                 onMouseLeave={(e) => {
-                  if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = '#7BA7CC';
+                  if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)';
                 }}
               >
                 <Icon size={15} />
-                <span className="hidden md:inline">{item.label}</span>
+                <span className="hidden md:inline" suppressHydrationWarning>{item.label}</span>
                 {isActive && (
                   <motion.div
                     layoutId="nav-indicator"
                     className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full"
-                    style={{ background: 'linear-gradient(90deg, #00D4FF, #1E90FF)', boxShadow: '0 0 6px rgba(0,212,255,0.6)' }}
+                    style={{ background: 'linear-gradient(90deg, var(--electric), var(--blue-mid))', boxShadow: '0 0 6px var(--electric-muted)' }}
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -118,7 +128,7 @@ export default function TopNav() {
           })}
         </div>
 
-        {/* Right: Language + User */}
+        {/* Right: Language + Theme Toggle + User */}
         <div className="flex items-center gap-2">
 
           {/* Language Switcher */}
@@ -126,7 +136,7 @@ export default function TopNav() {
             <button
               onClick={() => setLangOpen((p) => !p)}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={{ color: '#7BA7CC', border: '1px solid rgba(0,212,255,0.12)' }}
+              style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
               aria-label={tr.ui.language}
             >
               <Globe size={13} />
@@ -143,7 +153,7 @@ export default function TopNav() {
                   exit={{ opacity: 0, y: 6, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
                   className="absolute right-0 mt-2 w-40 rounded-xl p-1 z-50"
-                  style={{ background: '#111827', border: '1px solid rgba(0,212,255,0.2)', boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 16px rgba(0,212,255,0.08)' }}
+                  style={{ background: 'var(--bg-card)', border: '1px solid var(--border-bright)', boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 16px var(--electric-glow)' }}
                 >
                   {LANGUAGE_OPTIONS.map((opt) => (
                     <button
@@ -151,8 +161,8 @@ export default function TopNav() {
                       onClick={() => { setLanguage(opt.code); setLangOpen(false); }}
                       className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all"
                       style={{
-                        color: language === opt.code ? '#00D4FF' : '#7BA7CC',
-                        background: language === opt.code ? 'rgba(0,212,255,0.08)' : 'transparent',
+                        color: language === opt.code ? 'var(--electric)' : 'var(--text-secondary)',
+                        background: language === opt.code ? 'var(--electric-glow)' : 'transparent',
                         fontWeight: language === opt.code ? 700 : 400,
                       }}
                     >
@@ -166,17 +176,43 @@ export default function TopNav() {
             </AnimatePresence>
           </div>
 
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center w-8 h-8 rounded-lg transition-all"
+            style={{
+              color: 'var(--electric)',
+              border: '1px solid var(--border)',
+              background: 'var(--electric-glow)',
+            }}
+            aria-label={displayTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={displayTheme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+            suppressHydrationWarning
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={displayTheme}
+                initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                transition={{ duration: 0.2 }}
+              >
+                {displayTheme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+              </motion.div>
+            </AnimatePresence>
+          </button>
+
           {/* User / Settings dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen((p) => !p)}
               className="flex items-center gap-1 p-1.5 rounded-lg transition-all"
-              style={{ border: '1px solid rgba(0,212,255,0.12)', color: '#7BA7CC' }}
+              style={{ border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
               aria-label="Меню"
             >
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[10px]"
-                style={{ background: 'linear-gradient(135deg, #00D4FF22, #1E90FF22)', color: '#00D4FF', border: '1px solid rgba(0,212,255,0.3)' }}
+                style={{ background: 'linear-gradient(135deg, var(--electric-glow), var(--electric-glow))', color: 'var(--electric)', border: '1px solid var(--border-bright)' }}
               >
                 U
               </div>
@@ -191,20 +227,20 @@ export default function TopNav() {
                   exit={{ opacity: 0, y: 6, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
                   className="absolute right-0 mt-2 w-52 rounded-xl p-1.5 z-50 text-xs"
-                  style={{ background: '#111827', border: '1px solid rgba(0,212,255,0.2)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}
+                  style={{ background: 'var(--bg-card)', border: '1px solid var(--border-bright)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}
                 >
                   <button
                     onClick={() => { setDropdownOpen(false); window.print(); }}
                     className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-left"
-                    style={{ color: '#7BA7CC' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0,212,255,0.08)')}
+                    style={{ color: 'var(--text-secondary)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--electric-glow)')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <Printer size={13} style={{ color: '#7BA7CC' }} />
+                    <Printer size={13} style={{ color: 'var(--text-secondary)' }} />
                     <span>{tr.ui.print}</span>
                   </button>
 
-                  <div style={{ borderTop: '1px solid rgba(0,212,255,0.08)', margin: '4px 0' }} />
+                  <div style={{ borderTop: '1px solid var(--electric-glow)', margin: '4px 0' }} />
 
                   <button
                     onClick={() => {
@@ -215,7 +251,7 @@ export default function TopNav() {
                       }
                     }}
                     className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-left"
-                    style={{ color: '#FF3366' }}
+                    style={{ color: 'var(--accent-red)' }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,51,102,0.08)')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >

@@ -61,37 +61,113 @@
   --font-mono:    'JetBrains Mono', ui-monospace, monospace;
 }
 
+/* ===================== THEME VARIABLES ===================== */
+/* Default = dark (electric blue) */
+:root,
+[data-theme="dark"] {
+  --bg-primary:       #080C14;
+  --bg-secondary:     #0D1420;
+  --bg-card:          #111827;
+  --bg-card-alt:      #1A2235;
+  --bg-elevated:      #1E2A3E;
+  --bg-header:        #0F1929;
+  --bg-glass:         rgba(14, 24, 40, 0.92);
+
+  --electric:         #00D4FF;
+  --electric-dim:     #0098C8;
+  --electric-glow:    rgba(0, 212, 255, 0.15);
+  --electric-muted:   rgba(0, 212, 255, 0.4);
+  --blue-mid:         #1E90FF;
+  --blue-deep:        #0066CC;
+  --blue-neon:        #00BFFF;
+
+  --accent-green:     #00FF88;
+  --accent-green-dim: #00C66A;
+  --accent-purple:    #7B2FFF;
+  --accent-orange:    #FF6B00;
+  --accent-red:       #FF3366;
+  --accent-gold:      #FFD700;
+
+  --text-primary:     #E8F4FF;
+  --text-secondary:   #7BA7CC;
+  --text-muted:       #3D5A7A;
+  --text-bright:      #FFFFFF;
+
+  --border:           rgba(0, 212, 255, 0.12);
+  --border-bright:    rgba(0, 212, 255, 0.35);
+  --border-subtle:    rgba(255, 255, 255, 0.05);
+
+  --color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg-primary:       #EEF4FC;
+  --bg-secondary:     #E4EEF9;
+  --bg-card:          #FFFFFF;
+  --bg-card-alt:      #F0F6FF;
+  --bg-elevated:      #E8F0FB;
+  --bg-header:        #DDEAF8;
+  --bg-glass:         rgba(240, 246, 255, 0.95);
+
+  --electric:         #0055CC;
+  --electric-dim:     #0044AA;
+  --electric-glow:    rgba(0, 85, 204, 0.15);
+  --electric-muted:   rgba(0, 85, 204, 0.35);
+  --blue-mid:         #0077EE;
+  --blue-deep:        #003A99;
+  --blue-neon:        #0099FF;
+
+  --accent-green:     #00AA55;
+  --accent-green-dim: #008844;
+  --accent-purple:    #6611CC;
+  --accent-orange:    #E05000;
+  --accent-red:       #CC1144;
+  --accent-gold:      #BB8800;
+
+  --text-primary:     #0A1628;
+  --text-secondary:   #1E4A8A;
+  --text-muted:       #5577AA;
+  --text-bright:      #000D1A;
+
+  --border:           rgba(0, 85, 204, 0.15);
+  --border-bright:    rgba(0, 85, 204, 0.4);
+  --border-subtle:    rgba(0, 85, 204, 0.08);
+
+  --color-scheme: light;
+}
+
 /* ===================== BASE ===================== */
 html {
   font-size: 14px;
-  color-scheme: dark;
+  color-scheme: var(--color-scheme, dark);
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-bg-primary);
-  color: var(--color-text-primary);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ===================== SCROLLBAR ===================== */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--color-bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--color-electric-dim); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-electric); }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--electric-dim); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--electric); }
 
 /* ===================== FOCUS ===================== */
 *:focus-visible {
-  outline: 2px solid var(--color-electric);
+  outline: 2px solid var(--electric);
   outline-offset: 2px;
 }
 
 /* ===================== SELECTION ===================== */
 ::selection {
-  background: var(--color-electric-glow);
-  color: var(--color-electric);
+  background: var(--electric-glow);
+  color: var(--electric);
 }
 
 /* ===================== SHIMMER ===================== */
@@ -104,9 +180,9 @@ body {
 .animate-shimmer {
   background: linear-gradient(
     90deg,
-    var(--color-bg-card) 25%,
-    var(--color-bg-card-alt) 37%,
-    var(--color-bg-card) 63%
+    var(--bg-card) 25%,
+    var(--bg-card-alt) 37%,
+    var(--bg-card) 63%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
@@ -114,8 +190,8 @@ body {
 
 /* ===================== GLOW ANIMATIONS ===================== */
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 8px var(--color-electric-glow); }
-  50%       { box-shadow: 0 0 24px var(--color-electric-muted), 0 0 48px var(--color-electric-glow); }
+  0%, 100% { box-shadow: 0 0 8px var(--electric-glow); }
+  50%       { box-shadow: 0 0 24px var(--electric-muted), 0 0 48px var(--electric-glow); }
 }
 
 @keyframes float-up {
@@ -150,22 +226,22 @@ body {
 
 /* ===================== GLASS CARD ===================== */
 .glass-card {
-  background: var(--color-bg-glass);
+  background: var(--bg-glass);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--border);
 }
 
 /* ===================== ELECTRIC BUTTON ===================== */
 .btn-electric {
-  background: linear-gradient(135deg, var(--color-electric), var(--color-blue-mid));
-  color: var(--color-bg-primary);
+  background: linear-gradient(135deg, var(--electric), var(--blue-mid));
+  color: var(--bg-primary);
   font-weight: 700;
   transition: all 0.2s ease;
-  box-shadow: 0 0 16px var(--color-electric-glow);
+  box-shadow: 0 0 16px var(--electric-glow);
 }
 .btn-electric:hover {
-  box-shadow: 0 0 32px var(--color-electric-muted);
+  box-shadow: 0 0 32px var(--electric-muted);
   transform: translateY(-1px);
 }
 
@@ -173,7 +249,7 @@ body {
 .tracker-checkbox {
   width: 16px;
   height: 16px;
-  border: 1.5px solid var(--color-text-muted);
+  border: 1.5px solid var(--text-muted);
   border-radius: 3px;
   display: flex;
   align-items: center;
@@ -183,17 +259,17 @@ body {
   background: transparent;
 }
 .tracker-checkbox:hover {
-  border-color: var(--color-electric);
-  background: var(--color-electric-glow);
+  border-color: var(--electric);
+  background: var(--electric-glow);
 }
 .tracker-checkbox.checked {
-  background: var(--color-electric);
-  border-color: var(--color-electric);
-  box-shadow: 0 0 8px var(--color-electric-glow);
+  background: var(--electric);
+  border-color: var(--electric);
+  box-shadow: 0 0 8px var(--electric-glow);
 }
 .tracker-checkbox.checked::after {
   content: '✓';
-  color: var(--color-bg-primary);
+  color: var(--bg-primary);
   font-size: 11px;
   font-weight: 800;
   line-height: 1;
@@ -201,26 +277,26 @@ body {
 
 /* ===================== PROGRESS BAR ===================== */
 .progress-bar-track {
-  background: var(--color-bg-elevated);
+  background: var(--bg-elevated);
   border-radius: 999px;
   overflow: hidden;
 }
 .progress-bar-fill {
-  background: linear-gradient(90deg, var(--color-electric-dim), var(--color-electric), var(--color-blue-neon));
+  background: linear-gradient(90deg, var(--electric-dim), var(--electric), var(--blue-neon));
   border-radius: 999px;
-  box-shadow: 0 0 8px var(--color-electric-glow);
+  box-shadow: 0 0 8px var(--electric-glow);
   transition: width 0.6s ease;
 }
 .progress-bar-fill.green {
-  background: linear-gradient(90deg, var(--color-accent-green-dim), var(--color-accent-green));
+  background: linear-gradient(90deg, var(--accent-green-dim), var(--accent-green));
   box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
 }
 
 /* ===================== WEEK HEADER ===================== */
 .week-header {
-  background: linear-gradient(90deg, #0A1628, var(--color-bg-elevated));
-  border-top: 1px solid var(--color-border);
-  color: var(--color-electric);
+  background: linear-gradient(90deg, var(--bg-header), var(--bg-elevated));
+  border-top: 1px solid var(--border);
+  color: var(--electric);
   font-weight: 700;
   letter-spacing: 0.05em;
   font-size: 11px;
@@ -229,18 +305,18 @@ body {
 
 /* ===================== STAT BADGE ===================== */
 .stat-badge {
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 12px;
   text-align: center;
 }
-.stat-badge .label { font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
-.stat-badge .value { font-size: 18px; font-weight: 800; color: var(--color-electric); font-family: var(--font-mono); }
+.stat-badge .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.stat-badge .value { font-size: 18px; font-weight: 800; color: var(--electric); font-family: var(--font-mono); }
 
 /* ===================== GRID LINES ===================== */
 .tracker-grid-line {
-  border-right: 1px solid var(--color-border-subtle);
+  border-right: 1px solid var(--border-subtle);
 }
 .tracker-grid-line:last-child { border-right: none; }
 
@@ -261,7 +337,7 @@ body {
 .quote-text {
   font-family: var(--font-display);
   font-weight: 600;
-  background: linear-gradient(135deg, var(--color-electric), var(--color-blue-neon), var(--color-accent-purple));
+  background: linear-gradient(135deg, var(--electric), var(--blue-neon), var(--accent-purple));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -270,7 +346,7 @@ body {
 /* ===================== ANALYSIS TABLE ===================== */
 .analysis-table th {
   background: linear-gradient(90deg, #0A2010, #0D2A18);
-  color: var(--color-accent-green);
+  color: var(--accent-green);
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -281,7 +357,7 @@ body {
 .analysis-table td {
   padding: 3px 8px;
   font-size: 11px;
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--border-subtle);
   font-family: var(--font-mono);
 }
 .analysis-table .progress-cell {

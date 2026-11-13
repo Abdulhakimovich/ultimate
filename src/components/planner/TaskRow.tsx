@@ -61,11 +61,12 @@ export default function TaskRow({
       initial={{ opacity: 0, y: -4 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: 20 }}
-      className={`group flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all duration-200 ${
+      className="group flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all duration-200"
+      style={
         completed
-          ? 'bg-[rgba(0,212,255,0.08)] border border-[rgba(0,212,255,0.2)]'
-          : 'hover:bg-[rgba(255,255,255,0.03)] border border-transparent'
-      }`}
+          ? { background: 'var(--electric-glow)', border: '1px solid var(--border-bright)' }
+          : { background: 'transparent', border: '1px solid transparent' }
+      }
     >
       <Checkbox
         checked={completed}
@@ -82,15 +83,19 @@ export default function TaskRow({
           onChange={(e) => setEditText(e.target.value)}
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
-          className="flex-1 bg-transparent border-b border-[#00D4FF] text-xs text-text-primary outline-none py-0.5"
+          className="flex-1 bg-transparent border-b text-xs text-text-primary outline-none py-0.5"
+          style={{ borderColor: 'var(--electric)' }}
           aria-label="Редактирование задачи"
         />
       ) : (
         <span
           onClick={() => setIsEditing(true)}
-          className={`flex-1 text-xs cursor-text truncate transition-colors ${
-            completed ? 'line-through text-[#7BA7CC]/70' : 'text-[#E8F4FF]'
-          }`}
+          className="flex-1 text-xs cursor-text truncate transition-colors"
+          style={
+            completed
+              ? { textDecoration: 'line-through', color: 'var(--text-secondary)', opacity: 0.7 }
+              : { color: 'var(--text-primary)' }
+          }
         >
           {text}
         </span>
@@ -99,7 +104,10 @@ export default function TaskRow({
       <button
         type="button"
         onClick={onDelete}
-        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-[#7BA7CC] hover:text-[#FF3366] transition-all"
+        className="opacity-0 group-hover:opacity-100 p-0.5 rounded transition-all"
+        style={{ color: 'var(--text-secondary)' }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--accent-red)'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'; }}
         aria-label="Удалить задачу"
       >
         <Trash2 size={12} />

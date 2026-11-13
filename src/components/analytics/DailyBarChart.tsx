@@ -11,6 +11,11 @@ import { t } from '@/lib/i18n';
 import { startOfMonth, endOfMonth, eachDayOfInterval, toDateString, isToday } from '@/lib/utils/dates';
 import { calculateDailyCompletion, isHabitCompletedOnDate } from '@/lib/utils/calculations';
 
+function getCSSVar(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
+
 export default function DailyBarChart() {
   const [mounted, setMounted] = useState(false);
   const habits      = useHabitsStore((s) => s.habits);
@@ -44,9 +49,19 @@ export default function DailyBarChart() {
 
   if (!mounted) return <div className="h-[220px] rounded-xl skeleton-shimmer" />;
 
+  // Resolve CSS vars for Recharts SVG attributes
+  const electricColor   = getCSSVar('--electric', '#00D4FF');
+  const textMuted       = getCSSVar('--text-muted', '#3D5A7A');
+  const textSecondary   = getCSSVar('--text-secondary', '#7BA7CC');
+  const bgElevated      = getCSSVar('--bg-elevated', '#1E2A3E');
+  const borderBright    = getCSSVar('--border-bright', 'rgba(0,212,255,0.35)');
+  const textPrimary     = getCSSVar('--text-primary', '#E8F4FF');
+  const accentGreen     = getCSSVar('--accent-green', '#00FF88');
+  const blueMid         = getCSSVar('--blue-mid', '#1E90FF');
+
   if (habits.length === 0) {
     return (
-      <div className="text-center py-8 text-sm" style={{ color: '#3D5A7A' }}>
+      <div className="text-center py-8 text-sm" style={{ color: 'var(--text-muted)' }}>
         {tr.analytics.dailyCompletion}
       </div>
     );
@@ -54,7 +69,7 @@ export default function DailyBarChart() {
 
   return (
     <div>
-      <h3 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#7BA7CC' }}>
+      <h3 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-secondary)' }}>
         {tr.analytics.dailyCompletion}
       </h3>
 
@@ -63,24 +78,24 @@ export default function DailyBarChart() {
         <table className="w-full text-[9px] text-center font-mono" style={{ minWidth: 'max-content' }}>
           <tbody>
             <tr>
-              <td className="text-left pr-2 py-0.5 whitespace-nowrap font-bold" style={{ color: '#00D4FF' }}>%</td>
+              <td className="text-left pr-2 py-0.5 whitespace-nowrap font-bold" style={{ color: 'var(--electric)' }}>%</td>
               {chartData.map((d) => (
                 <td
                   key={`pct-${d.day}`}
                   className="px-0.5 py-0.5 font-semibold"
-                  style={{ color: d.isToday ? '#00D4FF' : d.percentage > 0 ? '#7BA7CC' : '#3D5A7A' }}
+                  style={{ color: d.isToday ? 'var(--electric)' : d.percentage > 0 ? 'var(--text-secondary)' : 'var(--text-muted)' }}
                 >
                   {d.percentage}
                 </td>
               ))}
             </tr>
-            <tr style={{ borderTop: '1px solid rgba(0,212,255,0.06)' }}>
-              <td className="text-left pr-2 py-0.5 whitespace-nowrap font-bold" style={{ color: '#00FF88' }}>✓</td>
+            <tr style={{ borderTop: '1px solid var(--border)' }}>
+              <td className="text-left pr-2 py-0.5 whitespace-nowrap font-bold" style={{ color: 'var(--accent-green)' }}>✓</td>
               {chartData.map((d) => (
-                <td key={`done-${d.day}`} className="px-0.5 py-0.5" style={{ color: '#00FF88' }}>{d.completed}</td>
+                <td key={`done-${d.day}`} className="px-0.5 py-0.5" style={{ color: 'var(--accent-green)' }}>{d.completed}</td>
               ))}
             </tr>
-            <tr style={{ borderTop: '1px solid rgba(0,212,255,0.06)' }}>
+            <tr style={{ borderTop: '1px solid var(--border)' }}>
               <td className="text-left pr-2 py-0.5 whitespace-nowrap font-bold" style={{ color: '#FF3366' }}>✗</td>
               {chartData.map((d) => (
                 <td key={`miss-${d.day}`} className="px-0.5 py-0.5" style={{ color: '#FF3366' }}>{d.notCompleted}</td>
@@ -94,11 +109,11 @@ export default function DailyBarChart() {
       <div style={{ height: '160px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} barSize={8}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.06)" vertical={false} />
-            <XAxis dataKey="day" tick={{ fontSize: 9, fill: '#3D5A7A', fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} interval={0} />
-            <YAxis tick={{ fontSize: 9, fill: '#3D5A7A', fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} width={28} />
+            <CartesianGrid strokeDasharray="3 3" stroke={`${electricColor}1a`} vertical={false} />
+            <XAxis dataKey="day" tick={{ fontSize: 9, fill: textMuted, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} interval={0} />
+            <YAxis tick={{ fontSize: 9, fill: textMuted, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} width={28} />
             <Tooltip
-              contentStyle={{ background: '#1A2235', border: '1px solid rgba(0,212,255,0.3)', borderRadius: 8, fontSize: 11, color: '#E8F4FF' }}
+              contentStyle={{ background: bgElevated, border: `1px solid ${borderBright}`, borderRadius: 8, fontSize: 11, color: textPrimary }}
               formatter={(value: any) => [`${value}%`, tr.tracker.completed]}
               labelFormatter={(label) => `День ${label}`}
             />
@@ -106,8 +121,8 @@ export default function DailyBarChart() {
               {chartData.map((entry, i) => (
                 <Cell
                   key={`cell-${i}`}
-                  fill={entry.isToday ? '#00D4FF' : entry.percentage >= 75 ? '#00FF88' : '#1E90FF'}
-                  style={{ filter: entry.isToday ? 'drop-shadow(0 0 4px rgba(0,212,255,0.6))' : 'none' }}
+                  fill={entry.isToday ? electricColor : entry.percentage >= 75 ? accentGreen : blueMid}
+                  style={{ filter: entry.isToday ? `drop-shadow(0 0 4px ${electricColor}99)` : 'none' }}
                 />
               ))}
             </Bar>
@@ -115,10 +130,9 @@ export default function DailyBarChart() {
         </ResponsiveContainer>
       </div>
 
-      <p className="text-[10px] italic mt-3 text-center" style={{ color: '#3D5A7A' }}>
+      <p className="text-[10px] italic mt-3 text-center" style={{ color: 'var(--text-muted)' }}>
         {tr.analytics.watchProgress}
       </p>
     </div>
   );
 }
-

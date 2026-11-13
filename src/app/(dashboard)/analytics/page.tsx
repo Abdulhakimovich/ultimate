@@ -31,12 +31,12 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div
         className="flex items-center justify-between px-5 py-3 rounded-xl"
-        style={{ background: '#111827', border: '1px solid rgba(0,212,255,0.12)' }}
+        style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
       >
         <button
           onClick={() => navigateMonth('prev')}
           className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-all"
-          style={{ color: '#7BA7CC', background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.12)' }}
+          style={{ color: 'var(--text-secondary)', background: 'var(--electric-glow)', border: '1px solid var(--border)' }}
           aria-label={tr.ui.prev}
         >
           <ChevronLeft size={16} />
@@ -44,16 +44,16 @@ export default function AnalyticsPage() {
         </button>
 
         <div className="flex items-center gap-2">
-          <TrendingUp size={18} style={{ color: '#00D4FF' }} />
-          <h2 className="font-display font-bold text-base" style={{ color: '#E8F4FF' }}>
-            {tr.analytics.title} — <span style={{ color: '#00D4FF' }}>{monthLabel}</span>
+          <TrendingUp size={18} style={{ color: 'var(--electric)' }} />
+          <h2 className="font-display font-bold text-base" style={{ color: 'var(--text-primary)' }}>
+            {tr.analytics.title} — <span style={{ color: 'var(--electric)' }}>{monthLabel}</span>
           </h2>
         </div>
 
         <button
           onClick={() => navigateMonth('next')}
           className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-all"
-          style={{ color: '#7BA7CC', background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.12)' }}
+          style={{ color: 'var(--text-secondary)', background: 'var(--electric-glow)', border: '1px solid var(--border)' }}
           aria-label={tr.ui.next}
         >
           <span className="hidden sm:inline">{tr.ui.next}</span>
@@ -64,10 +64,10 @@ export default function AnalyticsPage() {
       {/* Charts Card */}
       <div
         className="rounded-2xl p-5 space-y-6"
-        style={{ background: '#111827', border: '1px solid rgba(0,212,255,0.12)' }}
+        style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
       >
         <DailyBarChart />
-        <div style={{ borderTop: '1px solid rgba(0,212,255,0.08)' }} />
+        <div style={{ borderTop: '1px solid var(--border)' }} />
         <MonthlyAreaChart />
       </div>
     </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import '@/styles/globals.css';
+import ThemeProvider from '@/components/providers/ThemeProvider';
 
 export const metadata: Metadata = {
   title: 'Ultimate — Habit Tracker',
@@ -12,9 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru" className="dark">
-      <body className="min-h-screen bg-bg-primary text-text-primary antialiased">
-        {children}
+    <html lang="ru">
+      <body className="min-h-screen antialiased" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

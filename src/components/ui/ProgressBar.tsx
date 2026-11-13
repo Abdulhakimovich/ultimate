@@ -9,14 +9,14 @@ interface ProgressBarProps {
 }
 
 const gradients = {
-  electric: 'linear-gradient(90deg, #0098C8, #00D4FF, #00BFFF)',
+  electric: 'linear-gradient(90deg, var(--electric-dim), var(--electric), var(--blue-neon))',
   green:    'linear-gradient(90deg, #00C66A, #00FF88)',
-  purple:   'linear-gradient(90deg, #5B10CC, #7B2FFF)',
+  purple:   'linear-gradient(90deg, #5B10CC, var(--accent-purple))',
   gold:     'linear-gradient(90deg, #CC9900, #FFD700)',
 };
 
 const glows = {
-  electric: 'rgba(0,212,255,0.4)',
+  electric: 'var(--electric-muted)',
   green:    'rgba(0,255,136,0.4)',
   purple:   'rgba(123,47,255,0.4)',
   gold:     'rgba(255,215,0,0.4)',
@@ -34,15 +34,15 @@ export default function ProgressBar({
   return (
     <div className={className}>
       {showLabel && (
-        <div className="flex justify-between text-[9px] mb-0.5" style={{ color: '#3D5A7A' }}>
+        <div className="flex justify-between text-[9px] mb-0.5" style={{ color: 'var(--text-muted)' }}>
           <span>0%</span>
-          <span style={{ color: '#00D4FF', fontWeight: 700 }}>{clamped}%</span>
+          <span style={{ color: 'var(--electric)', fontWeight: 700 }}>{clamped}%</span>
           <span>100%</span>
         </div>
       )}
       <div
         className="rounded-full overflow-hidden"
-        style={{ height, background: '#1E2A3E' }}
+        style={{ height, background: 'var(--bg-elevated)' }}
         role="progressbar"
         aria-valuenow={clamped}
         aria-valuemin={0}

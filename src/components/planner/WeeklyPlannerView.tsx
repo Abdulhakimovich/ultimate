@@ -61,17 +61,17 @@ export default function WeeklyPlannerView() {
       <div
         className="flex items-center justify-between px-4 py-2.5 rounded-xl"
         style={{
-          background: '#111827',
-          border: '1px solid rgba(0,212,255,0.12)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
         }}
       >
         <button
           onClick={() => navigateWeek('prev')}
           className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
           style={{
-            color: '#7BA7CC',
+            color: 'var(--text-secondary)',
             background: 'rgba(0,212,255,0.06)',
-            border: '1px solid rgba(0,212,255,0.12)',
+            border: '1px solid var(--border)',
           }}
           aria-label={tr.ui.prev}
         >
@@ -79,7 +79,7 @@ export default function WeeklyPlannerView() {
           <span className="hidden sm:inline">{tr.ui.prev}</span>
         </button>
 
-        <h2 className="text-xs font-mono font-bold tracking-wide" style={{ color: '#00D4FF' }}>
+        <h2 className="text-xs font-mono font-bold tracking-wide" style={{ color: 'var(--electric)' }}>
           {formatRu(weekDays[0], 'd MMM')} — {formatRu(weekDays[6], 'd MMM yyyy')}
         </h2>
 
@@ -87,9 +87,9 @@ export default function WeeklyPlannerView() {
           onClick={() => navigateWeek('next')}
           className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
           style={{
-            color: '#7BA7CC',
+            color: 'var(--text-secondary)',
             background: 'rgba(0,212,255,0.06)',
-            border: '1px solid rgba(0,212,255,0.12)',
+            border: '1px solid var(--border)',
           }}
           aria-label={tr.ui.next}
         >
