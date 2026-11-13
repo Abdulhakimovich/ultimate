@@ -3,23 +3,35 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Calendar, BarChart3, LayoutDashboard, Printer, RotateCcw, ChevronDown, Zap, Globe, Sun, Moon } from 'lucide-react';
+import {
+  Calendar,
+  BarChart3,
+  LayoutDashboard,
+  Printer,
+  RotateCcw,
+  ChevronDown,
+  Sun,
+  Moon,
+  Volume2,
+  VolumeX,
+  Menu,
+  X,
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
-import { t, type Language } from '@/lib/i18n';
-
-const LANGUAGE_OPTIONS: { code: Language; label: string; flag: string }[] = [
-  { code: 'ru', label: 'Русский',  flag: '🇷🇺' },
-  { code: 'en', label: 'English',  flag: '🇺🇸' },
-  { code: 'uz', label: "O'zbek",   flag: '🇺🇿' },
-];
+import { useFeedbackStore } from '@/store/feedbackStore';
+import { playCheckSound } from '@/lib/feedback';
+import { t, LANGUAGE_OPTIONS } from '@/lib/i18n';
+import Logo from '@/components/ui/Logo';
 
 export default function TopNav() {
   const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [langOpen, setLangOpen]         = useState(false);
+  const [mobileMenuOpen, setMobileMenu] = useState(false);
   const [mounted, setMounted]           = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const langRef     = useRef<HTMLDivElement>(null);
 
@@ -27,8 +39,16 @@ export default function TopNav() {
   const setLanguage = useLanguageStore((s) => s.setLanguage);
   const theme       = useThemeStore((s) => s.theme);
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
+  const soundEnabled = useFeedbackStore((s) => s.soundEnabled);
+  const toggleSound  = useFeedbackStore((s) => s.toggleSound);
 
-  // Use default ('ru') on first render to match SSR, switch to real values after mount
+  const handleToggleSound = () => {
+    toggleSound();
+    if (!soundEnabled) {
+      setTimeout(() => playCheckSound(), 50);
+    }
+  };
+
   const displayLanguage = mounted ? language : 'ru';
   const displayTheme    = mounted ? theme : 'dark';
   const tr              = t(displayLanguage);
@@ -36,14 +56,18 @@ export default function TopNav() {
   useEffect(() => {
     setMounted(true);
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setDropdownOpen(false);
-      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false);
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentLang = LANGUAGE_OPTIONS.find((l) => l.code === displayLanguage)!;
+  const currentLang = LANGUAGE_OPTIONS.find((l) => l.code === displayLanguage) || LANGUAGE_OPTIONS[0];
 
   const navItems = [
     { href: '/tracker',   label: tr.nav.tracker,   icon: Calendar },
@@ -53,96 +77,81 @@ export default function TopNav() {
 
   return (
     <header
-      className="sticky top-0 z-50 h-[52px] no-print"
+      className="sticky top-0 z-50 h-[56px] no-print backdrop-blur-md transition-colors"
       style={{
         background: 'var(--bg-glass)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
         borderBottom: '1px solid var(--border)',
-        boxShadow: '0 1px 24px rgba(0,0,0,0.5)',
       }}
     >
       <nav className="h-full max-w-[1600px] mx-auto px-4 flex items-center justify-between">
-
-        {/* Logo */}
-        <Link
-          href="/tracker"
-          className="flex items-center gap-2 group"
-          aria-label="Ultimate"
-        >
-          <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all group-hover:scale-110"
-            style={{ background: 'linear-gradient(135deg, var(--electric), var(--blue-mid))', boxShadow: '0 0 12px var(--electric-muted)' }}
+        {/* Left: Brand Logo */}
+        <div className="flex items-center gap-6">
+          <Link
+            href="/tracker"
+            className="flex items-center gap-2 group relative py-1 focus-visible:ring-2 focus-visible:ring-[var(--electric)] rounded-lg"
+            aria-label="Ultimate Habit Tracker"
           >
-            <Zap size={14} style={{ color: 'var(--bg-primary)' }} />
+            <Logo size="sm" priority />
+          </Link>
+
+          {/* Desktop Nav Items */}
+          <div className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-label={item.label}
+                  aria-current={isActive ? 'page' : undefined}
+                  className="relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150"
+                  style={{
+                    color: isActive ? 'var(--electric)' : 'var(--text-secondary)',
+                    background: isActive ? 'var(--electric-glow)' : 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-primary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)';
+                  }}
+                >
+                  <Icon size={15} />
+                  <span>{item.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-indicator"
+                      className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full"
+                      style={{
+                        background: 'linear-gradient(90deg, var(--electric), var(--blue-neon))',
+                        boxShadow: '0 0 8px var(--electric-glow)',
+                      }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </div>
-          <span
-            className="font-display font-black text-base tracking-tight hidden sm:block"
-            style={{
-              background: 'linear-gradient(90deg, var(--electric), var(--blue-mid))',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            Ultimate
-          </span>
-        </Link>
-
-        {/* Nav Items */}
-        <div className="flex items-center gap-0.5 sm:gap-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-label={item.label}
-                aria-current={isActive ? 'page' : undefined}
-                className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
-                style={{
-                  color: isActive ? 'var(--electric)' : 'var(--text-secondary)',
-                  background: isActive ? 'var(--electric-glow)' : 'transparent',
-                }}
-                suppressHydrationWarning
-                onMouseEnter={(e) => {
-                  if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-primary)';
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)';
-                }}
-              >
-                <Icon size={15} />
-                <span className="hidden md:inline" suppressHydrationWarning>{item.label}</span>
-                {isActive && (
-                  <motion.div
-                    layoutId="nav-indicator"
-                    className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full"
-                    style={{ background: 'linear-gradient(90deg, var(--electric), var(--blue-mid))', boxShadow: '0 0 6px var(--electric-muted)' }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-              </Link>
-            );
-          })}
         </div>
 
-        {/* Right: Language + Theme Toggle + User */}
+        {/* Right Controls: Language Switcher, Theme Toggle, User Menu, Mobile Menu Toggle */}
         <div className="flex items-center gap-2">
-
-          {/* Language Switcher */}
+          {/* Clean Text-Based Language Switcher (No Emojis) */}
           <div className="relative" ref={langRef}>
             <button
               onClick={() => setLangOpen((p) => !p)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all"
+              style={{
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-card)',
+              }}
               aria-label={tr.ui.language}
             >
-              <Globe size={13} />
-              <span className="hidden sm:inline">{currentLang.flag} {currentLang.label}</span>
-              <span className="sm:hidden">{currentLang.flag}</span>
-              <ChevronDown size={11} style={{ opacity: 0.6 }} />
+              <span>{currentLang.label}</span>
+              <ChevronDown size={12} className="opacity-60" />
             </button>
 
             <AnimatePresence>
@@ -152,23 +161,25 @@ export default function TopNav() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 mt-2 w-40 rounded-xl p-1 z-50"
-                  style={{ background: 'var(--bg-card)', border: '1px solid var(--border-bright)', boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 16px var(--electric-glow)' }}
+                  className="absolute right-0 mt-2 w-36 rounded-xl p-1 z-50 shadow-xl"
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-bright)',
+                  }}
                 >
                   {LANGUAGE_OPTIONS.map((opt) => (
                     <button
                       key={opt.code}
                       onClick={() => { setLanguage(opt.code); setLangOpen(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all"
+                      className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-all"
                       style={{
-                        color: language === opt.code ? 'var(--electric)' : 'var(--text-secondary)',
-                        background: language === opt.code ? 'var(--electric-glow)' : 'transparent',
-                        fontWeight: language === opt.code ? 700 : 400,
+                        color: displayLanguage === opt.code ? 'var(--electric)' : 'var(--text-secondary)',
+                        background: displayLanguage === opt.code ? 'var(--electric-glow)' : 'transparent',
+                        fontWeight: displayLanguage === opt.code ? 700 : 500,
                       }}
                     >
-                      <span>{opt.flag}</span>
-                      <span>{opt.label}</span>
-                      {language === opt.code && <span className="ml-auto text-[10px]">✓</span>}
+                      <span className="font-sans">{opt.fullLabel}</span>
+                      <span className="font-mono text-[10px] opacity-75">{opt.label}</span>
                     </button>
                   ))}
                 </motion.div>
@@ -183,40 +194,59 @@ export default function TopNav() {
             style={{
               color: 'var(--electric)',
               border: '1px solid var(--border)',
-              background: 'var(--electric-glow)',
+              background: 'var(--bg-card)',
             }}
-            aria-label={displayTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            title={displayTheme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+            aria-label={displayTheme === 'dark' ? tr.ui.themeLight : tr.ui.themeDark}
+            title={displayTheme === 'dark' ? tr.ui.themeLight : tr.ui.themeDark}
             suppressHydrationWarning
           >
             <AnimatePresence mode="wait">
               <motion.div
                 key={displayTheme}
-                initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                initial={{ rotate: -90, opacity: 0, scale: 0.6 }}
                 animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-                transition={{ duration: 0.2 }}
+                exit={{ rotate: 90, opacity: 0, scale: 0.6 }}
+                transition={{ duration: 0.18 }}
               >
                 {displayTheme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
               </motion.div>
             </AnimatePresence>
           </button>
 
-          {/* User / Settings dropdown */}
+          {/* Sound / Haptic Cues Toggle */}
+          <button
+            onClick={handleToggleSound}
+            className="flex items-center justify-center w-8 h-8 rounded-lg transition-all"
+            style={{
+              color: soundEnabled ? 'var(--electric)' : 'var(--text-muted)',
+              border: '1px solid var(--border)',
+              background: 'var(--bg-card)',
+            }}
+            aria-label={soundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
+            title={soundEnabled ? 'Звуковые эффекты включены' : 'Звуковые эффекты выключены'}
+          >
+            {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+          </button>
+
+          {/* User Menu */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen((p) => !p)}
-              className="flex items-center gap-1 p-1.5 rounded-lg transition-all"
+              className="flex items-center gap-1.5 p-1 rounded-lg transition-all"
               style={{ border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
-              aria-label="Меню"
+              aria-label="User menu"
             >
               <div
-                className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[10px]"
-                style={{ background: 'linear-gradient(135deg, var(--electric-glow), var(--electric-glow))', color: 'var(--electric)', border: '1px solid var(--border-bright)' }}
+                className="w-6 h-6 rounded-md flex items-center justify-center font-bold text-[10px] font-mono"
+                style={{
+                  background: 'var(--electric-glow)',
+                  color: 'var(--electric)',
+                  border: '1px solid var(--border-bright)',
+                }}
               >
                 U
               </div>
-              <ChevronDown size={11} />
+              <ChevronDown size={11} className="hidden sm:block" />
             </button>
 
             <AnimatePresence>
@@ -226,33 +256,36 @@ export default function TopNav() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.95 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 mt-2 w-52 rounded-xl p-1.5 z-50 text-xs"
-                  style={{ background: 'var(--bg-card)', border: '1px solid var(--border-bright)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}
+                  className="absolute right-0 mt-2 w-48 rounded-xl p-1.5 z-50 text-xs shadow-xl"
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-bright)',
+                  }}
                 >
                   <button
                     onClick={() => { setDropdownOpen(false); window.print(); }}
                     className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-left"
                     style={{ color: 'var(--text-secondary)' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--electric-glow)')}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-elevated)')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <Printer size={13} style={{ color: 'var(--text-secondary)' }} />
+                    <Printer size={13} />
                     <span>{tr.ui.print}</span>
                   </button>
 
-                  <div style={{ borderTop: '1px solid var(--electric-glow)', margin: '4px 0' }} />
+                  <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }} />
 
                   <button
                     onClick={() => {
                       setDropdownOpen(false);
-                      if (confirm('Reset all data to demo defaults?')) {
+                      if (confirm('Reset demo data to defaults?')) {
                         localStorage.clear();
                         window.location.reload();
                       }
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-left"
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-left font-medium"
                     style={{ color: 'var(--accent-red)' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,51,102,0.08)')}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >
                     <RotateCcw size={13} />
@@ -262,8 +295,59 @@ export default function TopNav() {
               )}
             </AnimatePresence>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenu((p) => !p)}
+            className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg text-xs"
+            style={{
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border)',
+              background: 'var(--bg-card)',
+            }}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
+          </button>
         </div>
       </nav>
+
+      {/* Mobile Navigation Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden border-b px-4 py-3 space-y-1 shadow-2xl"
+            style={{
+              background: 'var(--bg-glass)',
+              borderColor: 'var(--border)',
+            }}
+          >
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenu(false)}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all touch-target"
+                  style={{
+                    color: isActive ? 'var(--electric)' : 'var(--text-primary)',
+                    background: isActive ? 'var(--electric-glow)' : 'transparent',
+                    border: isActive ? '1px solid var(--border-bright)' : '1px solid transparent',
+                  }}
+                >
+                  <Icon size={16} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

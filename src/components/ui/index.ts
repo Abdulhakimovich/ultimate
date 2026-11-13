@@ -4,3 +4,8 @@ export { default as Skeleton } from './Skeleton';
 export { default as ToastContainer } from './Toast';
 export { default as Modal } from './Modal';
 export { default as DonutRing } from './DonutRing';
+export { default as Logo } from './Logo';
+export { default as HabitCell } from './HabitCell';
+export { default as TodaySummaryBar } from './TodaySummaryBar';
+export { default as HeatmapCalendar } from './HeatmapCalendar';
+export { default as StreakBadge } from './StreakBadge';

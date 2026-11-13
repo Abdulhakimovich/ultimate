@@ -8,6 +8,7 @@ import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
 import { isToday, formatDotDate, toDateString } from '@/lib/utils/dates';
 import { calculateTaskStats } from '@/lib/utils/calculations';
+import { triggerFeedback } from '@/lib/feedback';
 import DonutRing from '@/components/ui/DonutRing';
 import TaskRow from './TaskRow';
 import DailyNotes from './DailyNotes';
@@ -18,20 +19,20 @@ interface DayColumnProps {
 }
 
 const RING_COLOR_VALUES = [
-  '#00D4FF', '#1E90FF', '#7B2FFF', '#00FF88', '#00BFFF', '#FFD700', '#FF6B00',
+  'var(--electric)', 'var(--blue-mid)', 'var(--accent-purple)', 'var(--accent-green)', 'var(--blue-neon)', 'var(--accent-gold)', 'var(--accent-orange)',
 ];
 
 export default function DayColumn({ date, dayIndex }: DayColumnProps) {
-  const dateStr   = toDateString(date);
-  const tasks     = usePlannerStore((s) => s.tasksByDate[dateStr] || []);
-  const entry     = usePlannerStore((s) => s.entriesByDate[dateStr]);
-  const addTask   = usePlannerStore((s) => s.addTask);
-  const toggleTask= usePlannerStore((s) => s.toggleTask);
-  const updateTask= usePlannerStore((s) => s.updateTask);
-  const deleteTask= usePlannerStore((s) => s.deleteTask);
+  const dateStr    = toDateString(date);
+  const tasks      = usePlannerStore((s) => s.tasksByDate[dateStr] || []);
+  const entry      = usePlannerStore((s) => s.entriesByDate[dateStr]);
+  const addTask    = usePlannerStore((s) => s.addTask);
+  const toggleTask = usePlannerStore((s) => s.toggleTask);
+  const updateTask = usePlannerStore((s) => s.updateTask);
+  const deleteTask = usePlannerStore((s) => s.deleteTask);
 
-  const language  = useLanguageStore((s) => s.language);
-  const tr        = t(language);
+  const language   = useLanguageStore((s) => s.language);
+  const tr         = t(language);
 
   const [newTaskText, setNewTaskText] = useState('');
   const [showNewTask, setShowNewTask] = useState(false);
@@ -62,67 +63,51 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
     [handleAddTask],
   );
 
-  const emptySlots = Math.max(0, 10 - tasks.length);
-
   return (
     <div
-      className="flex flex-col rounded-xl overflow-hidden transition-all"
-      style={{
-        background: 'var(--bg-card)',
-        border: today ? '1px solid var(--electric)' : '1px solid var(--border)',
-        boxShadow: today ? '0 0 16px var(--electric-glow)' : '0 4px 16px rgba(0,0,0,0.3)',
-      }}
+      className={`flex flex-col rounded-2xl overflow-hidden transition-all surface-card ${
+        today ? 'ring-2 ring-[var(--electric)] shadow-[0_0_20px_var(--electric-glow)]' : ''
+      }`}
     >
       {/* Column Header */}
       <div
-        className="px-2 py-2 text-center"
+        className="px-3 py-2.5 text-center"
         style={{
           background: today
-            ? 'linear-gradient(90deg, rgba(0,212,255,0.145) 0%, rgba(0,152,200,0.145) 100%)'
+            ? 'var(--electric-glow)'
             : isWeekend
-              ? 'linear-gradient(90deg, #181133 0%, #24144F 100%)'
-              : 'linear-gradient(90deg, var(--bg-header) 0%, var(--bg-elevated) 100%)',
-          borderBottom: '1px solid var(--electric-glow)',
+            ? 'var(--bg-elevated)'
+            : 'var(--bg-header)',
+          borderBottom: '1px solid var(--border)',
         }}
       >
         <div
-          className="font-bold text-sm tracking-wide"
-          style={{ color: today ? 'var(--electric)' : isWeekend ? 'var(--accent-green)' : 'var(--text-primary)' }}
+          className="font-display font-bold text-sm tracking-wide"
+          style={{ color: today ? 'var(--electric)' : isWeekend ? 'var(--accent-orange)' : 'var(--text-primary)' }}
         >
           {tr.tracker.weekdays[dayIndex]}
         </div>
-        <div className="text-[10px] font-mono mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+        <div className="font-mono text-xs tabular-nums" style={{ color: 'var(--text-secondary)' }}>
           {formatDotDate(date)}
         </div>
       </div>
 
-      {/* Donut Progress Ring */}
-      <div className="flex flex-col items-center py-3">
+      {/* Daily Donut Ring */}
+      <div className="flex flex-col items-center py-3 bg-[var(--bg-card)] border-b border-[var(--border)]">
         <DonutRing
           percentage={stats.percentage}
-          size={60}
-          strokeWidth={6}
+          size={56}
+          strokeWidth={5}
           color={RING_COLOR_VALUES[dayIndex]}
         />
-        <span className="text-[9px] font-semibold mt-1" style={{ color: 'var(--text-secondary)' }}>
-          {tr.tracker.progress}
+        <span className="text-[10px] uppercase font-bold mt-1 tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+          {stats.completed}/{stats.total} {tr.planner.completed}
         </span>
       </div>
 
       {/* Tasks Section */}
-      <div className="px-2 flex-1">
-        <div
-          className="text-[10px] font-bold text-center py-1 rounded-md mb-1.5 uppercase tracking-wider"
-          style={{
-            background: 'var(--electric-glow)',
-            color: 'var(--electric)',
-            border: '1px solid var(--electric-glow)',
-          }}
-        >
-          {tr.planner.tasks}
-        </div>
-
-        <div className="space-y-0.5 min-h-[120px]">
+      <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
+        <div className="space-y-1.5 flex-1 min-h-[80px]">
           <AnimatePresence mode="popLayout">
             {tasks.map((task) => (
               <TaskRow
@@ -130,43 +115,26 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
                 id={task.id}
                 text={task.text}
                 completed={task.completed}
-                onToggle={() => toggleTask(task.id, dateStr)}
+                onToggle={() => {
+                  triggerFeedback(!task.completed ? 'check' : 'uncheck');
+                  toggleTask(task.id, dateStr);
+                }}
                 onUpdate={(text) => updateTask(task.id, { text })}
                 onDelete={() => deleteTask(task.id, dateStr)}
               />
             ))}
           </AnimatePresence>
 
-          {/* Empty clickable rows */}
-          {Array.from({ length: emptySlots }).map((_, i) => (
-            <div
-              key={`empty-${i}`}
-              onClick={() => {
-                setShowNewTask(true);
-                setTimeout(() => inputRef.current?.focus(), 50);
-              }}
-              className="flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(0,212,255,0.06)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-              }}
-            >
-              <div
-                className="w-[14px] h-[14px] rounded-[3px] border"
-                style={{ borderColor: 'var(--text-muted)' }}
-              />
-              <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-                —
-              </span>
-            </div>
-          ))}
+          {tasks.length === 0 && !showNewTask && (
+            <p className="text-[11px] text-center py-4" style={{ color: 'var(--text-muted)' }}>
+              {tr.planner.noTasks}
+            </p>
+          )}
 
           {/* New task input */}
           {showNewTask && (
-            <div className="flex items-center gap-2 px-2 py-1">
-              <Plus size={12} style={{ color: 'var(--electric)' }} className="shrink-0" />
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--electric)]">
+              <Plus size={13} style={{ color: 'var(--electric)' }} className="shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
@@ -174,33 +142,46 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
                 onChange={(e) => setNewTaskText(e.target.value)}
                 onBlur={handleAddTask}
                 onKeyDown={handleNewTaskKeyDown}
-                placeholder={`${tr.planner.addTask}...`}
-                className="flex-1 text-xs bg-transparent border-b text-text-primary outline-none py-0.5 placeholder:text-text-muted/50"
-                style={{ borderColor: 'var(--electric)' }}
+                placeholder={tr.planner.newTaskPlaceholder}
+                className="flex-1 text-xs bg-transparent text-[var(--text-primary)] outline-none"
                 aria-label={tr.planner.addTask}
+                autoFocus
               />
             </div>
           )}
         </div>
 
+        {/* Quick Add Button */}
+        {!showNewTask && (
+          <button
+            type="button"
+            onClick={() => {
+              setShowNewTask(true);
+              setTimeout(() => inputRef.current?.focus(), 50);
+            }}
+            className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-xl border border-dashed transition-all hover:bg-[var(--bg-elevated)] text-xs font-medium"
+            style={{
+              borderColor: 'var(--border)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <Plus size={13} />
+            <span>{tr.planner.addTask}</span>
+          </button>
+        )}
+
         {/* Task Footer Stats */}
         <div
-          className="flex justify-between text-[9px] mt-2 px-1 py-1 border-t"
+          className="flex justify-between text-[10px] font-mono pt-2 border-t"
           style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
         >
-          <span>
-            {tr.planner.completed}{' '}
-            <strong style={{ color: 'var(--accent-green)' }}>{stats.completed}</strong>
-          </span>
-          <span>
-            {tr.planner.remaining}{' '}
-            <strong style={{ color: 'var(--accent-red)' }}>{stats.remaining}</strong>
-          </span>
+          <span>✓ {stats.completed}</span>
+          <span>• {stats.total - stats.completed} {tr.planner.remaining}</span>
         </div>
       </div>
 
       {/* Notes Sections */}
-      <div className="px-2 pb-2 mt-1">
+      <div className="px-3 pb-3 space-y-2">
         <DailyNotes
           title={tr.planner.notes}
           dateStr={dateStr}

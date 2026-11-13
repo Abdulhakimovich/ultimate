@@ -17,13 +17,25 @@ function getCSSVar(name: string, fallback: string): string {
 
 export default function MonthlyAreaChart() {
   const [mounted, setMounted] = useState(false);
-  const habits      = useHabitsStore((s) => s.habits);
-  const completions = useHabitsStore((s) => s.completions);
-  const currentMonth= useHabitsStore((s) => s.currentMonth);
-  const language    = useLanguageStore((s) => s.language);
-  const tr          = t(language);
+  const [isMobile, setIsMobile] = useState(false);
+  const [viewMode, setViewMode] = useState<'entire' | 'monthly'>('entire');
 
-  useEffect(() => { setMounted(true); }, []);
+  const habits         = useHabitsStore((s) => s.habits);
+  const completions    = useHabitsStore((s) => s.completions);
+  const allCompletions = useHabitsStore((s) => s.allCompletions);
+  const currentMonth   = useHabitsStore((s) => s.currentMonth);
+  const language       = useLanguageStore((s) => s.language);
+  const tr             = t(language);
+
+  const year = currentMonth.getFullYear();
+
+  useEffect(() => {
+    setMounted(true);
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const chartData = useMemo(() => {
     if (!mounted) return [];
@@ -36,67 +48,129 @@ export default function MonthlyAreaChart() {
       const completedCount = habits.filter((h) => isHabitCompletedOnDate(completions, h.id, dateStr)).length;
       return {
         day:        day.getDate(),
+        name:       String(day.getDate()),
         percentage: calculateDailyCompletion(completedCount, habits.length),
+        fullLabel:  `${day.getDate()} ${tr.months[currentMonth.getMonth()]}`,
       };
     });
-  }, [mounted, habits, completions, currentMonth]);
+  }, [mounted, habits, completions, currentMonth, tr.months]);
 
-  if (!mounted) return <div className="h-[220px] rounded-xl skeleton-shimmer" />;
+  const annualChartData = useMemo(() => {
+    if (!mounted || habits.length === 0) return [];
+    return tr.shortMonths.map((mShort, idx) => {
+      const targetMonth = idx + 1;
+      const monthPrefix = `${year}-${String(targetMonth).padStart(2, '0')}`;
+      const monthCompletions = allCompletions.filter((c) => c.completed_date.startsWith(monthPrefix));
+      const daysInTargetMonth = new Date(year, targetMonth, 0).getDate();
+      const totalPossible = daysInTargetMonth * habits.length;
+      const pct = totalPossible > 0 ? Math.round((monthCompletions.length / totalPossible) * 100) : 0;
+      return {
+        day: mShort,
+        name: mShort,
+        percentage: pct,
+        fullLabel: `${tr.months[idx]} ${year}`,
+      };
+    });
+  }, [mounted, habits.length, tr.shortMonths, tr.months, year, allCompletions]);
 
-  // Resolve CSS vars for Recharts SVG attributes
-  const electricColor = getCSSVar('--electric', '#00D4FF');
-  const textMuted     = getCSSVar('--text-muted', '#3D5A7A');
-  const bgElevated    = getCSSVar('--bg-elevated', '#1E2A3E');
-  const borderBright  = getCSSVar('--border-bright', 'rgba(0,212,255,0.35)');
-  const textPrimary   = getCSSVar('--text-primary', '#E8F4FF');
+  if (!mounted) return <div className="h-[200px] rounded-xl skeleton-shimmer" />;
 
-  if (habits.length === 0) {
-    return (
-      <div className="text-center py-8 text-sm" style={{ color: 'var(--text-muted)' }}>
-        {tr.analytics.monthlyTrend}
-      </div>
-    );
-  }
+  const electricColor = getCSSVar('--electric', '#0076F9');
+  const textMuted     = getCSSVar('--text-muted', '#64748B');
+  const bgElevated    = getCSSVar('--bg-elevated', '#141A29');
+  const borderBright  = getCSSVar('--border-bright', 'rgba(0,118,249,0.35)');
+  const textPrimary   = getCSSVar('--text-primary', '#F8FAFC');
+
+  if (habits.length === 0) return null;
 
   return (
-    <div>
-      <h3 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-secondary)' }}>
-        {tr.analytics.monthlyTrend}
-      </h3>
+    <div className="space-y-3">
+      {/* Subheader with View Toggle */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <span className="text-xs font-mono font-semibold text-[var(--electric)] px-2 py-0.5 rounded-md bg-[var(--electric-glow)] border-hairline">
+          {viewMode === 'entire' ? `${tr.analytics.entirePeriod} (${year})` : `${tr.months[currentMonth.getMonth()]} ${year}`}
+        </span>
+        <div className="flex items-center gap-1 p-0.5 rounded-lg bg-[var(--bg-elevated)] border-hairline">
+          <button
+            type="button"
+            onClick={() => setViewMode('entire')}
+            className={`px-2.5 py-0.5 rounded text-[11px] font-mono transition-all ${
+              viewMode === 'entire'
+                ? 'bg-[var(--electric)] text-[#07090E] font-bold shadow-sm'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            {tr.analytics.allMonths}
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('monthly')}
+            className={`px-2.5 py-0.5 rounded text-[11px] font-mono transition-all ${
+              viewMode === 'monthly'
+                ? 'bg-[var(--electric)] text-[#07090E] font-bold shadow-sm'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            {tr.analytics.dailyView}
+          </button>
+        </div>
+      </div>
 
-      <div style={{ height: '200px' }}>
+      <div style={{ height: '170px' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData}>
+          <AreaChart
+            data={(viewMode === 'entire' ? annualChartData : chartData) as any[]}
+            margin={{ top: 5, right: 5, left: -20, bottom: 0 }}
+          >
             <defs>
-              <linearGradient id="electricAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor={electricColor} stopOpacity={0.3} />
-                <stop offset="95%" stopColor={electricColor} stopOpacity={0.02} />
+              <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={electricColor} stopOpacity={0.4} />
+                <stop offset="60%" stopColor={electricColor} stopOpacity={0.12} />
+                <stop offset="95%" stopColor={electricColor} stopOpacity={0.0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke={`${electricColor}1a`} />
-            <XAxis dataKey="day" tick={{ fontSize: 9, fill: textMuted, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} interval={0} />
-            <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: textMuted, fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} ticks={[25, 50, 75, 100]} width={28} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
+            <XAxis
+              dataKey="day"
+              tick={{ fontSize: 10, fill: textMuted, fontFamily: 'JetBrains Mono' }}
+              axisLine={false}
+              tickLine={false}
+              interval={viewMode === 'entire' ? 0 : (isMobile ? 4 : 0)}
+            />
+            <YAxis
+              domain={[0, 100]}
+              tick={{ fontSize: 10, fill: textMuted, fontFamily: 'JetBrains Mono' }}
+              axisLine={false}
+              tickLine={false}
+              ticks={[0, 25, 50, 75, 100]}
+              width={35}
+              unit="%"
+            />
             <Tooltip
-              contentStyle={{ background: bgElevated, border: `1px solid ${borderBright}`, borderRadius: 8, fontSize: 11, color: textPrimary }}
+              contentStyle={{
+                background: bgElevated,
+                border: `1px solid ${borderBright}`,
+                borderRadius: 10,
+                fontSize: 11,
+                color: textPrimary,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+              }}
               formatter={(value: any) => [`${value}%`, tr.tracker.progress]}
-              labelFormatter={(label) => `День ${label}`}
+              labelFormatter={(label: any, payload: any) => payload?.[0]?.payload?.fullLabel || label}
             />
             <Area
               type="monotone"
               dataKey="percentage"
               stroke={electricColor}
               strokeWidth={2}
-              fill="url(#electricAreaGrad)"
-              animationDuration={1200}
-              dot={{ r: 2, fill: electricColor, strokeWidth: 0 }}
+              fill="url(#areaGradient)"
+              animationDuration={600}
+              dot={{ r: viewMode === 'entire' ? 3.5 : 2, fill: electricColor, strokeWidth: 0 }}
+              activeDot={{ r: 5, fill: '#FFFFFF', stroke: electricColor, strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
-
-      <p className="text-[10px] italic mt-3 text-center" style={{ color: 'var(--text-muted)' }}>
-        {tr.analytics.autoVisuals}
-      </p>
     </div>
   );
 }

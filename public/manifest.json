@@ -1,0 +1,24 @@
+{
+  "name": "Ultimate — Habit Tracker",
+  "short_name": "Ultimate",
+  "description": "Next-level habit tracker, weekly planner, and discipline analytics.",
+  "start_url": "/tracker",
+  "display": "standalone",
+  "background_color": "#07090E",
+  "theme_color": "#0076F9",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

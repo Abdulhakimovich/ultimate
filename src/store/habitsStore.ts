@@ -6,6 +6,7 @@ import { toDateString } from '@/lib/utils/dates';
 interface HabitsState {
   habits: Habit[];
   completions: HabitCompletion[];
+  allCompletions: HabitCompletion[];
   monthlyGoal: MonthlyGoal | null;
   currentMonth: Date;
   isLoading: boolean;
@@ -29,6 +30,7 @@ interface HabitsState {
 export const useHabitsStore = create<HabitsState>((set, get) => ({
   habits: [],
   completions: [],
+  allCompletions: [],
   monthlyGoal: null,
   currentMonth: new Date(),
   isLoading: true,
@@ -40,7 +42,8 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
 
   loadCompletions: (year: number, month: number) => {
     const completions = storage.getCompletions(year, month);
-    set({ completions });
+    const allCompletions = storage.getAllCompletions();
+    set({ completions, allCompletions });
   },
 
   loadMonthlyGoal: (year: number, month: number) => {
@@ -88,7 +91,8 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth() + 1;
     const completions = storage.getCompletions(year, month);
-    set({ completions });
+    const allCompletions = storage.getAllCompletions();
+    set({ completions, allCompletions });
     return isNowCompleted;
   },
 

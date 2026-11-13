@@ -19,21 +19,24 @@ import { calculateTaskStats, calculateWeeklyProgress, isHabitCompletedOnDate, ca
 import DonutRing from '@/components/ui/DonutRing';
 import Checkbox from '@/components/ui/Checkbox';
 import ProgressBar from '@/components/ui/ProgressBar';
+import Logo from '@/components/ui/Logo';
+import { getHabitDisplayName } from '@/lib/storage';
+import { Zap } from 'lucide-react';
 
 const ELECTRIC_RING_COLORS = [
-  '#00D4FF', '#1E90FF', '#7B2FFF', '#00FF88', '#00BFFF', '#FFD700', '#FF6B00',
+  '#00E5FF', '#0284C7', '#8B5CF6', '#10B981', '#38BDF8', '#F59E0B', '#F97316',
 ];
 
 export default function WeeklySummaryHeader() {
-  const weekDays        = usePlannerStore((s) => s.weekDays);
-  const tasksByDate     = usePlannerStore((s) => s.tasksByDate);
-  const setCurrentWeek  = usePlannerStore((s) => s.setCurrentWeek);
-  const habits          = useHabitsStore((s) => s.habits);
-  const completions     = useHabitsStore((s) => s.completions);
-  const toggleCompletion= useHabitsStore((s) => s.toggleCompletion);
+  const weekDays         = usePlannerStore((s) => s.weekDays);
+  const tasksByDate      = usePlannerStore((s) => s.tasksByDate);
+  const setCurrentWeek   = usePlannerStore((s) => s.setCurrentWeek);
+  const habits           = useHabitsStore((s) => s.habits);
+  const completions      = useHabitsStore((s) => s.completions);
+  const toggleCompletion = useHabitsStore((s) => s.toggleCompletion);
 
-  const language        = useLanguageStore((s) => s.language);
-  const tr              = t(language);
+  const language         = useLanguageStore((s) => s.language);
+  const tr               = t(language);
 
   // Chart data
   const chartData = useMemo(() => {
@@ -93,28 +96,14 @@ export default function WeeklySummaryHeader() {
   if (weekDays.length === 0) return null;
 
   return (
-    <div
-      className="rounded-2xl p-5 mb-4"
-      style={{
-        background: 'linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%)',
-        border: '1px solid var(--border-bright)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-      }}
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        {/* Left: Title + Date selector */}
+    <div className="surface-card p-5 sm:p-6 rounded-2xl mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+        {/* Left: Brand + Date Selector */}
         <div className="flex flex-col justify-center">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xl">⚡</span>
-            <h1
-              className="font-display text-2xl font-black tracking-tight"
-              style={{
-                background: 'linear-gradient(90deg, var(--text-bright) 0%, var(--electric) 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
+            <Logo size="sm" priority />
+            <div className="h-4 w-[1px] bg-[var(--border)] hidden sm:block" />
+            <h1 className="font-display text-sm sm:text-base font-bold tracking-tight" style={{ color: 'var(--text-secondary)' }}>
               {tr.planner.title}
             </h1>
           </div>
@@ -142,64 +131,64 @@ export default function WeeklySummaryHeader() {
               }}
             />
           </label>
-        </div>
 
-        {/* Center: Overall Progress */}
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider mb-2 text-center" style={{ color: 'var(--electric)' }}>
-            {tr.planner.overallProgress}
-          </h3>
-          <div className="flex items-center gap-4">
-            <div className="flex-1 h-[110px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} barSize={12}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.06)" vertical={false} />
-                  <XAxis
-                    dataKey="name"
-                    tick={{ fontSize: 9, fill: '#7BA7CC', fontFamily: 'JetBrains Mono' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 9, fill: '#7BA7CC', fontFamily: 'JetBrains Mono' }}
-                    axisLine={false}
-                    tickLine={false}
-                    width={22}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'var(--bg-card)',
-                      border: '1px solid var(--border-bright)',
-                      borderRadius: 8,
-                      fontSize: 11,
-                      color: 'var(--text-primary)',
-                    }}
-                    formatter={(value: any) => [value, tr.planner.completed]}
-                  />
-                  <Bar
-                    dataKey="tasks"
-                    fill="#00D4FF"
-                    radius={[3, 3, 0, 0]}
-                    animationDuration={600}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <DonutRing
-                segments={donutSegments}
-                size={76}
-                strokeWidth={7}
-              />
-              <span className="text-[10px] font-mono font-semibold mt-1 text-center" style={{ color: 'var(--accent-green)' }}>
-                {weeklyStats.totalCompleted} / {weeklyStats.totalTasks} {tr.planner.completed}
+          {/* Dynamic Sprint Velocity Indicator */}
+          <div className="mt-3 flex items-center gap-2 flex-wrap">
+            <span
+              className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border-hairline flex items-center gap-1"
+              style={{
+                background: 'var(--electric-glow)',
+                color: 'var(--electric)',
+                borderColor: 'var(--electric)',
+              }}
+            >
+              <Zap size={11} />
+              <span>
+                {weeklyStats.percentage}% {tr.analytics.sprintVelocity}
               </span>
-            </div>
+            </span>
+            <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
+              {weeklyStats.totalCompleted}/{weeklyStats.totalTasks} {tr.planner.completed}
+            </span>
           </div>
         </div>
 
-        {/* Right: Habit Tracker for Week */}
+        {/* Center: Overall Progress Chart & Donut */}
+        <div className="flex flex-col sm:flex-row items-center justify-around gap-4 py-2 border-y lg:border-y-0 lg:border-x border-[var(--border)] px-4">
+          <div className="w-full sm:w-36 h-24">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} width={30} />
+                <Tooltip
+                  contentStyle={{
+                    background: 'var(--bg-elevated)',
+                    border: '1px solid var(--border-bright)',
+                    borderRadius: 8,
+                    fontSize: 10,
+                    color: 'var(--text-primary)',
+                  }}
+                  formatter={(val: any) => [`${val}`, tr.planner.tasks]}
+                />
+                <Bar dataKey="tasks" fill="var(--electric)" radius={[2, 2, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="flex flex-col items-center flex-shrink-0">
+            <DonutRing
+              segments={donutSegments}
+              size={72}
+              strokeWidth={7}
+            />
+            <span className="text-[10px] font-mono font-bold mt-1 text-center" style={{ color: 'var(--accent-green)' }}>
+              {weeklyStats.totalCompleted} / {weeklyStats.totalTasks} {tr.planner.completed}
+            </span>
+          </div>
+        </div>
+
+        {/* Right: Weekly Habit Progress Mini-Matrix */}
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wider mb-2 text-center" style={{ color: 'var(--accent-green)' }}>
             {tr.planner.habitTracker}
@@ -209,45 +198,48 @@ export default function WeeklySummaryHeader() {
               {tr.tracker.noHabits}
             </p>
           ) : (
-            <div className="overflow-x-auto max-h-[120px] overflow-y-auto">
+            <div className="overflow-x-auto max-h-[150px] overflow-y-auto">
               <table className="w-full text-[10px]">
                 <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <th className="text-left py-1 pr-1 font-semibold" style={{ color: 'var(--text-secondary)' }}>
+                  <tr className="border-b border-[var(--border)]">
+                    <th className="text-left py-1 pr-2 font-semibold" style={{ color: 'var(--text-secondary)' }}>
                       {tr.tracker.habit}
                     </th>
                     {tr.tracker.weekdays.map((d) => (
-                      <th key={d} className="text-center py-1 px-0.5 font-semibold w-5" style={{ color: 'var(--text-secondary)' }}>
+                      <th key={d} className="text-center py-1 px-1 font-semibold w-6" style={{ color: 'var(--text-secondary)' }}>
                         {d}
                       </th>
                     ))}
-                    <th className="text-center py-1 pl-1 font-semibold w-14" style={{ color: 'var(--text-secondary)' }}>
+                    <th className="text-center py-1 pl-2 font-semibold w-16" style={{ color: 'var(--text-secondary)' }}>
                       {tr.tracker.progress}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {habitWeekData.map(({ habit, weekCompletions, progress }) => (
-                    <tr key={habit.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                      <td className="py-1 pr-1 truncate max-w-[80px]" style={{ color: 'var(--text-primary)' }}>
-                        <span className="mr-1">{habit.icon}</span>
-                        {habit.name}
-                      </td>
-                      {weekCompletions.map((checked, di) => (
-                        <td key={di} className="text-center py-1 px-0.5">
-                          <Checkbox
-                            checked={checked}
-                            onChange={() => toggleCompletion(habit.id, toDateString(weekDays[di]))}
-                            size="sm"
-                            ariaLabel={`${habit.name} — ${tr.tracker.weekdays[di]}`}
-                          />
+                  {habitWeekData.map(({ habit, weekCompletions, progress }) => {
+                    const habitName = getHabitDisplayName(habit, language);
+                    return (
+                      <tr key={habit.id} className="border-b border-[var(--border-subtle)]">
+                        <td className="py-1.5 pr-2 truncate max-w-[120px]" style={{ color: 'var(--text-primary)' }} title={habitName}>
+                          <span className="mr-1.5">{habit.icon}</span>
+                          {habitName}
                         </td>
-                      ))}
-                      <td className="py-1 pl-1">
-                        <ProgressBar value={progress} height={4} color="electric" />
-                      </td>
-                    </tr>
-                  ))}
+                        {weekCompletions.map((checked, di) => (
+                          <td key={di} className="text-center py-1 px-0.5">
+                            <Checkbox
+                              checked={checked}
+                              onChange={() => toggleCompletion(habit.id, toDateString(weekDays[di]))}
+                              size="sm"
+                              ariaLabel={`${habitName} — ${tr.tracker.weekdays[di]}`}
+                            />
+                          </td>
+                        ))}
+                        <td className="py-1 pl-2">
+                          <ProgressBar value={progress} height={4} color="electric" />
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

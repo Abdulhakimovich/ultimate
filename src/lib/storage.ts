@@ -1,5 +1,24 @@
 import type { Habit, HabitCompletion, MonthlyGoal, Task, DailyEntry } from './types';
 
+export const DEFAULT_HABIT_NAMES: Record<string, Record<'ru' | 'en' | 'uz', string>> = {
+  'h-1': { ru: 'Ранний подъем', en: 'Early Morning Rise', uz: 'Erta tongda uyg‘onish' },
+  'h-2': { ru: 'Выпить стакан воды', en: 'Drink a Glass of Water', uz: '1 stakan suv ichish' },
+  'h-3': { ru: 'Контрастный душ', en: 'Contrast / Cold Shower', uz: 'Kontrast dush' },
+  'h-4': { ru: 'Изучение языка', en: 'Language Practice', uz: 'Til o‘rganish' },
+  'h-5': { ru: 'Фитнес / пробежка', en: 'Fitness / Morning Run', uz: 'Fitnes / ertalabki yugurish' },
+  'h-6': { ru: 'Чтение книги (30 мин)', en: 'Read a Book (30 min)', uz: 'Kitob o‘qish (30 daqiqa)' },
+  'h-7': { ru: 'Планирование дня', en: 'Daily Planning', uz: 'Kunni rejalashtirish' },
+  'h-8': { ru: 'Фокус-работа', en: 'Deep Focus Session', uz: 'Fokusli ish seansi' },
+  'h-9': { ru: 'Медитация / дыхание', en: 'Meditation & Breathwork', uz: 'Meditatsiya va nafas mashqi' },
+};
+
+export function getHabitDisplayName(habit: Habit, lang: 'ru' | 'en' | 'uz'): string {
+  if (DEFAULT_HABIT_NAMES[habit.id] && DEFAULT_HABIT_NAMES[habit.id][lang]) {
+    return DEFAULT_HABIT_NAMES[habit.id][lang];
+  }
+  return habit.name;
+}
+
 // Generate a UUID-like ID
 function generateId(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -134,21 +153,29 @@ function ensureSeedData(): void {
   const defaultCompletions: HabitCompletion[] = [];
   const currentDay = now.getDate();
 
-  // Populate completions matching the photograph (days 1 to ~21 active)
-  for (let d = 1; d <= Math.min(currentDay, 28); d++) {
-    const dayDateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    defaultHabits.forEach((h, hIdx) => {
-      // In the photo, the first 7 days are 100% completed, then days 8-21 around 70-80%
-      const prob = d <= 7 ? 1.0 : ((hIdx + d) % 4 !== 0 ? 0.8 : 0.4);
-      if (Math.sin(d * 13 + hIdx * 7) > (1 - prob * 2) || d <= 7) {
-        defaultCompletions.push({
-          id: `c-${d}-${h.id}`,
-          user_id: 'local',
-          habit_id: h.id,
-          completed_date: dayDateStr,
-        });
-      }
-    });
+  // Populate completions for months of the year up to current month (reflecting full annual progress)
+  for (let m = 1; m <= month; m++) {
+    const isCurrent = m === month;
+    const maxDays = isCurrent ? Math.min(currentDay, 28) : 28;
+    const baseConsistency = 0.50 + ((m / 12) * 0.35);
+
+    for (let d = 1; d <= maxDays; d++) {
+      const dayDateStr = `${year}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      defaultHabits.forEach((h, hIdx) => {
+        const isAlwaysDone = isCurrent && d <= 7;
+        const pseudoRandom = Math.sin(d * 11 + hIdx * 7 + m * 17);
+        const shouldComplete = isAlwaysDone || (pseudoRandom > (1 - baseConsistency * 1.8));
+
+        if (shouldComplete) {
+          defaultCompletions.push({
+            id: `c-${m}-${d}-${h.id}`,
+            user_id: 'local',
+            habit_id: h.id,
+            completed_date: dayDateStr,
+          });
+        }
+      });
+    }
   }
 
   // Monthly goal
@@ -332,8 +359,49 @@ export function reorderHabits(orderedIds: string[]): void {
 
 // ========== HABIT COMPLETIONS ==========
 
-export function getCompletions(year?: number, month?: number): HabitCompletion[] {
+export function ensureYearlyCompletions(): HabitCompletion[] {
   let completions = getItem<HabitCompletion>(STORAGE_KEYS.completions);
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const currentDay = now.getDate();
+  const habits = getHabits();
+
+  // If local storage only has data for 1 month, backfill past months for full annual trend
+  const monthsFound = new Set(completions.map((c) => c.completed_date.slice(0, 7)));
+  if (monthsFound.size <= 1 && habits.length > 0) {
+    const additional: HabitCompletion[] = [];
+    for (let m = 1; m < month; m++) {
+      const baseConsistency = 0.50 + ((m / 12) * 0.35);
+      for (let d = 1; d <= 28; d++) {
+        const dayDateStr = `${year}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        habits.forEach((h, hIdx) => {
+          const pseudoRandom = Math.sin(d * 11 + hIdx * 7 + m * 17);
+          if (pseudoRandom > (1 - baseConsistency * 1.8)) {
+            additional.push({
+              id: `c-backfill-${m}-${d}-${h.id}`,
+              user_id: 'local',
+              habit_id: h.id,
+              completed_date: dayDateStr,
+            });
+          }
+        });
+      }
+    }
+    if (additional.length > 0) {
+      completions = [...completions, ...additional];
+      setItem(STORAGE_KEYS.completions, completions);
+    }
+  }
+  return completions;
+}
+
+export function getAllCompletions(): HabitCompletion[] {
+  return ensureYearlyCompletions();
+}
+
+export function getCompletions(year?: number, month?: number): HabitCompletion[] {
+  let completions = ensureYearlyCompletions();
   if (year !== undefined && month !== undefined) {
     const prefix = `${year}-${String(month).padStart(2, '0')}`;
     completions = completions.filter((c) => c.completed_date.startsWith(prefix));
@@ -408,6 +476,10 @@ export function getTasks(dateStr: string): Task[] {
   return tasks
     .filter((t) => t.day_date === dateStr)
     .sort((a, b) => a.sort_order - b.sort_order);
+}
+
+export function getAllTasks(): Task[] {
+  return getItem<Task>(STORAGE_KEYS.tasks);
 }
 
 export function getTasksForDateRange(startDate: string, endDate: string): Task[] {

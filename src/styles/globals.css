@@ -2,144 +2,120 @@
 @import "tailwindcss";
 
 @theme {
-  /* === DARK ELECTRIC BLUE THEME === */
-
-  /* Backgrounds */
-  --color-bg-primary:    #080C14;
-  --color-bg-secondary:  #0D1420;
-  --color-bg-card:       #111827;
-  --color-bg-card-alt:   #1A2235;
-  --color-bg-elevated:   #1E2A3E;
-  --color-bg-header:     #0F1929;
-  --color-bg-glass:      rgba(14, 24, 40, 0.85);
-
-  /* Electric Blue Accents */
-  --color-electric:      #00D4FF;
-  --color-electric-dim:  #0098C8;
-  --color-electric-glow: rgba(0, 212, 255, 0.15);
-  --color-electric-muted: rgba(0, 212, 255, 0.4);
-  --color-blue-mid:      #1E90FF;
-  --color-blue-deep:     #0066CC;
-  --color-blue-neon:     #00BFFF;
-
-  /* Accent colors */
-  --color-accent-green:  #00FF88;
-  --color-accent-green-dim: #00C66A;
-  --color-accent-purple: #7B2FFF;
-  --color-accent-orange: #FF6B00;
-  --color-accent-red:    #FF3366;
-  --color-accent-gold:   #FFD700;
-
-  /* Text */
-  --color-text-primary:  #E8F4FF;
-  --color-text-secondary: #7BA7CC;
-  --color-text-muted:    #3D5A7A;
-  --color-text-on-dark:  #E8F4FF;
-  --color-text-bright:   #FFFFFF;
-
-  /* Borders */
-  --color-border:        rgba(0, 212, 255, 0.12);
-  --color-border-bright: rgba(0, 212, 255, 0.35);
-  --color-border-subtle: rgba(255, 255, 255, 0.05);
-
-  /* Donut ring colors by day — electric palette */
-  --color-ring-mon: #00D4FF;
-  --color-ring-tue: #1E90FF;
-  --color-ring-wed: #7B2FFF;
-  --color-ring-thu: #00FF88;
-  --color-ring-fri: #00BFFF;
-  --color-ring-sat: #FFD700;
-  --color-ring-sun: #FF6B00;
-
-  /* Header colors by weekday for planner */
-  --color-header-weekday: #0F1929;
-  --color-header-weekend: #1A0D2E;
-
-  /* Font families */
-  --font-sans:    'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* Tailwind CSS v4 Theme definitions */
+  --font-sans:    'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
   --font-mono:    'JetBrains Mono', ui-monospace, monospace;
 }
 
-/* ===================== THEME VARIABLES ===================== */
-/* Default = dark (electric blue) */
+/* ==========================================================================
+   DESIGN SYSTEM: KINETIC PRECISION
+   ========================================================================== */
+
+/* DARK MODE (Default: Deep Aerospace Obsidian & Vivid Electric Blue) */
 :root,
 [data-theme="dark"] {
-  --bg-primary:       #080C14;
-  --bg-secondary:     #0D1420;
-  --bg-card:          #111827;
-  --bg-card-alt:      #1A2235;
-  --bg-elevated:      #1E2A3E;
-  --bg-header:        #0F1929;
-  --bg-glass:         rgba(14, 24, 40, 0.92);
+  --bg-primary:          #07090E;
+  --bg-secondary:        #0C101A;
+  --bg-card:             #111624;
+  --bg-card-alt:         #171F32;
+  --bg-elevated:         #1D263D;
+  --bg-header:           #141B2D;
+  --bg-glass:            rgba(11, 16, 26, 0.92);
 
-  --electric:         #00D4FF;
-  --electric-dim:     #0098C8;
-  --electric-glow:    rgba(0, 212, 255, 0.15);
-  --electric-muted:   rgba(0, 212, 255, 0.4);
-  --blue-mid:         #1E90FF;
-  --blue-deep:        #0066CC;
-  --blue-neon:        #00BFFF;
+  --electric:            #0076F9; /* True Vivid Electric Blue (sampled directly from logo #0076F9) */
+  --electric-dim:        #005FE0;
+  --electric-glow:       rgba(0, 118, 249, 0.22);
+  --electric-muted:      rgba(0, 118, 249, 0.45);
+  --electric-bright:     #00A4FD;
+  --blue-mid:            #0076F9;
+  --blue-deep:           #00439A;
+  --blue-neon:           #02B3FF;
 
-  --accent-green:     #00FF88;
-  --accent-green-dim: #00C66A;
-  --accent-purple:    #7B2FFF;
-  --accent-orange:    #FF6B00;
-  --accent-red:       #FF3366;
-  --accent-gold:      #FFD700;
+  --accent-green:        #10B981;
+  --accent-green-dim:    #059669;
+  --accent-purple:       #8B5CF6;
+  --accent-orange:       #F97316;
+  --accent-red:          #EF4444;
+  --accent-gold:         #F59E0B;
 
-  --text-primary:     #E8F4FF;
-  --text-secondary:   #7BA7CC;
-  --text-muted:       #3D5A7A;
-  --text-bright:      #FFFFFF;
+  /* Harmonious per-habit palette tokens (WCAG AA tested) */
+  --habit-1: #0076F9; /* Electric Blue */
+  --habit-2: #02B3FF; /* Sky */
+  --habit-3: #818CF8; /* Indigo */
+  --habit-4: #34D399; /* Emerald */
+  --habit-5: #FBBF24; /* Amber */
+  --habit-6: #F472B6; /* Rose */
+  --habit-7: #A78BFA; /* Violet */
+  --habit-8: #FB923C; /* Coral */
 
-  --border:           rgba(0, 212, 255, 0.12);
-  --border-bright:    rgba(0, 212, 255, 0.35);
-  --border-subtle:    rgba(255, 255, 255, 0.05);
+  --text-primary:        #F8FAFC;
+  --text-secondary:      #94A3B8;
+  --text-muted:          #64748B;
+  --text-bright:         #FFFFFF;
+
+  --border:              rgba(255, 255, 255, 0.08);
+  --border-bright:       rgba(0, 118, 249, 0.40);
+  --border-subtle:       rgba(255, 255, 255, 0.05);
 
   --color-scheme: dark;
 }
 
+/* LIGHT MODE (First-class Arctic Slate & Deep Electric Blue) */
 [data-theme="light"] {
-  --bg-primary:       #EEF4FC;
-  --bg-secondary:     #E4EEF9;
-  --bg-card:          #FFFFFF;
-  --bg-card-alt:      #F0F6FF;
-  --bg-elevated:      #E8F0FB;
-  --bg-header:        #DDEAF8;
-  --bg-glass:         rgba(240, 246, 255, 0.95);
+  --bg-primary:          #F8FAFC;
+  --bg-secondary:        #F1F5F9;
+  --bg-card:             #FFFFFF;
+  --bg-card-alt:         #F8FAFC;
+  --bg-elevated:         #E2E8F0;
+  --bg-header:           #F1F5F9;
+  --bg-glass:            rgba(255, 255, 255, 0.94);
 
-  --electric:         #0055CC;
-  --electric-dim:     #0044AA;
-  --electric-glow:    rgba(0, 85, 204, 0.15);
-  --electric-muted:   rgba(0, 85, 204, 0.35);
-  --blue-mid:         #0077EE;
-  --blue-deep:        #003A99;
-  --blue-neon:        #0099FF;
+  --electric:            #0066FF;
+  --electric-dim:        #0052CC;
+  --electric-glow:       rgba(0, 102, 255, 0.16);
+  --electric-muted:      rgba(0, 102, 255, 0.35);
+  --electric-bright:     #0076F9;
+  --blue-mid:            #0066FF;
+  --blue-deep:           #00439A;
+  --blue-neon:           #0084FF;
 
-  --accent-green:     #00AA55;
-  --accent-green-dim: #008844;
-  --accent-purple:    #6611CC;
-  --accent-orange:    #E05000;
-  --accent-red:       #CC1144;
-  --accent-gold:      #BB8800;
+  --accent-green:        #059669;
+  --accent-green-dim:    #047857;
+  --accent-purple:       #7C3AED;
+  --accent-orange:       #EA580C;
+  --accent-red:          #DC2626;
+  --accent-gold:         #D97706;
 
-  --text-primary:     #0A1628;
-  --text-secondary:   #1E4A8A;
-  --text-muted:       #5577AA;
-  --text-bright:      #000D1A;
+  /* Harmonious per-habit palette tokens in light mode */
+  --habit-1: #0066FF;
+  --habit-2: #0284C7;
+  --habit-3: #4F46E5;
+  --habit-4: #059669;
+  --habit-5: #D97706;
+  --habit-6: #DB2777;
+  --habit-7: #7C3AED;
+  --habit-8: #EA580C;
 
-  --border:           rgba(0, 85, 204, 0.15);
-  --border-bright:    rgba(0, 85, 204, 0.4);
-  --border-subtle:    rgba(0, 85, 204, 0.08);
+  --text-primary:        #0F172A;
+  --text-secondary:      #475569;
+  --text-muted:          #94A3B8;
+  --text-bright:         #020617;
+
+  --border:              rgba(15, 23, 42, 0.08);
+  --border-bright:       rgba(0, 102, 255, 0.40);
+  --border-subtle:       rgba(15, 23, 42, 0.04);
 
   --color-scheme: light;
 }
 
-/* ===================== BASE ===================== */
+/* ==========================================================================
+   BASE & RESET
+   ========================================================================== */
 html {
   font-size: 14px;
   color-scheme: var(--color-scheme, dark);
+  scroll-behavior: smooth;
 }
 
 body {
@@ -149,35 +125,102 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ===================== SCROLLBAR ===================== */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--electric-dim); border-radius: 4px; }
+/* Tabular numerals for stats, counts, timer, and dates */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Minimum 44px touch target utility */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Hairline borders */
+.border-hairline {
+  border-width: 1px;
+  border-color: var(--border);
+}
+
+/* ==========================================================================
+   SCROLLBAR & FOCUS
+   ========================================================================== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-bright);
+  border-radius: 9999px;
+}
 ::-webkit-scrollbar-thumb:hover { background: var(--electric); }
 
-/* ===================== FOCUS ===================== */
 *:focus-visible {
   outline: 2px solid var(--electric);
   outline-offset: 2px;
 }
 
-/* ===================== SELECTION ===================== */
 ::selection {
   background: var(--electric-glow);
   color: var(--electric);
 }
 
-/* ===================== SHIMMER ===================== */
+/* ==========================================================================
+   ANIMATIONS & MICRO-INTERACTIONS
+   ========================================================================== */
+@keyframes checkmark-pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes streak-flame {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.08) rotate(-3deg); }
+  75% { transform: scale(1.08) rotate(3deg); }
+}
+
+.animate-check-pop {
+  animation: checkmark-pop 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-flame {
+  animation: streak-flame 2.5s ease-in-out infinite;
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Card elevation tokens */
+.surface-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.surface-card:hover {
+  border-color: var(--border-bright);
+}
+
+/* Skeleton shimmer */
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
 }
 
-.skeleton-shimmer,
-.animate-shimmer {
+.skeleton-shimmer {
   background: linear-gradient(
     90deg,
     var(--bg-card) 25%,
@@ -188,178 +231,52 @@ body {
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
-/* ===================== GLOW ANIMATIONS ===================== */
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 8px var(--electric-glow); }
-  50%       { box-shadow: 0 0 24px var(--electric-muted), 0 0 48px var(--electric-glow); }
+/* ==========================================================================
+   PRINT & PDF EXPORT STYLES (A4 Landscape Weekly Review Journal)
+   ========================================================================== */
+.print-show {
+  display: none;
 }
 
-@keyframes float-up {
-  0%   { transform: translateY(0px); }
-  50%  { transform: translateY(-4px); }
-  100% { transform: translateY(0px); }
-}
-
-@keyframes electric-border {
-  0%   { border-color: rgba(0, 212, 255, 0.3); }
-  50%  { border-color: rgba(0, 212, 255, 0.8); }
-  100% { border-color: rgba(0, 212, 255, 0.3); }
-}
-
-@keyframes scan-line {
-  0%   { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
-
-@keyframes neon-flicker {
-  0%, 100% { opacity: 1; }
-  92%       { opacity: 1; }
-  93%       { opacity: 0.6; }
-  94%       { opacity: 1; }
-  96%       { opacity: 0.8; }
-  97%       { opacity: 1; }
-}
-
-.animate-pulse-glow  { animation: pulse-glow 2.5s ease-in-out infinite; }
-.animate-float       { animation: float-up 3s ease-in-out infinite; }
-.animate-neon-flicker { animation: neon-flicker 4s ease-in-out infinite; }
-
-/* ===================== GLASS CARD ===================== */
-.glass-card {
-  background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-}
-
-/* ===================== ELECTRIC BUTTON ===================== */
-.btn-electric {
-  background: linear-gradient(135deg, var(--electric), var(--blue-mid));
-  color: var(--bg-primary);
-  font-weight: 700;
-  transition: all 0.2s ease;
-  box-shadow: 0 0 16px var(--electric-glow);
-}
-.btn-electric:hover {
-  box-shadow: 0 0 32px var(--electric-muted);
-  transform: translateY(-1px);
-}
-
-/* ===================== TRACKER CHECKBOX ===================== */
-.tracker-checkbox {
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid var(--text-muted);
-  border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  background: transparent;
-}
-.tracker-checkbox:hover {
-  border-color: var(--electric);
-  background: var(--electric-glow);
-}
-.tracker-checkbox.checked {
-  background: var(--electric);
-  border-color: var(--electric);
-  box-shadow: 0 0 8px var(--electric-glow);
-}
-.tracker-checkbox.checked::after {
-  content: '✓';
-  color: var(--bg-primary);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-/* ===================== PROGRESS BAR ===================== */
-.progress-bar-track {
-  background: var(--bg-elevated);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.progress-bar-fill {
-  background: linear-gradient(90deg, var(--electric-dim), var(--electric), var(--blue-neon));
-  border-radius: 999px;
-  box-shadow: 0 0 8px var(--electric-glow);
-  transition: width 0.6s ease;
-}
-.progress-bar-fill.green {
-  background: linear-gradient(90deg, var(--accent-green-dim), var(--accent-green));
-  box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
-}
-
-/* ===================== WEEK HEADER ===================== */
-.week-header {
-  background: linear-gradient(90deg, var(--bg-header), var(--bg-elevated));
-  border-top: 1px solid var(--border);
-  color: var(--electric);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  font-size: 11px;
-  text-transform: uppercase;
-}
-
-/* ===================== STAT BADGE ===================== */
-.stat-badge {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 12px;
-  text-align: center;
-}
-.stat-badge .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
-.stat-badge .value { font-size: 18px; font-weight: 800; color: var(--electric); font-family: var(--font-mono); }
-
-/* ===================== GRID LINES ===================== */
-.tracker-grid-line {
-  border-right: 1px solid var(--border-subtle);
-}
-.tracker-grid-line:last-child { border-right: none; }
-
-/* ===================== PRINT ===================== */
 @media print {
-  body { background: white; color: black; font-size: 11px; }
-  .no-print { display: none !important; }
+  @page {
+    size: A4 landscape;
+    margin: 8mm 6mm;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print,
+  header,
+  nav,
+  button,
+  .touch-target,
+  .print-hide {
+    display: none !important;
+  }
+
+  .print-show {
+    display: block !important;
+  }
+
+  .surface-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .planner-print-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
 }
 
-/* ===================== SCROLLABLE TABLE ===================== */
-.tracker-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.tracker-scroll::-webkit-scrollbar { height: 4px; }
-
-/* ===================== INSPIRATIONAL QUOTE ===================== */
-.quote-text {
-  font-family: var(--font-display);
-  font-weight: 600;
-  background: linear-gradient(135deg, var(--electric), var(--blue-neon), var(--accent-purple));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* ===================== ANALYSIS TABLE ===================== */
-.analysis-table th {
-  background: linear-gradient(90deg, #0A2010, #0D2A18);
-  color: var(--accent-green);
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 4px 8px;
-  border: 1px solid rgba(0, 255, 136, 0.2);
-}
-.analysis-table td {
-  padding: 3px 8px;
-  font-size: 11px;
-  border: 1px solid var(--border-subtle);
-  font-family: var(--font-mono);
-}
-.analysis-table .progress-cell {
-  min-width: 80px;
-}
