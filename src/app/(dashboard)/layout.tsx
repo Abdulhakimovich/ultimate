@@ -1,11 +1,22 @@
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
 import TopNav from '@/components/layout/TopNav';
 import ToastContainer from '@/components/ui/Toast';
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden" style={{ background: 'var(--bg-primary)' }}>
       {/* Ambient Electric Blue Aura for the Main Dashboard */}

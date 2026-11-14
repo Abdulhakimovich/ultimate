@@ -2,13 +2,12 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Calendar,
   BarChart3,
   LayoutDashboard,
   Printer,
-  RotateCcw,
   ChevronDown,
   Sun,
   Moon,
@@ -16,17 +15,22 @@ import {
   VolumeX,
   Menu,
   X,
+  LogOut,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { useFeedbackStore } from '@/store/feedbackStore';
+import { useHabitsStore } from '@/store/habitsStore';
+import { usePlannerStore } from '@/store/plannerStore';
+import { createClient } from '@/lib/supabase/client';
 import { playCheckSound } from '@/lib/feedback';
 import { t, LANGUAGE_OPTIONS } from '@/lib/i18n';
 import Logo from '@/components/ui/Logo';
 
 export default function TopNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [langOpen, setLangOpen]         = useState(false);
   const [mobileMenuOpen, setMobileMenu] = useState(false);
@@ -41,6 +45,30 @@ export default function TopNav() {
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const soundEnabled = useFeedbackStore((s) => s.soundEnabled);
   const toggleSound  = useFeedbackStore((s) => s.toggleSound);
+
+  const handleSignOut = async () => {
+    setDropdownOpen(false);
+    setMobileMenu(false);
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Sign out error:', err);
+    }
+    useHabitsStore.setState({
+      habits: [],
+      completions: [],
+      allCompletions: [],
+      monthlyGoal: null,
+      isLoading: true,
+    });
+    usePlannerStore.setState({
+      tasksByDate: {},
+      entriesByDate: {},
+      isLoading: true,
+    });
+    router.push('/login');
+  };
 
   const handleToggleSound = () => {
     toggleSound();
@@ -276,20 +304,14 @@ export default function TopNav() {
                   <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }} />
 
                   <button
-                    onClick={() => {
-                      setDropdownOpen(false);
-                      if (confirm('Reset demo data to defaults?')) {
-                        localStorage.clear();
-                        window.location.reload();
-                      }
-                    }}
+                    onClick={handleSignOut}
                     className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-left font-medium"
                     style={{ color: 'var(--accent-red)' }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <RotateCcw size={13} />
-                    <span>{tr.ui.reset}</span>
+                    <LogOut size={13} />
+                    <span>{tr.ui.signOut}</span>
                   </button>
                 </motion.div>
               )}
@@ -345,6 +367,18 @@ export default function TopNav() {
                 </Link>
               );
             })}
+            <div style={{ borderTop: '1px solid var(--border)', margin: '6px 0' }} />
+            <button
+              onClick={handleSignOut}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all touch-target text-left"
+              style={{
+                color: 'var(--accent-red)',
+                background: 'rgba(239, 68, 68, 0.08)',
+              }}
+            >
+              <LogOut size={16} />
+              <span>{tr.ui.signOut}</span>
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

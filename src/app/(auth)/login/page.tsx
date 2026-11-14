@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
-import { LogIn, Loader2, Mail, Lock, Eye, EyeOff, AlertCircle, Sparkles, Check } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { LogIn, Loader2, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
 
@@ -19,8 +19,11 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextTarget = searchParams.get('next') || '/tracker';
+
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -36,7 +39,6 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -52,14 +54,6 @@ export default function LoginPage() {
     setAuthError(null);
 
     try {
-      if (!isSupabaseConfigured) {
-        // Fallback for local demo mode: instant transition
-        setTimeout(() => {
-          router.push('/tracker');
-        }, 400);
-        return;
-      }
-
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({
         email: data.email,
@@ -70,40 +64,35 @@ export default function LoginPage() {
         setAuthError(error.message || 'Ошибка входа. Проверьте данные.');
         setIsLoading(false);
       } else {
-        router.push('/tracker');
+        router.push(nextTarget);
       }
-    } catch (err: any) {
-      setAuthError(err.message || 'Произошла непредвиденная ошибка');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Произошла непредвиденная ошибка';
+      setAuthError(message);
       setIsLoading(false);
     }
   };
 
-  const handleQuickDemoLogin = () => {
-    setValue('email', 'demo@ultimate.app');
-    setValue('password', 'discipline2026');
-    setIsLoading(true);
-    setAuthError(null);
-    setTimeout(() => {
-      router.push('/tracker');
-    }, 350);
-  };
-
   const handleGoogleLogin = async () => {
     setIsLoading(true);
+    setAuthError(null);
     try {
-      if (!isSupabaseConfigured) {
-        router.push('/tracker');
-        return;
-      }
       const supabase = createClient();
-      await supabase.auth.signInWithOAuth({
+      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextTarget)}`;
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/tracker`,
+          redirectTo: callbackUrl,
         },
       });
-    } catch {
-      router.push('/tracker');
+      if (error) {
+        setAuthError(error.message);
+        setIsLoading(false);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Ошибка входа через Google';
+      setAuthError(message);
+      setIsLoading(false);
     }
   };
 
@@ -138,18 +127,18 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Google OAuth Button */}
+      {/* Google OAuth Login */}
       <button
         type="button"
         onClick={handleGoogleLogin}
         disabled={isLoading}
-        className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl border-hairline transition-all hover:bg-[var(--bg-elevated)] text-xs font-semibold shadow-sm disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all border-hairline hover:bg-[var(--bg-elevated)] active:scale-[0.99] disabled:opacity-50"
         style={{
-          background: 'var(--bg-elevated)',
+          background: 'var(--bg-card)',
           color: 'var(--text-primary)',
         }}
       >
-        <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+        <svg className="w-4 h-4" viewBox="0 0 24 24">
           <path
             fill="#4285F4"
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -167,27 +156,24 @@ export default function LoginPage() {
             d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
           />
         </svg>
-        <span>{tr.auth.googleLogin}</span>
+        <span>{tr.auth.googleBtn}</span>
       </button>
 
       {/* Divider */}
-      <div className="relative my-3 flex items-center justify-center">
-        <div className="border-t border-[var(--border)] w-full" />
-        <span
-          className="px-2 text-[10px] font-mono uppercase bg-[var(--bg-card)] whitespace-nowrap"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          {tr.auth.orContinueWith}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-[var(--border)]" />
+        <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-muted)]">
+          {tr.auth.orEmail}
         </span>
-        <div className="border-t border-[var(--border)] w-full" />
+        <div className="flex-1 h-px bg-[var(--border)]" />
       </div>
 
-      {/* Login Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Email field */}
+      {/* Form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
+        {/* Email */}
         <div>
-          <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>
-            {tr.auth.email}
+          <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+            {tr.auth.emailLabel}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--text-muted)]">
@@ -196,7 +182,7 @@ export default function LoginPage() {
             <input
               {...register('email')}
               type="email"
-              placeholder="alex@example.com"
+              placeholder={tr.auth.emailPlaceholder}
               className="w-full pl-9 pr-3 py-2 rounded-xl text-xs outline-none transition-all border-hairline font-mono"
               style={{
                 background: 'var(--bg-primary)',
@@ -211,19 +197,12 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Password field */}
+        {/* Password */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
-              {tr.auth.password}
+            <label className="block text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {tr.auth.passwordLabel}
             </label>
-            <span
-              className="text-[11px] cursor-pointer hover:underline"
-              style={{ color: 'var(--electric)' }}
-              onClick={() => alert(tr.auth.forgotPassword + ' — В демо-режиме используйте быстрый вход ниже.')}
-            >
-              {tr.auth.forgotPassword}
-            </span>
           </div>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--text-muted)]">
@@ -288,29 +267,11 @@ export default function LoginPage() {
         </button>
       </form>
 
-      {/* Quick Demo Login Option */}
-      <div className="pt-2">
-        <button
-          type="button"
-          onClick={handleQuickDemoLogin}
-          disabled={isLoading}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all border-hairline hover:bg-[var(--bg-elevated)]"
-          style={{
-            color: 'var(--electric)',
-            borderColor: 'var(--border-bright)',
-            background: 'var(--electric-glow)',
-          }}
-        >
-          <Sparkles size={14} />
-          <span>{tr.auth.quickDemoLogin}</span>
-        </button>
-      </div>
-
       {/* Switch to Register */}
       <div className="mt-4 pt-3 border-t border-[var(--border)] text-center text-xs" style={{ color: 'var(--text-secondary)' }}>
         <span>{tr.auth.noAccount} </span>
         <Link
-          href="/register"
+          href={`/register${nextTarget !== '/tracker' ? `?next=${encodeURIComponent(nextTarget)}` : ''}`}
           className="font-bold hover:underline transition-colors ml-1"
           style={{ color: 'var(--electric)' }}
         >
@@ -318,5 +279,13 @@ export default function LoginPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="h-80 rounded-2xl skeleton-shimmer" />}>
+      <LoginForm />
+    </Suspense>
   );
 }
