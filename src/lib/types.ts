@@ -8,6 +8,16 @@ export interface Habit {
   color: string;
   created_at: string;
   archived: boolean;
+  sort_order?: number;
+}
+
+export interface Profile {
+  id: string;
+  display_name: string | null;
+  theme: 'dark' | 'light';
+  language: 'ru' | 'en' | 'uz';
+  local_import_done_at: string | null;
+  created_at: string;
 }
 
 export interface MonthlyGoal {
