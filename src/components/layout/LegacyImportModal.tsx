@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Download, X, Loader2 } from 'lucide-react';
+import { Sparkles, Download, Loader2 } from 'lucide-react';
 import { getProfile } from '@/lib/data/profile';
 import { getHabits } from '@/lib/data/habits';
 import { getLegacyDataSummary, importLegacyData, skipLegacyImport, type LegacyDataSummary } from '@/lib/legacy-import';

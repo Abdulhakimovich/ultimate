@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 import { LogIn, Loader2, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
+import { useMounted } from '@/hooks/useMounted';
 
 const loginSchema = z.object({
   email: z.string().email('Некорректный email адрес'),
@@ -27,14 +28,10 @@ function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
 
   const language = useLanguageStore((s) => s.language);
   const tr = t(language);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const {
     register,
@@ -156,14 +153,14 @@ function LoginForm() {
             d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
           />
         </svg>
-        <span>{tr.auth.googleBtn}</span>
+        <span>{tr.auth.googleLogin}</span>
       </button>
 
       {/* Divider */}
       <div className="flex items-center gap-3">
         <div className="flex-1 h-px bg-[var(--border)]" />
         <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-muted)]">
-          {tr.auth.orEmail}
+          {tr.auth.orContinueWith}
         </span>
         <div className="flex-1 h-px bg-[var(--border)]" />
       </div>
@@ -173,7 +170,7 @@ function LoginForm() {
         {/* Email */}
         <div>
           <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
-            {tr.auth.emailLabel}
+            {tr.auth.email}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--text-muted)]">
@@ -182,7 +179,7 @@ function LoginForm() {
             <input
               {...register('email')}
               type="email"
-              placeholder={tr.auth.emailPlaceholder}
+              placeholder="you@example.com"
               className="w-full pl-9 pr-3 py-2 rounded-xl text-xs outline-none transition-all border-hairline font-mono"
               style={{
                 background: 'var(--bg-primary)',
@@ -201,7 +198,7 @@ function LoginForm() {
         <div>
           <div className="flex items-center justify-between mb-1">
             <label className="block text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
-              {tr.auth.passwordLabel}
+              {tr.auth.password}
             </label>
           </div>
           <div className="relative">

@@ -9,8 +9,6 @@ import {
   ArrowUpRight,
   TrendingUp,
   Zap,
-  Target,
-  Sparkles,
 } from 'lucide-react';
 import { useHabitsStore } from '@/store/habitsStore';
 import { useLanguageStore } from '@/store/languageStore';
@@ -19,9 +17,10 @@ import { toDateString, getWeekDays, formatShortDotDate, isToday } from '@/lib/ut
 import { isHabitCompletedOnDate } from '@/lib/utils/calculations';
 import { getTasksForDateRange } from '@/lib/data/tasks';
 import type { Task } from '@/lib/types';
+import { useMounted } from '@/hooks/useMounted';
 
 export default function WeeklyPlannerIndicator() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const habits = useHabitsStore((s) => s.habits);
@@ -36,7 +35,6 @@ export default function WeeklyPlannerIndicator() {
   const weekDays = useMemo(() => getWeekDays(today), [today]);
 
   useEffect(() => {
-    setMounted(true);
     if (weekDays.length === 7) {
       const startStr = toDateString(weekDays[0]);
       const endStr = toDateString(weekDays[6]);

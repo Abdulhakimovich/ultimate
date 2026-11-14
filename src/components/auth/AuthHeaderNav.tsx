@@ -10,10 +10,11 @@ import { useHabitsStore } from '@/store/habitsStore';
 import { usePlannerStore } from '@/store/plannerStore';
 import { createClient } from '@/lib/supabase/client';
 import { t, LANGUAGE_OPTIONS } from '@/lib/i18n';
+import { useMounted } from '@/hooks/useMounted';
 
 export default function AuthHeaderNav() {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [langOpen, setLangOpen] = useState(false);
   const [hasSession, setHasSession] = useState(false);
 
@@ -23,7 +24,6 @@ export default function AuthHeaderNav() {
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
 
   useEffect(() => {
-    setMounted(true);
     try {
       const supabase = createClient();
       supabase.auth.getSession().then(({ data: { session } }) => {

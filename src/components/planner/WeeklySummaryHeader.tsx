@@ -169,7 +169,7 @@ export default function WeeklySummaryHeader() {
                     fontSize: 10,
                     color: 'var(--text-primary)',
                   }}
-                  formatter={(val: any) => [`${val}`, tr.planner.tasks]}
+                  formatter={(val: unknown) => [`${val}`, tr.planner.tasks]}
                 />
                 <Bar dataKey="tasks" fill="var(--electric)" radius={[2, 2, 0, 0]} />
               </BarChart>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 import { UserPlus, Loader2, Mail, Lock, User, AlertCircle, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
+import { useMounted } from '@/hooks/useMounted';
 
 const registerSchema = z
   .object({
@@ -35,14 +36,10 @@ function RegisterForm() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [isCheckEmail, setIsCheckEmail] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
 
   const language = useLanguageStore((s) => s.language);
   const tr = t(language);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const {
     register,
@@ -208,14 +205,14 @@ function RegisterForm() {
             d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
           />
         </svg>
-        <span>{tr.auth.googleBtn}</span>
+        <span>{tr.auth.googleLogin}</span>
       </button>
 
       {/* Divider */}
       <div className="flex items-center gap-3">
         <div className="flex-1 h-px bg-[var(--border)]" />
         <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-muted)]">
-          {tr.auth.orEmail}
+          {tr.auth.orContinueWith}
         </span>
         <div className="flex-1 h-px bg-[var(--border)]" />
       </div>
@@ -224,7 +221,7 @@ function RegisterForm() {
         {/* Name */}
         <div>
           <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
-            {tr.auth.nameLabel}
+            {tr.auth.name}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--text-muted)]">
@@ -233,7 +230,7 @@ function RegisterForm() {
             <input
               {...register('name')}
               type="text"
-              placeholder={tr.auth.namePlaceholder}
+              placeholder="Алекс"
               className="w-full pl-9 pr-3 py-2 rounded-xl text-xs outline-none transition-all border-hairline"
               style={{
                 background: 'var(--bg-primary)',
@@ -251,7 +248,7 @@ function RegisterForm() {
         {/* Email */}
         <div>
           <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
-            {tr.auth.emailLabel}
+            {tr.auth.email}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--text-muted)]">
@@ -260,7 +257,7 @@ function RegisterForm() {
             <input
               {...register('email')}
               type="email"
-              placeholder={tr.auth.emailPlaceholder}
+              placeholder="you@example.com"
               className="w-full pl-9 pr-3 py-2 rounded-xl text-xs outline-none transition-all border-hairline font-mono"
               style={{
                 background: 'var(--bg-primary)',
@@ -278,7 +275,7 @@ function RegisterForm() {
         {/* Password */}
         <div>
           <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
-            {tr.auth.passwordLabel}
+            {tr.auth.password}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--text-muted)]">
@@ -313,7 +310,7 @@ function RegisterForm() {
         {/* Confirm Password */}
         <div>
           <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
-            {tr.auth.confirmPasswordLabel}
+            {tr.auth.confirmPassword}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[var(--text-muted)]">
@@ -362,7 +359,7 @@ function RegisterForm() {
 
       {/* Switch to Login */}
       <div className="mt-3 pt-3 border-t border-[var(--border)] text-center text-xs" style={{ color: 'var(--text-secondary)' }}>
-        <span>{tr.auth.alreadyHaveAccount} </span>
+        <span>{tr.auth.hasAccount} </span>
         <Link
           href={`/login${nextTarget !== '/tracker' ? `?next=${encodeURIComponent(nextTarget)}` : ''}`}
           className="font-bold hover:underline transition-colors ml-1"
