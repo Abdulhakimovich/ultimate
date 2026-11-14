@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import TopNav from '@/components/layout/TopNav';
 import ToastContainer from '@/components/ui/Toast';
+import LegacyImportModal from '@/components/layout/LegacyImportModal';
 
 export default async function DashboardLayout({
   children,
@@ -31,6 +32,7 @@ export default async function DashboardLayout({
       <main className="flex-1 max-w-[1600px] w-full mx-auto px-3 py-4 relative z-10">
         {children}
       </main>
+      <LegacyImportModal />
       <ToastContainer />
     </div>
   );
