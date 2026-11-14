@@ -1,7 +1,22 @@
 import { create } from 'zustand';
 import type { Task, DailyEntry } from '@/lib/types';
-import * as storage from '@/lib/storage';
+import * as dataTasks from '@/lib/data/tasks';
+import * as dataEntries from '@/lib/data/entries';
 import { toDateString, getWeekDays, addWeeks, subWeeks } from '@/lib/utils/dates';
+import { useToastStore } from '@/stores/toastStore';
+
+function handleError(error: unknown, fallbackMessage: string) {
+  const message = error instanceof Error ? error.message : fallbackMessage;
+  useToastStore.getState().addToast({ message, variant: 'error' });
+  const isAuthError =
+    message.includes('JWT') ||
+    message.includes('expired') ||
+    message.includes('Unauthorized') ||
+    message.includes('session');
+  if (isAuthError && typeof window !== 'undefined') {
+    window.location.href = '/login';
+  }
+}
 
 interface PlannerState {
   currentWeekStart: Date;
@@ -11,7 +26,7 @@ interface PlannerState {
   isLoading: boolean;
 
   // Actions
-  loadWeekData: () => void;
+  loadWeekData: () => Promise<void>;
   setCurrentWeek: (date: Date) => void;
   navigateWeek: (direction: 'prev' | 'next') => void;
   addTask: (dateStr: string, text: string) => Task;
@@ -19,7 +34,11 @@ interface PlannerState {
   deleteTask: (id: string, dateStr: string) => void;
   toggleTask: (id: string, dateStr: string) => void;
   reorderTasks: (dateStr: string, orderedIds: string[]) => void;
-  updateEntry: (dateStr: string, field: keyof Pick<DailyEntry, 'notes' | 'improvements' | 'gratitude'>, values: string[]) => void;
+  updateEntry: (
+    dateStr: string,
+    field: keyof Pick<DailyEntry, 'notes' | 'improvements' | 'gratitude'>,
+    values: string[]
+  ) => void;
 }
 
 export const usePlannerStore = create<PlannerState>((set, get) => ({
@@ -34,28 +53,39 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
   entriesByDate: {},
   isLoading: true,
 
-  loadWeekData: () => {
-    const { currentWeekStart } = get();
-    const days = getWeekDays(currentWeekStart);
-    const startStr = toDateString(days[0]);
-    const endStr = toDateString(days[6]);
+  loadWeekData: async () => {
+    try {
+      set({ isLoading: true });
+      const { currentWeekStart } = get();
+      const days = getWeekDays(currentWeekStart);
+      const startStr = toDateString(days[0]);
+      const endStr = toDateString(days[6]);
 
-    const tasks = storage.getTasksForDateRange(startStr, endStr);
-    const tasksByDate: Record<string, Task[]> = {};
-    const entriesByDate: Record<string, DailyEntry> = {};
+      const tasksPromise = dataTasks.getTasksForDateRange(startStr, endStr);
+      const entriesPromises = days.map((d) => dataEntries.getDailyEntry(toDateString(d)));
 
-    for (const day of days) {
-      const dateStr = toDateString(day);
-      tasksByDate[dateStr] = tasks
-        .filter((t) => t.day_date === dateStr)
-        .sort((a, b) => a.sort_order - b.sort_order);
-      const entry = storage.getDailyEntry(dateStr);
-      if (entry) {
-        entriesByDate[dateStr] = entry;
+      const [tasks, ...entries] = await Promise.all([tasksPromise, ...entriesPromises]);
+
+      const tasksByDate: Record<string, Task[]> = {};
+      const entriesByDate: Record<string, DailyEntry> = {};
+
+      for (let i = 0; i < days.length; i++) {
+        const dateStr = toDateString(days[i]);
+        tasksByDate[dateStr] = tasks
+          .filter((t) => t.day_date === dateStr)
+          .sort((a, b) => a.sort_order - b.sort_order);
+
+        const entry = entries[i];
+        if (entry) {
+          entriesByDate[dateStr] = entry;
+        }
       }
-    }
 
-    set({ weekDays: days, tasksByDate, entriesByDate, isLoading: false });
+      set({ weekDays: days, tasksByDate, entriesByDate, isLoading: false });
+    } catch (err) {
+      handleError(err, 'Failed to load planner data');
+      set({ isLoading: false });
+    }
   },
 
   setCurrentWeek: (date) => {
@@ -63,8 +93,7 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
     const diff = date.getDate() - day + (day === 0 ? -6 : 1);
     const weekStart = new Date(date.getFullYear(), date.getMonth(), diff);
     set({ currentWeekStart: weekStart });
-    // Reload data after setting
-    setTimeout(() => get().loadWeekData(), 0);
+    get().loadWeekData();
   },
 
   navigateWeek: (direction) => {
@@ -74,22 +103,46 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
         ? subWeeks(currentWeekStart, 1)
         : addWeeks(currentWeekStart, 1);
     set({ currentWeekStart: newStart });
-    setTimeout(() => get().loadWeekData(), 0);
+    get().loadWeekData();
   },
 
   addTask: (dateStr, text) => {
-    const task = storage.createTask(dateStr, text);
+    const currentTasks = get().tasksByDate[dateStr] || [];
+    const maxOrder = currentTasks.reduce((max, t) => Math.max(max, t.sort_order), -1);
+
+    const task: Task = {
+      id: crypto.randomUUID(),
+      user_id: '',
+      day_date: dateStr,
+      text,
+      completed: false,
+      sort_order: maxOrder + 1,
+      created_at: new Date().toISOString(),
+    };
+
+    const previousTasks = currentTasks;
     set((state) => ({
       tasksByDate: {
         ...state.tasksByDate,
-        [dateStr]: [...(state.tasksByDate[dateStr] || []), task],
+        [dateStr]: [...previousTasks, task],
       },
     }));
+
+    dataTasks.createTask(task).catch((err) => {
+      handleError(err, 'Failed to save task');
+      set((state) => ({
+        tasksByDate: {
+          ...state.tasksByDate,
+          [dateStr]: previousTasks,
+        },
+      }));
+    });
+
     return task;
   },
 
   updateTask: (id, data) => {
-    storage.updateTask(id, data);
+    const previousState = get().tasksByDate;
     set((state) => {
       const newTasksByDate = { ...state.tasksByDate };
       for (const dateStr in newTasksByDate) {
@@ -99,24 +152,41 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
       }
       return { tasksByDate: newTasksByDate };
     });
+
+    dataTasks.updateTask(id, data).catch((err) => {
+      handleError(err, 'Failed to update task');
+      set({ tasksByDate: previousState });
+    });
   },
 
   deleteTask: (id, dateStr) => {
-    storage.deleteTask(id);
+    const previousTasks = get().tasksByDate[dateStr] || [];
     set((state) => ({
       tasksByDate: {
         ...state.tasksByDate,
         [dateStr]: (state.tasksByDate[dateStr] || []).filter((t) => t.id !== id),
       },
     }));
+
+    dataTasks.deleteTask(id).catch((err) => {
+      handleError(err, 'Failed to delete task');
+      set((state) => ({
+        tasksByDate: {
+          ...state.tasksByDate,
+          [dateStr]: previousTasks,
+        },
+      }));
+    });
   },
 
   toggleTask: (id, dateStr) => {
     const tasks = get().tasksByDate[dateStr] || [];
     const task = tasks.find((t) => t.id === id);
     if (!task) return;
+
     const newCompleted = !task.completed;
-    storage.updateTask(id, { completed: newCompleted });
+    const previousTasks = tasks;
+
     set((state) => ({
       tasksByDate: {
         ...state.tasksByDate,
@@ -125,31 +195,72 @@ export const usePlannerStore = create<PlannerState>((set, get) => ({
         ),
       },
     }));
+
+    dataTasks.updateTask(id, { completed: newCompleted }).catch((err) => {
+      handleError(err, 'Failed to update task');
+      set((state) => ({
+        tasksByDate: {
+          ...state.tasksByDate,
+          [dateStr]: previousTasks,
+        },
+      }));
+    });
   },
 
   reorderTasks: (dateStr, orderedIds) => {
-    storage.reorderTasks(dateStr, orderedIds);
-    set((state) => {
-      const tasks = state.tasksByDate[dateStr] || [];
-      const reordered = orderedIds
-        .map((id) => tasks.find((t) => t.id === id))
-        .filter(Boolean) as Task[];
-      return {
+    const currentTasks = get().tasksByDate[dateStr] || [];
+    const reordered = orderedIds
+      .map((id) => currentTasks.find((t) => t.id === id))
+      .filter(Boolean) as Task[];
+
+    set((state) => ({
+      tasksByDate: {
+        ...state.tasksByDate,
+        [dateStr]: reordered,
+      },
+    }));
+
+    dataTasks.reorderTasks(dateStr, orderedIds).catch((err) => {
+      handleError(err, 'Failed to reorder tasks');
+      set((state) => ({
         tasksByDate: {
           ...state.tasksByDate,
-          [dateStr]: reordered,
+          [dateStr]: currentTasks,
         },
-      };
+      }));
     });
   },
 
   updateEntry: (dateStr, field, values) => {
-    const entry = storage.upsertDailyEntry(dateStr, { [field]: values });
+    const previousEntry = get().entriesByDate[dateStr] || {
+      id: crypto.randomUUID(),
+      user_id: '',
+      day_date: dateStr,
+      notes: ['', '', '', ''],
+      improvements: ['', '', '', ''],
+      gratitude: ['', '', '', ''],
+    };
+
+    const newEntry: DailyEntry = {
+      ...previousEntry,
+      [field]: values,
+    };
+
     set((state) => ({
       entriesByDate: {
         ...state.entriesByDate,
-        [dateStr]: entry,
+        [dateStr]: newEntry,
       },
     }));
+
+    dataEntries.upsertDailyEntry(dateStr, { [field]: values }).catch((err) => {
+      handleError(err, 'Failed to save daily entry');
+      set((state) => ({
+        entriesByDate: {
+          ...state.entriesByDate,
+          [dateStr]: previousEntry,
+        },
+      }));
+    });
   },
 }));

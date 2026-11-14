@@ -20,7 +20,7 @@ import DonutRing from '@/components/ui/DonutRing';
 import Checkbox from '@/components/ui/Checkbox';
 import ProgressBar from '@/components/ui/ProgressBar';
 import Logo from '@/components/ui/Logo';
-import { getHabitDisplayName } from '@/lib/storage';
+import { getHabitDisplayName } from '@/lib/utils/habitDisplay';
 import { Zap } from 'lucide-react';
 
 const ELECTRIC_RING_COLORS = [

@@ -7,7 +7,7 @@ import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
 import { toDateString } from '@/lib/utils/dates';
 import { isHabitCompletedOnDate } from '@/lib/utils/calculations';
-import { getHabitDisplayName } from '@/lib/storage';
+import { getHabitDisplayName } from '@/lib/utils/habitDisplay';
 import { triggerFeedback } from '@/lib/feedback';
 
 export default function TodaySummaryBar() {

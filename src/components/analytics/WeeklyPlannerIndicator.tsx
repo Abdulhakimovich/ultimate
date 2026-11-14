@@ -17,7 +17,7 @@ import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
 import { toDateString, getWeekDays, formatShortDotDate, isToday } from '@/lib/utils/dates';
 import { isHabitCompletedOnDate } from '@/lib/utils/calculations';
-import { getTasksForDateRange } from '@/lib/storage';
+import { getTasksForDateRange } from '@/lib/data/tasks';
 import type { Task } from '@/lib/types';
 
 export default function WeeklyPlannerIndicator() {
@@ -40,8 +40,9 @@ export default function WeeklyPlannerIndicator() {
     if (weekDays.length === 7) {
       const startStr = toDateString(weekDays[0]);
       const endStr = toDateString(weekDays[6]);
-      const loadedTasks = getTasksForDateRange(startStr, endStr);
-      setTasks(loadedTasks);
+      getTasksForDateRange(startStr, endStr)
+        .then((loadedTasks) => setTasks(loadedTasks))
+        .catch(console.error);
     }
   }, [weekDays]);
 

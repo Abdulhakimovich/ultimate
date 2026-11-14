@@ -45,7 +45,7 @@ import {
   calculateDailyCompletion,
 } from '@/lib/utils/calculations';
 import type { Habit } from '@/lib/types';
-import { getHabitDisplayName, loadDemoData } from '@/lib/storage';
+import { getHabitDisplayName } from '@/lib/utils/habitDisplay';
 import AddHabitModal from './AddHabitModal';
 import { useToast } from '@/hooks/useToast';
 import Logo from '@/components/ui/Logo';
@@ -596,26 +596,6 @@ export default function UltimateMonthlyTracker() {
                     <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
                       {tr.tracker.noHabitsDesc}
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const loaded = loadDemoData();
-                        if (loaded) {
-                          loadHabits();
-                          loadCompletions(year, month);
-                          loadMonthlyGoal(year, month);
-                        }
-                      }}
-                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
-                      style={{
-                        background: 'var(--bg-elevated)',
-                        color: 'var(--electric)',
-                        border: '1px solid var(--border-bright)',
-                      }}
-                    >
-                      <Sparkles size={14} />
-                      <span>{tr.tracker.loadDemo}</span>
-                    </button>
                   </td>
                 </tr>
               ) : (

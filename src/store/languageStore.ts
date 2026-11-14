@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { Language } from '@/lib/i18n';
+import { updateProfile } from '@/lib/data/profile';
 
 interface LanguageState {
   language: Language;
@@ -7,7 +8,7 @@ interface LanguageState {
 }
 
 // Always start with 'ru' so SSR and first client render match.
-// ThemeProvider / TopNav hydrates the real value from localStorage via useEffect.
+// ThemeProvider / TopNav hydrates the real value from localStorage / profile via useEffect.
 export const useLanguageStore = create<LanguageState>((set) => ({
   language: 'ru',
   setLanguage: (lang) => {
@@ -15,6 +16,9 @@ export const useLanguageStore = create<LanguageState>((set) => ({
       localStorage.setItem('ult_language', lang);
     }
     set({ language: lang });
+    updateProfile({ language: lang }).catch(() => {
+      // Ignore if offline or not signed in
+    });
   },
 }));
 
@@ -23,6 +27,6 @@ export function hydrateLanguage() {
   if (typeof window === 'undefined') return;
   const saved = localStorage.getItem('ult_language') as Language;
   if (saved && ['ru', 'en', 'uz'].includes(saved)) {
-    useLanguageStore.getState().setLanguage(saved);
+    useLanguageStore.setState({ language: saved });
   }
 }
