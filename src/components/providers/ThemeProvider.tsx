@@ -1,22 +1,30 @@
 'use client';
+
 import { useEffect } from 'react';
-import { useThemeStore } from '@/store/themeStore';
+import { useThemeStore, type Theme } from '@/store/themeStore';
 import { hydrateLanguage } from '@/store/languageStore';
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const setTheme = useThemeStore((s) => s.setTheme);
+  const hydrateTheme = useThemeStore((s) => s.hydrateTheme);
 
   useEffect(() => {
-    // Hydrate theme from localStorage (or system preference) after mount
-    const saved = localStorage.getItem('ult_theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = (saved as 'dark' | 'light') ?? (prefersDark ? 'dark' : 'dark');
-    setTheme(theme);
-    if (!saved) localStorage.setItem('ult_theme', theme);
+    let resolvedTheme: Theme = 'dark';
+    try {
+      const saved = localStorage.getItem('ult_theme');
+      if (saved === 'dark' || saved === 'light') {
+        resolvedTheme = saved;
+      } else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        resolvedTheme = prefersDark ? 'dark' : 'light';
+      }
+    } catch {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      resolvedTheme = prefersDark ? 'dark' : 'light';
+    }
 
-    // Hydrate language from localStorage after mount
+    hydrateTheme(resolvedTheme);
     hydrateLanguage();
-  }, [setTheme]);
+  }, [hydrateTheme]);
 
   return <>{children}</>;
 }

@@ -38,12 +38,10 @@ const STORAGE_KEYS = {
   tasks: 'ht_tasks',
   entries: 'ht_daily_entries',
   mental: 'ht_mental_ratings',
-  seeded: 'ht_is_seeded_ultimate_v2',
 } as const;
 
 function getItem<T>(key: string): T[] {
   if (typeof window === 'undefined') return [];
-  ensureSeedData();
   try {
     const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : [];
@@ -57,10 +55,17 @@ function setItem<T>(key: string, data: T[]): void {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
-// Seed initial realistic data so the app looks vibrant and useful immediately
-function ensureSeedData(): void {
+function seedIfEmpty<T>(key: string, data: T[]): void {
   if (typeof window === 'undefined') return;
-  if (localStorage.getItem(STORAGE_KEYS.seeded)) return;
+  const existing = getItem<T>(key);
+  if (existing.length === 0) {
+    setItem(key, data);
+  }
+}
+
+// Seed initial realistic data so the app looks vibrant and useful immediately
+function seedDemoData(): void {
+  if (typeof window === 'undefined') return;
 
   const now = new Date();
   const year = now.getFullYear();
@@ -288,12 +293,21 @@ function ensureSeedData(): void {
     });
   }
 
-  localStorage.setItem(STORAGE_KEYS.habits, JSON.stringify(defaultHabits));
-  localStorage.setItem(STORAGE_KEYS.completions, JSON.stringify(defaultCompletions));
-  localStorage.setItem(STORAGE_KEYS.goals, JSON.stringify(defaultGoals));
-  localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(defaultTasks));
-  localStorage.setItem(STORAGE_KEYS.entries, JSON.stringify(defaultEntries));
-  localStorage.setItem(STORAGE_KEYS.seeded, 'true');
+  seedIfEmpty(STORAGE_KEYS.habits, defaultHabits);
+  seedIfEmpty(STORAGE_KEYS.completions, defaultCompletions);
+  seedIfEmpty(STORAGE_KEYS.goals, defaultGoals);
+  seedIfEmpty(STORAGE_KEYS.tasks, defaultTasks);
+  seedIfEmpty(STORAGE_KEYS.entries, defaultEntries);
+}
+
+export function loadDemoData(): boolean {
+  if (typeof window === 'undefined') return false;
+  const existingHabits = getAllHabits();
+  if (existingHabits.length > 0) {
+    return false;
+  }
+  seedDemoData();
+  return true;
 }
 
 // ========== HABITS ==========
@@ -360,40 +374,7 @@ export function reorderHabits(orderedIds: string[]): void {
 // ========== HABIT COMPLETIONS ==========
 
 export function ensureYearlyCompletions(): HabitCompletion[] {
-  let completions = getItem<HabitCompletion>(STORAGE_KEYS.completions);
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1;
-  const currentDay = now.getDate();
-  const habits = getHabits();
-
-  // If local storage only has data for 1 month, backfill past months for full annual trend
-  const monthsFound = new Set(completions.map((c) => c.completed_date.slice(0, 7)));
-  if (monthsFound.size <= 1 && habits.length > 0) {
-    const additional: HabitCompletion[] = [];
-    for (let m = 1; m < month; m++) {
-      const baseConsistency = 0.50 + ((m / 12) * 0.35);
-      for (let d = 1; d <= 28; d++) {
-        const dayDateStr = `${year}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        habits.forEach((h, hIdx) => {
-          const pseudoRandom = Math.sin(d * 11 + hIdx * 7 + m * 17);
-          if (pseudoRandom > (1 - baseConsistency * 1.8)) {
-            additional.push({
-              id: `c-backfill-${m}-${d}-${h.id}`,
-              user_id: 'local',
-              habit_id: h.id,
-              completed_date: dayDateStr,
-            });
-          }
-        });
-      }
-    }
-    if (additional.length > 0) {
-      completions = [...completions, ...additional];
-      setItem(STORAGE_KEYS.completions, completions);
-    }
-  }
-  return completions;
+  return getItem<HabitCompletion>(STORAGE_KEYS.completions);
 }
 
 export function getAllCompletions(): HabitCompletion[] {
@@ -574,20 +555,9 @@ export interface MentalRatings {
 export function getMentalRatings(): MentalRatings {
   if (typeof window === 'undefined') return { mood: {}, motivation: {} };
   try {
-    const raw = localStorage.getItem('ht_mental_ratings');
+    const raw = localStorage.getItem(STORAGE_KEYS.mental);
     if (raw) return JSON.parse(raw);
-    // Seed initial ratings for realism
-    const initial: MentalRatings = { mood: {}, motivation: {} };
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
-    for (let d = 1; d <= Math.min(now.getDate(), 28); d++) {
-      const dayDateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      initial.mood[dayDateStr] = 7 + (d % 3);
-      initial.motivation[dayDateStr] = 8 + (d % 3 === 0 ? -1 : 1);
-    }
-    localStorage.setItem('ht_mental_ratings', JSON.stringify(initial));
-    return initial;
+    return { mood: {}, motivation: {} };
   } catch {
     return { mood: {}, motivation: {} };
   }
@@ -601,7 +571,7 @@ export function setMentalRating(
   const current = getMentalRatings();
   current[type][dateStr] = value;
   if (typeof window !== 'undefined') {
-    localStorage.setItem('ht_mental_ratings', JSON.stringify(current));
+    localStorage.setItem(STORAGE_KEYS.mental, JSON.stringify(current));
   }
   return current;
 }
