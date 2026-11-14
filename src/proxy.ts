@@ -8,10 +8,30 @@ export async function proxy(request: NextRequest) {
     },
   });
 
+  const { pathname, search } = request.nextUrl;
+
+  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register');
+  const isAuthCallback = pathname.startsWith('/auth/callback');
+
+  // Allow auth callback through unconditionally
+  if (isAuthCallback) {
+    return response;
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+  // If Supabase is not configured in env, treat as unauthenticated
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (!isAuthRoute) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = '/login';
+      const nextPath = `${pathname}${search}`;
+      if (pathname !== '/' && nextPath) {
+        redirectUrl.searchParams.set('next', nextPath);
+      }
+      return NextResponse.redirect(redirectUrl);
+    }
     return response;
   }
 
@@ -37,16 +57,6 @@ export async function proxy(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const { pathname, search } = request.nextUrl;
-
-  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/register');
-  const isAuthCallback = pathname.startsWith('/auth/callback');
-
-  // Allow auth callback through unconditionally
-  if (isAuthCallback) {
-    return response;
-  }
 
   // If user is logged in
   if (user) {

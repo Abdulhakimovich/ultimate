@@ -162,6 +162,25 @@ function RegisterForm() {
         </p>
       </div>
 
+      {/* Missing configuration notice */}
+      {(!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) && (
+        <div
+          className="p-3 rounded-xl flex items-start gap-2.5 text-xs"
+          style={{
+            background: 'rgba(234, 179, 8, 0.12)',
+            border: '1px solid rgba(234, 179, 8, 0.35)',
+            color: '#eab308',
+          }}
+        >
+          <AlertCircle size={15} className="shrink-0 mt-0.5" />
+          <span>
+            {language === 'ru' && 'Supabase не подключен. Создайте файл .env.local и укажите NEXT_PUBLIC_SUPABASE_URL и NEXT_PUBLIC_SUPABASE_ANON_KEY.'}
+            {language === 'en' && 'Supabase is not configured. Create a .env.local file with NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.'}
+            {language === 'uz' && 'Supabase sozlanmagan. NEXT_PUBLIC_SUPABASE_URL va NEXT_PUBLIC_SUPABASE_ANON_KEY bilan .env.local faylini yarating.'}
+          </span>
+        </div>
+      )}
+
       {authError && (
         <div
           className="p-3 rounded-xl flex items-start gap-2.5 text-xs animate-shake"

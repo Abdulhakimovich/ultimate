@@ -30,7 +30,7 @@ export default function AuthLayout({
         {/* Logo and brand */}
         <div className="text-center mb-6 flex flex-col items-center">
           <Link
-            href="/tracker"
+            href="/login"
             className="inline-flex items-center justify-center group focus:outline-none transition-transform hover:scale-105 mb-2"
             aria-label="Ultimate"
           >
@@ -52,17 +52,6 @@ export default function AuthLayout({
           }}
         >
           {children}
-        </div>
-
-        {/* Guest mode quick link */}
-        <div className="text-center mt-6 text-xs" style={{ color: 'var(--text-muted)' }}>
-          <Link
-            href="/tracker"
-            className="hover:underline transition-colors font-medium inline-flex items-center gap-1 justify-center"
-            style={{ color: 'var(--electric)' }}
-          >
-            <span>Войти как гость в демо-режиме →</span>
-          </Link>
         </div>
       </div>
 
