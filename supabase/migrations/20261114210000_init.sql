@@ -87,64 +87,78 @@ alter table public.tasks enable row level security;
 alter table public.daily_entries enable row level security;
 
 -- PROFILES POLICIES
+drop policy if exists "Users can view their own profile" on public.profiles;
 create policy "Users can view their own profile"
   on public.profiles for select
   using (auth.uid() = id);
 
+drop policy if exists "Users can insert their own profile" on public.profiles;
 create policy "Users can insert their own profile"
   on public.profiles for insert
   with check (auth.uid() = id);
 
+drop policy if exists "Users can update their own profile" on public.profiles;
 create policy "Users can update their own profile"
   on public.profiles for update
   using (auth.uid() = id)
   with check (auth.uid() = id);
 
+drop policy if exists "Users can delete their own profile" on public.profiles;
 create policy "Users can delete their own profile"
   on public.profiles for delete
   using (auth.uid() = id);
 
 -- HABITS POLICIES
+drop policy if exists "Users can view their own habits" on public.habits;
 create policy "Users can view their own habits"
   on public.habits for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can insert their own habits" on public.habits;
 create policy "Users can insert their own habits"
   on public.habits for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "Users can update their own habits" on public.habits;
 create policy "Users can update their own habits"
   on public.habits for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+drop policy if exists "Users can delete their own habits" on public.habits;
 create policy "Users can delete their own habits"
   on public.habits for delete
   using (auth.uid() = user_id);
 
 -- MONTHLY GOALS POLICIES
+drop policy if exists "Users can view their own monthly goals" on public.monthly_goals;
 create policy "Users can view their own monthly goals"
   on public.monthly_goals for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can insert their own monthly goals" on public.monthly_goals;
 create policy "Users can insert their own monthly goals"
   on public.monthly_goals for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "Users can update their own monthly goals" on public.monthly_goals;
 create policy "Users can update their own monthly goals"
   on public.monthly_goals for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+drop policy if exists "Users can delete their own monthly goals" on public.monthly_goals;
 create policy "Users can delete their own monthly goals"
   on public.monthly_goals for delete
   using (auth.uid() = user_id);
 
 -- HABIT COMPLETIONS POLICIES (must also verify habit belongs to same user)
+drop policy if exists "Users can view their own completions" on public.habit_completions;
 create policy "Users can view their own completions"
   on public.habit_completions for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can insert their own completions" on public.habit_completions;
 create policy "Users can insert their own completions"
   on public.habit_completions for insert
   with check (
@@ -155,6 +169,7 @@ create policy "Users can insert their own completions"
     )
   );
 
+drop policy if exists "Users can update their own completions" on public.habit_completions;
 create policy "Users can update their own completions"
   on public.habit_completions for update
   using (auth.uid() = user_id)
@@ -166,42 +181,51 @@ create policy "Users can update their own completions"
     )
   );
 
+drop policy if exists "Users can delete their own completions" on public.habit_completions;
 create policy "Users can delete their own completions"
   on public.habit_completions for delete
   using (auth.uid() = user_id);
 
 -- TASKS POLICIES
+drop policy if exists "Users can view their own tasks" on public.tasks;
 create policy "Users can view their own tasks"
   on public.tasks for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can insert their own tasks" on public.tasks;
 create policy "Users can insert their own tasks"
   on public.tasks for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "Users can update their own tasks" on public.tasks;
 create policy "Users can update their own tasks"
   on public.tasks for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+drop policy if exists "Users can delete their own tasks" on public.tasks;
 create policy "Users can delete their own tasks"
   on public.tasks for delete
   using (auth.uid() = user_id);
 
 -- DAILY ENTRIES POLICIES
+drop policy if exists "Users can view their own daily entries" on public.daily_entries;
 create policy "Users can view their own daily entries"
   on public.daily_entries for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can insert their own daily entries" on public.daily_entries;
 create policy "Users can insert their own daily entries"
   on public.daily_entries for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "Users can update their own daily entries" on public.daily_entries;
 create policy "Users can update their own daily entries"
   on public.daily_entries for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+drop policy if exists "Users can delete their own daily entries" on public.daily_entries;
 create policy "Users can delete their own daily entries"
   on public.daily_entries for delete
   using (auth.uid() = user_id);
