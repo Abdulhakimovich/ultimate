@@ -6,6 +6,7 @@ import {
 } from 'recharts';
 import { useHabitsStore } from '@/store/habitsStore';
 import { useLanguageStore } from '@/store/languageStore';
+import { useMounted } from '@/hooks/useMounted';
 import { t } from '@/lib/i18n';
 import { startOfMonth, endOfMonth, eachDayOfInterval, toDateString } from '@/lib/utils/dates';
 import { calculateDailyCompletion, isHabitCompletedOnDate } from '@/lib/utils/calculations';
@@ -16,7 +17,7 @@ function getCSSVar(name: string, fallback: string): string {
 }
 
 export default function MonthlyAreaChart() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [isMobile, setIsMobile] = useState(false);
   const [viewMode, setViewMode] = useState<'entire' | 'monthly'>('entire');
 
@@ -30,7 +31,6 @@ export default function MonthlyAreaChart() {
   const year = currentMonth.getFullYear();
 
   useEffect(() => {
-    setMounted(true);
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
     window.addEventListener('resize', checkMobile);

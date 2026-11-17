@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { useThemeStore } from '@/store/themeStore';
+import { useMounted } from '@/hooks/useMounted';
 
 export interface LogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -27,12 +28,8 @@ export default function Logo({
   showGlow = true,
   priority = false,
 }: LogoProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const theme = useThemeStore((s) => s.theme);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const dimensions = SIZE_MAP[size] || SIZE_MAP.sm;
 

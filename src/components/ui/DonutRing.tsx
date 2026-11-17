@@ -48,19 +48,21 @@ export default function DonutRing(props: DonutRingProps) {
     ? { stroke: backgroundColor }
     : { stroke: 'var(--bg-elevated)' };
 
+  const segments = props.segments;
+  const segmentData = useMemo(() => {
+    if (!segments) return [];
+    let accumulated = 0;
+    return segments.map((seg) => {
+      const segLength = (seg.value / 100) * circumference;
+      const offset    = circumference - accumulated * (circumference / 100);
+      accumulated += seg.value;
+      return { ...seg, segLength, offset };
+    });
+  }, [segments, circumference]);
+
   if (props.segments) {
     const totalValue  = props.segments.reduce((s, seg) => s + seg.value, 0);
     const clamped     = Math.min(100, totalValue);
-
-    const segmentData = useMemo(() => {
-      let accumulated = 0;
-      return props.segments!.map((seg) => {
-        const segLength = (seg.value / 100) * circumference;
-        const offset    = circumference - accumulated * (circumference / 100);
-        accumulated += seg.value;
-        return { ...seg, segLength, offset };
-      });
-    }, [props.segments, circumference]);
 
     return (
       <div

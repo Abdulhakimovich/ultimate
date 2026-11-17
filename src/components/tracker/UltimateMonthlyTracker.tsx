@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMounted } from '@/hooks/useMounted';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
@@ -90,7 +91,7 @@ export default function UltimateMonthlyTracker() {
   const [showModal, setShowModal]       = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [quoteIdx, setQuoteIdx]         = useState(0);
-  const [mounted, setMounted]           = useState(false);
+  const mounted                         = useMounted();
   const [isMobile, setIsMobile]         = useState(false);
   const [trendViewMode, setTrendViewMode] = useState<'entire' | 'monthly'>('entire');
   const { toast }                       = useToast();
@@ -99,7 +100,6 @@ export default function UltimateMonthlyTracker() {
   const month = currentMonth.getMonth() + 1; // 1-12
 
   useEffect(() => {
-    setMounted(true);
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -866,12 +866,12 @@ export default function UltimateMonthlyTracker() {
                     fontSize: 11,
                     color: getCSSVar('--text-primary', '#F8FAFC'),
                   }}
-                  formatter={(val: any) => [`${val ?? 0}%`, tr.tracker.progress]}
-                  labelFormatter={(lbl: any, payload: any) => {
+                  formatter={(val: unknown) => [`${val ?? 0}%`, tr.tracker.progress]}
+                  labelFormatter={(lbl: unknown, payload: readonly { payload?: { fullMonth?: string } }[]) => {
                     if (trendViewMode === 'entire') {
-                      return payload?.[0]?.payload?.fullMonth || lbl;
+                      return payload?.[0]?.payload?.fullMonth || String(lbl);
                     }
-                    return `${tr.tracker.todayDate}: ${lbl} ${tr.months[month - 1]}`;
+                    return `${tr.tracker.todayDate}: ${String(lbl)} ${tr.months[month - 1]}`;
                   }}
                 />
                 <Area

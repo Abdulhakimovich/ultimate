@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,13 +10,12 @@ import {
   CheckCircle2,
   Calendar as CalendarIcon,
   Sparkles,
-  ArrowUpRight,
-  AlertCircle,
   Plus,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useHabitsStore } from '@/store/habitsStore';
 import { useLanguageStore } from '@/store/languageStore';
+import { useMounted } from '@/hooks/useMounted';
 import { t } from '@/lib/i18n';
 import { toDateString } from '@/lib/utils/dates';
 import { isHabitCompletedOnDate } from '@/lib/utils/calculations';
@@ -36,10 +35,9 @@ export default function AnalyticsPage() {
   const language        = useLanguageStore((s) => s.language);
   const tr              = t(language);
 
-  const [mounted, setMounted] = useState(false);
+  const mounted         = useMounted();
 
   useEffect(() => {
-    setMounted(true);
     loadHabits();
   }, [loadHabits]);
 
@@ -71,7 +69,7 @@ export default function AnalyticsPage() {
 
     // Current Streak calculation
     let currStreak = 0;
-    let checkDate = new Date(today);
+    const checkDate = new Date(today);
     // check if today has at least one completion, otherwise check yesterday
     const todayDone = habits.some((h) => isHabitCompletedOnDate(completions, h.id, todayStr));
     if (!todayDone) {

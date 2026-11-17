@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { useHabitsStore } from '@/store/habitsStore';
 import { useLanguageStore } from '@/store/languageStore';
+import { useMounted } from '@/hooks/useMounted';
 import { t } from '@/lib/i18n';
 import { startOfMonth, endOfMonth, eachDayOfInterval, toDateString, isToday } from '@/lib/utils/dates';
 import { calculateDailyCompletion, isHabitCompletedOnDate } from '@/lib/utils/calculations';
@@ -75,7 +76,7 @@ function getVelocityTier(pct: number, minVal: number, maxVal: number): VelocityT
 }
 
 export default function DailyBarChart() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [isMobile, setIsMobile] = useState(false);
 
   const habits       = useHabitsStore((s) => s.habits);
@@ -85,7 +86,6 @@ export default function DailyBarChart() {
   const tr           = t(language);
 
   useEffect(() => {
-    setMounted(true);
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -124,13 +124,10 @@ export default function DailyBarChart() {
 
   if (!mounted) return <div className="h-[200px] rounded-xl skeleton-shimmer" />;
 
-  const electricColor = getCSSVar('--electric', '#0076F9');
   const textMuted     = getCSSVar('--text-muted', '#64748B');
   const bgElevated    = getCSSVar('--bg-elevated', '#141A29');
   const borderBright  = getCSSVar('--border-bright', 'rgba(0,118,249,0.40)');
   const textPrimary   = getCSSVar('--text-primary', '#F8FAFC');
-  const accentGreen   = getCSSVar('--accent-green', '#10B981');
-  const blueMid       = getCSSVar('--blue-mid', '#0284C7');
 
   if (habits.length === 0) return null;
 
