@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClient } from '@/lib/supabase/client';
+import { isSupabaseConfigured } from '@/lib/supabase/config';
 import { LogIn, Loader2, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
@@ -110,7 +111,7 @@ function LoginForm() {
       </div>
 
       {/* Missing configuration notice */}
-      {(!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) && (
+      {!isSupabaseConfigured && (
         <div
           className="p-3 rounded-xl flex items-start gap-2.5 text-xs"
           style={{
