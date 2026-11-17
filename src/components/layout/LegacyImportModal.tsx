@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Download, Loader2 } from 'lucide-react';
+import { Sparkles, Download, Loader2, AlertCircle, RotateCcw } from 'lucide-react';
 import { getProfile } from '@/lib/data/profile';
 import { getHabits } from '@/lib/data/habits';
 import { getLegacyDataSummary, importLegacyData, skipLegacyImport, type LegacyDataSummary } from '@/lib/legacy-import';
@@ -15,6 +15,7 @@ export default function LegacyImportModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [summary, setSummary] = useState<LegacyDataSummary | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
 
   const language = useLanguageStore((s) => s.language);
   const loadHabits = useHabitsStore((s) => s.loadHabits);
@@ -57,7 +58,9 @@ export default function LegacyImportModal() {
   }, []);
 
   const handleImport = async () => {
+    if (isImporting) return;
     setIsImporting(true);
+    setImportError(null);
     try {
       await importLegacyData();
       useToastStore.getState().addToast({
@@ -69,14 +72,23 @@ export default function LegacyImportModal() {
             : 'Data successfully imported to your account!',
         variant: 'success',
       });
-      // Refresh stores
+      // Refresh stores so UI updates without page refresh
       await loadHabits();
       await loadCompletions(currentMonth.getFullYear(), currentMonth.getMonth() + 1);
       await loadMonthlyGoal(currentMonth.getFullYear(), currentMonth.getMonth() + 1);
       await loadWeekData();
       setIsOpen(false);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Import failed:', err);
+      const errMsg =
+        err instanceof Error
+          ? err.message
+          : language === 'ru'
+          ? 'Не удалось импортировать данные'
+          : language === 'uz'
+          ? "Ma'lumotlarni import qilishda xatolik yuz berdi"
+          : 'Failed to import data';
+      setImportError(errMsg);
       useToastStore.getState().addToast({
         message:
           language === 'ru'
@@ -92,6 +104,7 @@ export default function LegacyImportModal() {
   };
 
   const handleSkip = async () => {
+    if (isImporting) return;
     try {
       await skipLegacyImport();
     } catch (err) {
@@ -116,8 +129,17 @@ export default function LegacyImportModal() {
       ? `Ushbu brauzerda ${summary.habitsCount} ta odat, ${summary.completionsCount} ta bajarilish va ${summary.tasksCount} ta vazifa topildi. Ularni hisobingizga import qilinsinmi?`
       : `We found ${summary.habitsCount} habits, ${summary.completionsCount} completions, and ${summary.tasksCount} tasks saved in this browser. Import into your account?`;
 
-  const importBtnText =
-    language === 'ru' ? 'Импортировать' : language === 'uz' ? 'Import qilish' : 'Import';
+  const importBtnText = importError
+    ? language === 'ru'
+      ? 'Повторить'
+      : language === 'uz'
+      ? 'Qayta urinish'
+      : 'Retry'
+    : language === 'ru'
+    ? 'Импортировать'
+    : language === 'uz'
+    ? 'Import qilish'
+    : 'Import';
 
   const skipBtnText =
     language === 'ru' ? 'Пропустить' : language === 'uz' ? 'O‘tkazib yuborish' : 'Skip';
@@ -149,12 +171,36 @@ export default function LegacyImportModal() {
             {bodyText}
           </p>
 
+          {/* Inline error alert on failure */}
+          {importError && (
+            <div
+              className="mt-3 p-3 rounded-xl flex items-start gap-2.5 text-xs animate-shake"
+              style={{
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                color: 'var(--accent-red)',
+              }}
+            >
+              <AlertCircle size={15} className="shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-semibold">
+                  {language === 'ru'
+                    ? 'Ошибка импорта'
+                    : language === 'uz'
+                    ? 'Import xatoligi'
+                    : 'Import failed'}
+                </p>
+                <p className="text-[11px] opacity-90 mt-0.5">{importError}</p>
+              </div>
+            </div>
+          )}
+
           <div className="mt-6 flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={handleSkip}
               disabled={isImporting}
-              className="px-4 py-2 rounded-xl text-xs font-semibold transition-colors hover:bg-[var(--bg-elevated)]"
+              className="px-4 py-2 rounded-xl text-xs font-semibold transition-colors hover:bg-[var(--bg-elevated)] disabled:opacity-50"
               style={{ color: 'var(--text-secondary)' }}
             >
               {skipBtnText}
@@ -176,7 +222,7 @@ export default function LegacyImportModal() {
                 </>
               ) : (
                 <>
-                  <Download size={14} />
+                  {importError ? <RotateCcw size={14} /> : <Download size={14} />}
                   <span>{importBtnText}</span>
                 </>
               )}
