@@ -200,7 +200,7 @@ function RegisterForm() {
       <button
         type="button"
         onClick={handleGoogleLogin}
-        disabled={isLoading}
+        disabled={isLoading || !isSupabaseConfigured}
         className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all border-hairline hover:bg-[var(--bg-elevated)] active:scale-[0.99] disabled:opacity-50"
         style={{
           background: 'var(--bg-card)',
@@ -238,6 +238,7 @@ function RegisterForm() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <fieldset disabled={isLoading || !isSupabaseConfigured} className="space-y-3 border-0 p-0 m-0 min-w-0">
         {/* Name */}
         <div>
           <label className="block text-xs font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
@@ -359,7 +360,7 @@ function RegisterForm() {
         {/* Submit */}
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !isSupabaseConfigured}
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[#07090E] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md disabled:opacity-50 mt-2"
           style={{
             background: 'linear-gradient(135deg, var(--electric), var(--blue-neon))',
@@ -375,6 +376,7 @@ function RegisterForm() {
             </>
           )}
         </button>
+        </fieldset>
       </form>
 
       {/* Switch to Login */}
