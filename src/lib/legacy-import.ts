@@ -52,7 +52,6 @@ export function isValidUUID(str: string): boolean {
 }
 
 export async function toDeterministicUUID(userId: string, id: string): Promise<string> {
-  if (isValidUUID(id)) return id;
   const encoder = new TextEncoder();
   const data = encoder.encode(`${userId}:${id}`);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
