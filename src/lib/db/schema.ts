@@ -7,6 +7,8 @@ export const profiles = pgTable('profiles', {
   theme: text('theme').default('dark').notNull(),
   language: text('language').default('ru').notNull(),
   localImportDoneAt: timestamp('local_import_done_at', { withTimezone: true }),
+  soundEnabled: boolean('sound_enabled').default(true).notNull(),
+  hapticsEnabled: boolean('haptics_enabled').default(true).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 

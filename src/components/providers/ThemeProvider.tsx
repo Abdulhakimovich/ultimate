@@ -3,7 +3,9 @@
 import { useEffect } from 'react';
 import { useThemeStore, type Theme } from '@/store/themeStore';
 import { useLanguageStore, hydrateLanguage } from '@/store/languageStore';
+import { useProfileStore } from '@/store/profileStore';
 import { getProfile } from '@/lib/data/profile';
+import { useFeedbackStore } from '@/store/feedbackStore';
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const hydrateTheme = useThemeStore((s) => s.hydrateTheme);
@@ -30,6 +32,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     getProfile()
       .then((profile) => {
         if (!profile) return;
+        useProfileStore.getState().setProfile(profile);
         if (profile.theme && (profile.theme === 'dark' || profile.theme === 'light')) {
           hydrateTheme(profile.theme);
           try {
@@ -41,6 +44,12 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
           try {
             localStorage.setItem('ult_language', profile.language);
           } catch {}
+        }
+        if (typeof profile.sound_enabled === 'boolean') {
+          useFeedbackStore.getState().setSoundEnabled(profile.sound_enabled);
+        }
+        if (typeof profile.haptics_enabled === 'boolean') {
+          useFeedbackStore.getState().setHapticsEnabled(profile.haptics_enabled);
         }
       })
       .catch(() => {

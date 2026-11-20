@@ -18,6 +18,8 @@ export interface Profile {
   language: 'ru' | 'en' | 'uz';
   local_import_done_at: string | null;
   created_at: string;
+  sound_enabled: boolean;
+  haptics_enabled: boolean;
 }
 
 export interface MonthlyGoal {

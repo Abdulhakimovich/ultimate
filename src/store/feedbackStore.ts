@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { updateProfile } from '@/lib/data/profile';
 
 interface FeedbackState {
   soundEnabled: boolean;
@@ -9,7 +10,7 @@ interface FeedbackState {
   setHapticsEnabled: (enabled: boolean) => void;
 }
 
-export const useFeedbackStore = create<FeedbackState>((set) => ({
+export const useFeedbackStore = create<FeedbackState>((set, get) => ({
   soundEnabled: typeof window !== 'undefined' ? localStorage.getItem('ht_sound_enabled') !== 'false' : true,
   hapticsEnabled: typeof window !== 'undefined' ? localStorage.getItem('ht_haptics_enabled') !== 'false' : true,
   toggleSound: () =>
@@ -18,6 +19,7 @@ export const useFeedbackStore = create<FeedbackState>((set) => ({
       if (typeof window !== 'undefined') {
         localStorage.setItem('ht_sound_enabled', String(next));
       }
+      updateProfile({ sound_enabled: next }).catch(() => {});
       return { soundEnabled: next };
     }),
   setSoundEnabled: (enabled) => {
@@ -25,6 +27,7 @@ export const useFeedbackStore = create<FeedbackState>((set) => ({
       localStorage.setItem('ht_sound_enabled', String(enabled));
     }
     set({ soundEnabled: enabled });
+    updateProfile({ sound_enabled: enabled }).catch(() => {});
   },
   toggleHaptics: () =>
     set((s) => {
@@ -32,6 +35,7 @@ export const useFeedbackStore = create<FeedbackState>((set) => ({
       if (typeof window !== 'undefined') {
         localStorage.setItem('ht_haptics_enabled', String(next));
       }
+      updateProfile({ haptics_enabled: next }).catch(() => {});
       return { hapticsEnabled: next };
     }),
   setHapticsEnabled: (enabled) => {
@@ -39,5 +43,6 @@ export const useFeedbackStore = create<FeedbackState>((set) => ({
       localStorage.setItem('ht_haptics_enabled', String(enabled));
     }
     set({ hapticsEnabled: enabled });
+    updateProfile({ haptics_enabled: enabled }).catch(() => {});
   },
 }));
