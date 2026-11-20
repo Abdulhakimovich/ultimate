@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useMounted } from '@/hooks/useMounted';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -17,6 +18,7 @@ import {
   Edit2,
   Trash2,
   Sparkles,
+  BookOpen,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -596,6 +598,14 @@ export default function UltimateMonthlyTracker() {
                     <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
                       {tr.tracker.noHabitsDesc}
                     </p>
+                    <Link
+                      href="/instruction"
+                      className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold hover:underline transition-colors"
+                      style={{ color: 'var(--electric)' }}
+                    >
+                      <BookOpen size={13} />
+                      <span>{tr.tracker.howItWorks} →</span>
+                    </Link>
                   </td>
                 </tr>
               ) : (
