@@ -19,7 +19,7 @@ import PersonalInfoSection from './PersonalInfoSection';
 import PreferencesSection from './PreferencesSection';
 import SecuritySection from './SecuritySection';
 import DataSection from './DataSection';
-// import DangerSection from './DangerSection';
+import DangerSection from './DangerSection';
 
 export default function ProfilePage() {
   const language = useLanguageStore((s) => s.language);
@@ -162,6 +162,9 @@ export default function ProfilePage() {
 
       {/* 6. Your Data */}
       <DataSection />
+
+      {/* 7. Danger Zone */}
+      <DangerSection email={authUser?.email || null} />
     </div>
   );
 }
