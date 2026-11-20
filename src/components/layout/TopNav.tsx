@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   Calendar,
   BarChart3,
@@ -16,13 +16,15 @@ import {
   Menu,
   X,
   LogOut,
+  User,
+  BookOpen,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguageStore } from '@/store/languageStore';
 import { useThemeStore } from '@/store/themeStore';
 import { useFeedbackStore } from '@/store/feedbackStore';
-import { useHabitsStore } from '@/store/habitsStore';
-import { usePlannerStore } from '@/store/plannerStore';
+import { useProfileStore } from '@/store/profileStore';
+import { useSignOut } from '@/hooks/useSignOut';
 import { createClient } from '@/lib/supabase/client';
 import { playCheckSound } from '@/lib/feedback';
 import { t, LANGUAGE_OPTIONS } from '@/lib/i18n';
@@ -30,11 +32,11 @@ import Logo from '@/components/ui/Logo';
 
 export default function TopNav() {
   const pathname = usePathname();
-  const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [langOpen, setLangOpen]         = useState(false);
   const [mobileMenuOpen, setMobileMenu] = useState(false);
   const [mounted, setMounted]           = useState(false);
+  const [userEmail, setUserEmail]       = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const langRef     = useRef<HTMLDivElement>(null);
@@ -45,29 +47,13 @@ export default function TopNav() {
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const soundEnabled = useFeedbackStore((s) => s.soundEnabled);
   const toggleSound  = useFeedbackStore((s) => s.toggleSound);
+  const profile      = useProfileStore((s) => s.profile);
+  const signOut      = useSignOut();
 
   const handleSignOut = async () => {
     setDropdownOpen(false);
     setMobileMenu(false);
-    try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-    } catch (err) {
-      console.error('Sign out error:', err);
-    }
-    useHabitsStore.setState({
-      habits: [],
-      completions: [],
-      allCompletions: [],
-      monthlyGoal: null,
-      isLoading: true,
-    });
-    usePlannerStore.setState({
-      tasksByDate: {},
-      entriesByDate: {},
-      isLoading: true,
-    });
-    router.push('/login');
+    await signOut();
   };
 
   const handleToggleSound = () => {
@@ -83,6 +69,13 @@ export default function TopNav() {
 
   useEffect(() => {
     setMounted(true);
+    try {
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data }) => {
+        if (data?.user?.email) setUserEmail(data.user.email);
+      }).catch(() => {});
+    } catch {}
+
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
@@ -98,9 +91,10 @@ export default function TopNav() {
   const currentLang = LANGUAGE_OPTIONS.find((l) => l.code === displayLanguage) || LANGUAGE_OPTIONS[0];
 
   const navItems = [
-    { href: '/tracker',   label: tr.nav.tracker,   icon: Calendar },
-    { href: '/planner',   label: tr.nav.planner,   icon: LayoutDashboard },
-    { href: '/analytics', label: tr.nav.analytics, icon: BarChart3 },
+    { href: '/tracker',     label: tr.nav.tracker,     icon: Calendar },
+    { href: '/planner',     label: tr.nav.planner,     icon: LayoutDashboard },
+    { href: '/analytics',   label: tr.nav.analytics,   icon: BarChart3 },
+    { href: '/instruction', label: tr.nav.instruction, icon: BookOpen },
   ];
 
   return (
@@ -272,7 +266,7 @@ export default function TopNav() {
                   border: '1px solid var(--border-bright)',
                 }}
               >
-                U
+                {(profile?.display_name?.[0] || userEmail?.[0] || 'U').toUpperCase()}
               </div>
               <ChevronDown size={11} className="hidden sm:block" />
             </button>
@@ -290,6 +284,20 @@ export default function TopNav() {
                     border: '1px solid var(--border-bright)',
                   }}
                 >
+                  {(profile?.display_name || userEmail) && (
+                    <div className="px-3 py-2" style={{ borderBottom: '1px solid var(--border)', marginBottom: '4px' }}>
+                      {profile?.display_name && (
+                        <div className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                          {profile.display_name}
+                        </div>
+                      )}
+                      {userEmail && (
+                        <div className="text-[11px] truncate opacity-70" style={{ color: 'var(--text-secondary)' }}>
+                          {userEmail}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <button
                     onClick={() => { setDropdownOpen(false); window.print(); }}
                     className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-left"
@@ -300,6 +308,18 @@ export default function TopNav() {
                     <Printer size={13} />
                     <span>{tr.ui.print}</span>
                   </button>
+
+                  <Link
+                    href="/profile"
+                    onClick={() => setDropdownOpen(false)}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-left"
+                    style={{ color: 'var(--text-secondary)', display: 'flex' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-elevated)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  >
+                    <User size={13} />
+                    <span>{tr.nav.profile}</span>
+                  </Link>
 
                   <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }} />
 
@@ -367,6 +387,19 @@ export default function TopNav() {
                 </Link>
               );
             })}
+            <Link
+              href="/profile"
+              onClick={() => setMobileMenu(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all touch-target"
+              style={{
+                color: pathname === '/profile' ? 'var(--electric)' : 'var(--text-primary)',
+                background: pathname === '/profile' ? 'var(--electric-glow)' : 'transparent',
+                border: pathname === '/profile' ? '1px solid var(--border-bright)' : '1px solid transparent',
+              }}
+            >
+              <User size={16} />
+              <span>{tr.nav.profile}</span>
+            </Link>
             <div style={{ borderTop: '1px solid var(--border)', margin: '6px 0' }} />
             <button
               onClick={handleSignOut}
