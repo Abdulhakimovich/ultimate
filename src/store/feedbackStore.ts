@@ -10,7 +10,7 @@ interface FeedbackState {
   setHapticsEnabled: (enabled: boolean) => void;
 }
 
-export const useFeedbackStore = create<FeedbackState>((set, get) => ({
+export const useFeedbackStore = create<FeedbackState>((set) => ({
   soundEnabled: typeof window !== 'undefined' ? localStorage.getItem('ht_sound_enabled') !== 'false' : true,
   hapticsEnabled: typeof window !== 'undefined' ? localStorage.getItem('ht_haptics_enabled') !== 'false' : true,
   toggleSound: () =>

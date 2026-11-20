@@ -22,6 +22,39 @@ export async function getMonthlyGoal(year: number, month: number): Promise<Month
   } as MonthlyGoal;
 }
 
+export async function getAllGoals(): Promise<MonthlyGoal[]> {
+  const supabase = createClient();
+  const PAGE_SIZE = 1000;
+  let all: MonthlyGoal[] = [];
+  let from = 0;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from('monthly_goals')
+      .select('*')
+      .order('year', { ascending: true })
+      .order('month', { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all = all.concat(
+      data.map((d) => ({
+        id: d.id,
+        user_id: d.user_id,
+        year: d.year,
+        month: d.month,
+        goal_text: d.goal_text || '',
+        habit_targets: d.habit_targets || {},
+      })) as MonthlyGoal[]
+    );
+    if (data.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
+
+  return all;
+}
+
 export async function upsertMonthlyGoal(
   year: number,
   month: number,

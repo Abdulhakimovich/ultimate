@@ -14,6 +14,30 @@ export async function getTasksForDateRange(startDate: string, endDate: string): 
   return (data || []) as Task[];
 }
 
+export async function getAllTasks(): Promise<Task[]> {
+  const supabase = createClient();
+  const PAGE_SIZE = 1000;
+  let all: Task[] = [];
+  let from = 0;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .order('day_date', { ascending: true })
+      .order('sort_order', { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all = all.concat(data as Task[]);
+    if (data.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
+  }
+
+  return all;
+}
+
 export async function createTask(task: Task): Promise<void> {
   const supabase = createClient();
   const { error } = await supabase.from('tasks').insert({
