@@ -2,10 +2,8 @@
 
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import type { FAQItem } from '@/lib/instruction-content';
-
 interface Props {
-  items: FAQItem[];
+  items: { q: string; a: string }[];
 }
 
 export default function FAQAccordion({ items }: Props) {
@@ -48,7 +46,7 @@ export default function FAQAccordion({ items }: Props) {
                 background: isOpen ? 'var(--bg-elevated)' : 'transparent',
               }}
             >
-              <span>{item.question}</span>
+              <span>{item.q}</span>
               <div
                 className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 transition-transform duration-200"
                 style={{
@@ -72,7 +70,7 @@ export default function FAQAccordion({ items }: Props) {
                   background: 'var(--bg-elevated)',
                 }}
               >
-                {item.answer}
+                {item.a}
               </div>
             )}
           </div>
