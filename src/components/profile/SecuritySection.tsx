@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useLanguageStore } from '@/store/languageStore';
 import { useToastStore } from '@/stores/toastStore';
 import { useSignOut } from '@/hooks/useSignOut';
+import { MIN_PASSWORD_LENGTH } from '@/lib/constants';
 import { t } from '@/lib/i18n';
 
 interface Props {
@@ -42,7 +43,7 @@ export default function SecuritySection({ user }: Props) {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPassword.length < 8) {
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
       setError(tr.profile.passwordMinLength);
       return;
     }

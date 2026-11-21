@@ -155,7 +155,7 @@ export const translations = {
       rememberMe: 'Запомнить меня',
       orContinueWith: 'или продолжите через email',
       tagline: 'Личный дашборд привычек, продуктивности и побед',
-      passwordPlaceholder: 'Минимум 6 символов',
+      passwordPlaceholder: 'Минимум 8 символов',
     },
     ui: {
       save: 'Сохранить',
@@ -397,7 +397,7 @@ export const translations = {
       rememberMe: 'Remember me',
       orContinueWith: 'or continue with email',
       tagline: 'Personal dashboard for habits, velocity, and discipline',
-      passwordPlaceholder: 'At least 6 characters',
+      passwordPlaceholder: 'At least 8 characters',
     },
     ui: {
       save: 'Save',
@@ -639,7 +639,7 @@ export const translations = {
       rememberMe: 'Meni eslab qolish',
       orContinueWith: 'yoki elektron pochta orqali',
       tagline: 'Odatlar, intizom va samaradorlik shaxsiy boshqaruvi',
-      passwordPlaceholder: 'Kamida 6 ta belgi',
+      passwordPlaceholder: 'Kamida 8 ta belgi',
     },
     ui: {
       save: 'Saqlash',

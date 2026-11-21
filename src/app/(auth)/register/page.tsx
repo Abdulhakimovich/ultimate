@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createClient } from '@/lib/supabase/client';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
+import { MIN_PASSWORD_LENGTH } from '@/lib/constants';
 import { UserPlus, Loader2, Mail, Lock, User, AlertCircle, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
@@ -17,8 +18,10 @@ const registerSchema = z
   .object({
     name: z.string().min(2, 'Имя должно содержать минимум 2 символа'),
     email: z.string().email('Некорректный email адрес'),
-    password: z.string().min(6, 'Пароль должен содержать минимум 6 символов'),
-    confirmPassword: z.string().min(6, 'Подтвердите пароль'),
+    password: z
+      .string()
+      .min(MIN_PASSWORD_LENGTH, `Пароль должен содержать минимум ${MIN_PASSWORD_LENGTH} символов`),
+    confirmPassword: z.string().min(MIN_PASSWORD_LENGTH, 'Подтвердите пароль'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Пароли не совпадают',
