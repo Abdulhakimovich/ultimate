@@ -15,7 +15,6 @@ interface TaskRowProps {
 }
 
 export default function TaskRow({
-  id,
   text,
   completed,
   onToggle,

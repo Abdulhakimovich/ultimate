@@ -10,9 +10,7 @@ import {
   CheckCircle2,
   Calendar as CalendarIcon,
   Sparkles,
-  Plus,
 } from 'lucide-react';
-import Link from 'next/link';
 import { useHabitsStore } from '@/store/habitsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { useMounted } from '@/hooks/useMounted';
@@ -23,7 +21,8 @@ import DailyBarChart from '@/components/analytics/DailyBarChart';
 import MonthlyAreaChart from '@/components/analytics/MonthlyAreaChart';
 import WeeklyPlannerIndicator from '@/components/analytics/WeeklyPlannerIndicator';
 import HeatmapCalendar from '@/components/ui/HeatmapCalendar';
-import Logo from '@/components/ui/Logo';
+import PageHeader from '@/components/ui/PageHeader';
+import EmptyStateIllustration from '@/components/ui/EmptyStateIllustration';
 
 export default function AnalyticsPage() {
   const currentMonth    = useHabitsStore((s) => s.currentMonth);
@@ -130,26 +129,14 @@ export default function AnalyticsPage() {
   // Empty state if no habits exist
   if (mounted && habits.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto py-16 px-4 text-center surface-card rounded-2xl border-hairline mt-6">
-        <div className="w-16 h-16 rounded-2xl bg-[var(--electric-glow)] text-[var(--electric)] flex items-center justify-center mx-auto mb-4">
-          <Sparkles size={32} />
-        </div>
-        <h2 className="font-display font-bold text-xl mb-2" style={{ color: 'var(--text-primary)' }}>
-          {tr.analytics.emptyAnalytics}
-        </h2>
-        <p className="text-sm max-w-md mx-auto mb-6" style={{ color: 'var(--text-secondary)' }}>
-          {tr.analytics.emptyAnalyticsDesc}
-        </p>
-        <Link
-          href="/tracker"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-[var(--bg-primary)] transition-transform hover:scale-105 active:scale-95 shadow-lg"
-          style={{
-            background: 'linear-gradient(135deg, var(--electric), var(--blue-neon))',
-          }}
-        >
-          <Plus size={16} />
-          <span>{tr.tracker.addHabit}</span>
-        </Link>
+      <div className="max-w-2xl mx-auto py-12 px-4 surface-card rounded-2xl border-hairline mt-6">
+        <EmptyStateIllustration
+          variant="analytics"
+          title={tr.analytics.emptyAnalytics}
+          description={tr.analytics.emptyAnalyticsDesc}
+          actionLabel={tr.tracker.addHabit}
+          actionHref="/tracker"
+        />
       </div>
     );
   }
@@ -157,20 +144,11 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto pb-12">
       {/* 1. Header & Month Navigator */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 surface-card p-4 rounded-2xl">
-        <div className="flex items-center gap-3">
-          <Logo size="xs" />
-          <div className="h-5 w-[1px] bg-[var(--border)] hidden sm:block" />
-          <div>
-            <h1 className="font-display font-bold text-lg sm:text-xl tracking-tight" style={{ color: 'var(--text-primary)' }}>
-              {tr.analytics.title}
-            </h1>
-            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-              {tr.analytics.subtitle}
-            </p>
-          </div>
-        </div>
-
+      <PageHeader
+        title={tr.analytics.title}
+        subtitle={tr.analytics.subtitle}
+        icon={<TrendingUp size={20} />}
+      >
         {/* Month Selector Buttons */}
         <div className="flex items-center gap-1.5 self-start sm:self-auto">
           <button
@@ -196,7 +174,7 @@ export default function AnalyticsPage() {
             <ChevronRight size={16} />
           </button>
         </div>
-      </div>
+      </PageHeader>
 
       {/* 2. Hero Metric Row (Current Streak, Best Streak, Completion Rate, Total Check-ins) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">

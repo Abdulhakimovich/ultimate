@@ -10,6 +10,7 @@ import { isToday, formatDotDate, toDateString } from '@/lib/utils/dates';
 import { calculateTaskStats } from '@/lib/utils/calculations';
 import { triggerFeedback } from '@/lib/feedback';
 import DonutRing from '@/components/ui/DonutRing';
+import EmptyStateIllustration from '@/components/ui/EmptyStateIllustration';
 import TaskRow from './TaskRow';
 import DailyNotes from './DailyNotes';
 
@@ -126,9 +127,14 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
           </AnimatePresence>
 
           {tasks.length === 0 && !showNewTask && (
-            <p className="text-xs text-center py-4" style={{ color: 'var(--text-muted)' }}>
-              {tr.planner.noTasks}
-            </p>
+            <div className="py-2">
+              <EmptyStateIllustration
+                variant="planner"
+                title={tr.planner.noTasks}
+                actionLabel={tr.planner.addTask}
+                onAction={() => setShowNewTask(true)}
+              />
+            </div>
           )}
 
           {/* New task input */}

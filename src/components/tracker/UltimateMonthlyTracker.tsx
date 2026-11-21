@@ -1,7 +1,6 @@
 ﻿'use client';
 
 import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
-import Link from 'next/link';
 import { useMounted } from '@/hooks/useMounted';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -17,8 +16,6 @@ import {
   ChevronDown,
   Edit2,
   Trash2,
-  Sparkles,
-  BookOpen,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -57,6 +54,7 @@ import HabitCell from '@/components/ui/HabitCell';
 import TodayView from './TodayView';
 import ConfettiBurst from '@/components/ui/ConfettiBurst';
 import MilestoneCelebrationModal, { MilestoneInfo } from '@/components/ui/MilestoneCelebrationModal';
+import EmptyStateIllustration from '@/components/ui/EmptyStateIllustration';
 import { useProfileStore } from '@/store/profileStore';
 
 function getCSSVar(name: string, fallback: string): string {
@@ -683,22 +681,17 @@ export default function UltimateMonthlyTracker() {
             <tbody>
               {habits.length === 0 ? (
                 <tr>
-                  <td colSpan={allDays.length + 4} className="py-12 text-center">
-                    <Sparkles size={28} className="mx-auto mb-2 text-[var(--electric)]" />
-                    <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
-                      {tr.tracker.noHabits}
-                    </p>
-                    <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-                      {tr.tracker.noHabitsDesc}
-                    </p>
-                    <Link
-                      href="/instruction"
-                      className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold hover:underline transition-colors"
-                      style={{ color: 'var(--electric)' }}
-                    >
-                      <BookOpen size={13} />
-                      <span>{tr.tracker.howItWorks} →</span>
-                    </Link>
+                  <td colSpan={allDays.length + 4} className="py-8">
+                    <EmptyStateIllustration
+                      variant="tracker"
+                      title={tr.tracker.noHabits}
+                      description={tr.tracker.noHabitsDesc}
+                      actionLabel={tr.tracker.addHabit}
+                      onAction={() => {
+                        setEditingHabit(null);
+                        setShowModal(true);
+                      }}
+                    />
                   </td>
                 </tr>
               ) : (

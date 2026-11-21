@@ -248,13 +248,13 @@ export default function DailyBarChart() {
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
             <XAxis
               dataKey="day"
-              tick={{ fontSize: 10, fill: textMuted, fontFamily: 'JetBrains Mono' }}
+              tick={{ fontSize: 12, fill: textMuted, fontFamily: 'JetBrains Mono' }}
               axisLine={false}
               tickLine={false}
               interval={isMobile ? 4 : 0}
             />
             <YAxis
-              tick={{ fontSize: 10, fill: textMuted, fontFamily: 'JetBrains Mono' }}
+              tick={{ fontSize: 12, fill: textMuted, fontFamily: 'JetBrains Mono' }}
               axisLine={false}
               tickLine={false}
               domain={[0, 100]}
@@ -267,7 +267,7 @@ export default function DailyBarChart() {
                 background: bgElevated,
                 border: `1px solid ${borderBright}`,
                 borderRadius: 10,
-                fontSize: 11,
+                fontSize: 12,
                 color: textPrimary,
                 boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
               }}
