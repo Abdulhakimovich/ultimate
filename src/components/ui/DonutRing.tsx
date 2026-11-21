@@ -90,8 +90,8 @@ export default function DonutRing(props: DonutRingProps) {
           ))}
         </svg>
         <span
-          className="absolute inset-0 flex items-center justify-center font-mono font-bold tabular-nums"
-          style={{ fontSize: size < 60 ? '10px' : '12px', color: 'var(--electric)' }}
+          className="absolute inset-0 flex items-center justify-center font-mono font-bold tabular-nums text-xs"
+          style={{ color: 'var(--electric)' }}
         >
           {Math.round(clamped)}%
         </span>
@@ -126,8 +126,8 @@ export default function DonutRing(props: DonutRingProps) {
         />
       </svg>
       <span
-        className="absolute inset-0 flex items-center justify-center font-mono font-bold tabular-nums"
-        style={{ fontSize: size < 60 ? '10px' : '12px', color: fillColor }}
+        className="absolute inset-0 flex items-center justify-center font-mono font-bold tabular-nums text-xs"
+        style={{ color: fillColor }}
       >
         {Math.round(percentage)}%
       </span>

@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { CheckCircle2, Sparkles, Flame, Check } from 'lucide-react';
 import { useHabitsStore } from '@/store/habitsStore';
 import { useLanguageStore } from '@/store/languageStore';
@@ -9,6 +10,7 @@ import { toDateString } from '@/lib/utils/dates';
 import { isHabitCompletedOnDate } from '@/lib/utils/calculations';
 import { getHabitDisplayName } from '@/lib/utils/habitDisplay';
 import { triggerFeedback } from '@/lib/feedback';
+import ConfettiBurst from '@/components/ui/ConfettiBurst';
 
 export default function TodaySummaryBar() {
   const habits = useHabitsStore((s) => s.habits);
@@ -16,6 +18,7 @@ export default function TodaySummaryBar() {
   const toggleCompletion = useHabitsStore((s) => s.toggleCompletion);
   const language = useLanguageStore((s) => s.language);
   const tr = t(language);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const todayStr = toDateString(new Date());
 
@@ -35,6 +38,7 @@ export default function TodaySummaryBar() {
   const handleQuickCheck = (habitId: string) => {
     if (remainingToday.length === 1) {
       triggerFeedback('celebrate');
+      setShowConfetti(true);
     } else {
       triggerFeedback('check');
     }
@@ -118,8 +122,11 @@ export default function TodaySummaryBar() {
         )}
 
         {isAllDone && (
-          <div
-            className="flex items-center gap-1.5 text-xs font-bold font-display px-3 py-1.5 rounded-xl border shadow-sm"
+          <motion.div
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: [1, 1.06, 1], opacity: 1 }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            className="flex items-center gap-1.5 text-xs font-bold font-display px-3 py-1.5 rounded-xl border shadow-sm select-none"
             style={{
               background: 'var(--electric-glow)',
               borderColor: 'var(--electric)',
@@ -128,9 +135,11 @@ export default function TodaySummaryBar() {
           >
             <CheckCircle2 size={16} style={{ color: 'var(--electric)' }} />
             <span className="tracking-wide">100% COMPLETE</span>
-          </div>
+          </motion.div>
         )}
       </div>
+
+      {showConfetti && <ConfettiBurst onComplete={() => setShowConfetti(false)} />}
     </div>
   );
 }

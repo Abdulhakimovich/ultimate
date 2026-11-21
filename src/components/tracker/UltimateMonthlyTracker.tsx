@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useMounted } from '@/hooks/useMounted';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -55,6 +55,8 @@ import Logo from '@/components/ui/Logo';
 import TodaySummaryBar from '@/components/ui/TodaySummaryBar';
 import HabitCell from '@/components/ui/HabitCell';
 import TodayView from './TodayView';
+import ConfettiBurst from '@/components/ui/ConfettiBurst';
+import MilestoneCelebrationModal, { MilestoneInfo } from '@/components/ui/MilestoneCelebrationModal';
 import { useProfileStore } from '@/store/profileStore';
 
 function getCSSVar(name: string, fallback: string): string {
@@ -217,6 +219,47 @@ export default function UltimateMonthlyTracker() {
       return streak;
     },
     [completions]
+  );
+
+  const [activeMilestone, setActiveMilestone] = useState<MilestoneInfo | null>(null);
+  const [trackerConfetti, setTrackerConfetti] = useState(false);
+  const shownMilestonesRef = useRef<Set<string>>(new Set());
+
+  const handleToggleHabit = useCallback(
+    (habitId: string, dateStr: string) => {
+      const todayStr = toDateString(new Date());
+      const isAlreadyDone = isHabitCompletedOnDate(completions, habitId, dateStr);
+
+      if (!isAlreadyDone && dateStr === todayStr) {
+        // 1. Check if completing the last habit of the day
+        const remainingBefore = habits.filter(
+          (h) => !isHabitCompletedOnDate(completions, h.id, todayStr)
+        );
+        if (remainingBefore.length === 1 && remainingBefore[0].id === habitId) {
+          setTrackerConfetti(true);
+        }
+
+        // 2. Check if streak milestone is crossed (7, 30, 100 days)
+        const currentStreak = getHabitStreak(habitId);
+        const nextStreak = currentStreak + 1;
+        if ([7, 30, 100].includes(nextStreak)) {
+          const key = `${habitId}-${nextStreak}`;
+          if (!shownMilestonesRef.current.has(key)) {
+            shownMilestonesRef.current.add(key);
+            const mData: MilestoneInfo =
+              nextStreak === 100
+                ? { days: 100, title: tr.milestones.streak100Title, desc: tr.milestones.streak100Desc, icon: '👑' }
+                : nextStreak === 30
+                ? { days: 30, title: tr.milestones.streak30Title, desc: tr.milestones.streak30Desc, icon: '💎' }
+                : { days: 7, title: tr.milestones.streak7Title, desc: tr.milestones.streak7Desc, icon: '🔥' };
+            setActiveMilestone(mData);
+          }
+        }
+      }
+
+      toggleCompletion(habitId, dateStr);
+    },
+    [completions, habits, toggleCompletion, getHabitStreak, tr]
   );
 
   // Reorder habit up or down
@@ -515,7 +558,7 @@ export default function UltimateMonthlyTracker() {
           habits={habits}
           completions={completions}
           todayStr={toDateString(new Date())}
-          onToggle={toggleCompletion}
+          onToggle={handleToggleHabit}
           onSwitchToGrid={() => setMobileView('grid')}
           tr={tr}
         />
@@ -753,7 +796,7 @@ export default function UltimateMonthlyTracker() {
                               habitName={habit.name}
                               dateStr={dateStr}
                               habitColor={habit.color || 'var(--electric)'}
-                              onToggle={() => toggleCompletion(habit.id, dateStr)}
+                              onToggle={() => handleToggleHabit(habit.id, dateStr)}
                             />
                           </td>
                         );
@@ -999,6 +1042,13 @@ export default function UltimateMonthlyTracker() {
         }}
         onSave={handleSaveHabit}
         editHabit={editingHabit}
+      />
+
+      {/* Motivation: Confetti & Milestone Celebration */}
+      {trackerConfetti && <ConfettiBurst onComplete={() => setTrackerConfetti(false)} />}
+      <MilestoneCelebrationModal
+        milestone={activeMilestone}
+        onClose={() => setActiveMilestone(null)}
       />
     </div>
   );
