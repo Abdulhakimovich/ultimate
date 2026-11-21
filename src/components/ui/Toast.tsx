@@ -4,6 +4,8 @@ import { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import { useToastStore, type ToastVariant, type ToastItem } from '@/stores/toastStore';
+import { useLanguageStore } from '@/store/languageStore';
+import { t } from '@/lib/i18n';
 
 /* ------------------------------------------------------------------ */
 /* Variant styling & icons                                            */
@@ -34,7 +36,7 @@ const variantStyles: Record<
 /* Single Toast                                                       */
 /* ------------------------------------------------------------------ */
 
-function ToastCard({ toast }: { toast: ToastItem }) {
+function ToastCard({ toast, tr }: { toast: ToastItem; tr: ReturnType<typeof t> }) {
   const dismissToast = useToastStore((s) => s.dismissToast);
   const style = variantStyles[toast.variant];
 
@@ -72,9 +74,9 @@ function ToastCard({ toast }: { toast: ToastItem }) {
           type="button"
           onClick={handleUndo}
           className="shrink-0 rounded px-2 py-1 text-xs font-semibold text-accent-blue hover:bg-bg-card-alt transition-colors"
-          aria-label="Отменить действие"
+          aria-label={tr.ui.undoAction}
         >
-          Отменить
+          {tr.ui.undo}
         </button>
       )}
 
@@ -82,7 +84,7 @@ function ToastCard({ toast }: { toast: ToastItem }) {
         type="button"
         onClick={() => dismissToast(toast.id)}
         className="shrink-0 rounded p-1 text-text-muted hover:text-text-primary hover:bg-bg-card-alt transition-colors"
-        aria-label="Закрыть уведомление"
+        aria-label={tr.ui.dismissNotification}
       >
         <X size={14} />
       </button>
@@ -96,15 +98,17 @@ function ToastCard({ toast }: { toast: ToastItem }) {
 
 export default function ToastContainer() {
   const toasts = useToastStore((s) => s.toasts);
+  const language = useLanguageStore((s) => s.language);
+  const tr = t(language);
 
   return (
     <div
       className="pointer-events-none fixed bottom-4 right-4 z-50 flex flex-col-reverse gap-2 w-full max-w-sm"
-      aria-label="Уведомления"
+      aria-label={tr.ui.notifications}
     >
       <AnimatePresence mode="popLayout">
-        {toasts.map((t) => (
-          <ToastCard key={t.id} toast={t} />
+        {toasts.map((toastItem) => (
+          <ToastCard key={toastItem.id} toast={toastItem} tr={tr} />
         ))}
       </AnimatePresence>
     </div>

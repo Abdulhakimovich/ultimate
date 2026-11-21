@@ -3,7 +3,9 @@
 import { useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useHabitsStore } from '@/store/habitsStore';
-import { getCalendarDays, isToday, isSameMonth, formatRu } from '@/lib/utils/dates';
+import { useLanguageStore } from '@/store/languageStore';
+import { t } from '@/lib/i18n';
+import { getCalendarDays, isToday, isSameMonth } from '@/lib/utils/dates';
 
 interface MiniCalendarProps {
   onDayClick?: (date: Date) => void;
@@ -12,9 +14,11 @@ interface MiniCalendarProps {
 export default function MiniCalendar({ onDayClick }: MiniCalendarProps) {
   const currentMonth = useHabitsStore((s) => s.currentMonth);
   const navigateMonth = useHabitsStore((s) => s.navigateMonth);
+  const language = useLanguageStore((s) => s.language);
+  const tr = t(language);
 
-  const monthName = formatRu(currentMonth, 'LLLL yyyy');
-  const dayHeaders = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  const monthName = `${tr.months[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+  const dayHeaders = tr.tracker.weekdays;
 
   const days = useMemo(() => getCalendarDays(currentMonth), [currentMonth]);
 
@@ -25,7 +29,7 @@ export default function MiniCalendar({ onDayClick }: MiniCalendarProps) {
         <button
           onClick={() => navigateMonth('prev')}
           className="p-0.5 rounded hover:bg-white/10 transition-colors"
-          aria-label="Предыдущий месяц"
+          aria-label={tr.tracker.prevMonth}
         >
           <ChevronLeft size={14} className="text-text-on-dark" />
         </button>
@@ -35,7 +39,7 @@ export default function MiniCalendar({ onDayClick }: MiniCalendarProps) {
         <button
           onClick={() => navigateMonth('next')}
           className="p-0.5 rounded hover:bg-white/10 transition-colors"
-          aria-label="Следующий месяц"
+          aria-label={tr.tracker.nextMonth}
         >
           <ChevronRight size={14} className="text-text-on-dark" />
         </button>
@@ -74,7 +78,7 @@ export default function MiniCalendar({ onDayClick }: MiniCalendarProps) {
                     : 'text-text-muted/40'
                 }
               `}
-              aria-label={formatRu(day, 'd MMMM')}
+              aria-label={`${day.getDate()} ${tr.months[day.getMonth()]}`}
             >
               {day.getDate()}
             </button>

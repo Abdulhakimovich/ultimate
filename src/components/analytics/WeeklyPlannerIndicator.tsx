@@ -282,7 +282,7 @@ export default function WeeklyPlannerIndicator() {
           </div>
 
           <div className="text-xs font-mono text-center mt-1" style={{ color: 'var(--text-muted)' }}>
-            Пн • Вт • Ср • Чт • Пт • Сб • Вс
+            {tr.tracker.weekdays.join(' • ')}
           </div>
         </div>
 

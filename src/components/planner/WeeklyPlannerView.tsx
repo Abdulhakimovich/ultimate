@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Printer } from 'lucide-react';
 import { usePlannerStore } from '@/store/plannerStore';
 import { useHabitsStore } from '@/store/habitsStore';

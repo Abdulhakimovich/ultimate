@@ -244,8 +244,8 @@ export default function TopNav() {
               border: '1px solid var(--border)',
               background: 'var(--bg-card)',
             }}
-            aria-label={soundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
-            title={soundEnabled ? 'Звуковые эффекты включены' : 'Звуковые эффекты выключены'}
+            aria-label={tr.profile.sound}
+            title={soundEnabled ? (language === 'ru' ? 'Звуковые эффекты включены' : language === 'uz' ? 'Ovoz effektlari yoqilgan' : 'Sound effects enabled') : (language === 'ru' ? 'Звуковые эффекты выключены' : language === 'uz' ? 'Ovoz effektlari o‘chirilgan' : 'Sound effects disabled')}
           >
             {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
           </button>
@@ -256,7 +256,7 @@ export default function TopNav() {
               onClick={() => setDropdownOpen((p) => !p)}
               className="flex items-center gap-1.5 p-1 rounded-lg transition-all"
               style={{ border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
-              aria-label="User menu"
+              aria-label={language === 'ru' ? 'Меню пользователя' : language === 'uz' ? 'Foydalanuvchi menyusi' : 'User menu'}
             >
               <div
                 className="w-7 h-7 rounded-md flex items-center justify-center font-bold text-xs font-mono"

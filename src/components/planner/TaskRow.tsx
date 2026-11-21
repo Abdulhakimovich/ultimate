@@ -4,6 +4,8 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trash2 } from 'lucide-react';
 import Checkbox from '@/components/ui/Checkbox';
+import { useLanguageStore } from '@/store/languageStore';
+import { t } from '@/lib/i18n';
 
 interface TaskRowProps {
   id: string;
@@ -21,6 +23,8 @@ export default function TaskRow({
   onUpdate,
   onDelete,
 }: TaskRowProps) {
+  const language = useLanguageStore((s) => s.language);
+  const tr = t(language);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(text);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -71,7 +75,7 @@ export default function TaskRow({
         checked={completed}
         onChange={onToggle}
         size="sm"
-        ariaLabel={`Задача: ${text}`}
+        ariaLabel={text}
       />
 
       {isEditing ? (
@@ -84,7 +88,7 @@ export default function TaskRow({
           onKeyDown={handleKeyDown}
           className="flex-1 bg-transparent border-b text-xs text-text-primary outline-none py-0.5"
           style={{ borderColor: 'var(--electric)' }}
-          aria-label="Редактирование задачи"
+          aria-label={tr.ui.edit}
         />
       ) : (
         <span
@@ -107,7 +111,7 @@ export default function TaskRow({
         style={{ color: 'var(--text-secondary)' }}
         onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--accent-red)'; }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'; }}
-        aria-label="Удалить задачу"
+        aria-label={tr.ui.delete}
       >
         <Trash2 size={12} />
       </button>

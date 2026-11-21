@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react';
 import { useHabitsStore } from '@/store/habitsStore';
+import { useLanguageStore } from '@/store/languageStore';
+import { t } from '@/lib/i18n';
 import { toDateString, startOfMonth, endOfMonth } from '@/lib/utils/dates';
 import { calculateHabitProgress, calculateAverageProgress, countCompletionsInRange } from '@/lib/utils/calculations';
 import ProgressBar from '@/components/ui/ProgressBar';
@@ -12,6 +14,8 @@ export default function ProgressSummaryPanel() {
   const currentMonth = useHabitsStore((s) => s.currentMonth);
   const monthlyGoal = useHabitsStore((s) => s.monthlyGoal);
   const setHabitTarget = useHabitsStore((s) => s.setHabitTarget);
+  const language = useLanguageStore((s) => s.language);
+  const tr = t(language);
 
   const startStr = toDateString(startOfMonth(currentMonth));
   const endStr = toDateString(endOfMonth(currentMonth));
@@ -33,15 +37,15 @@ export default function ProgressSummaryPanel() {
   return (
     <div className="w-[180px] shrink-0 bg-bg-card rounded-lg p-3 shadow-sm">
       <h3 className="text-xs font-semibold text-text-secondary text-center mb-1">
-        Прогресс за месяц
+        {tr.tracker.monthProgress}
       </h3>
-      <p className="text-xs text-text-muted text-center mb-3">по привычкам</p>
+      <p className="text-xs text-text-muted text-center mb-3">{tr.tracker.habits}</p>
 
       {/* Column headers */}
       <div className="grid grid-cols-3 gap-1 text-xs font-medium text-text-muted mb-2 text-center">
-        <span>Всего</span>
-        <span>Цель</span>
-        <span>Прогресс</span>
+        <span>{tr.tracker.fact}</span>
+        <span>{tr.tracker.goal}</span>
+        <span>{tr.tracker.progress}</span>
       </div>
 
       {/* Per-habit rows */}
@@ -61,7 +65,7 @@ export default function ProgressSummaryPanel() {
                 className="w-full text-xs text-center bg-bg-primary border border-bg-card-alt rounded px-1 py-0.5 text-text-primary outline-none focus:border-accent-blue"
                 min={1}
                 max={31}
-                aria-label={`Цель для ${habit.name}`}
+                aria-label={`${tr.tracker.goal}: ${habit.name}`}
               />
               <span className="text-xs text-text-secondary">{progress}%</span>
             </div>
@@ -74,7 +78,7 @@ export default function ProgressSummaryPanel() {
       {habits.length > 0 && (
         <div className="mt-3 pt-2 border-t border-bg-card-alt">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-text-secondary font-medium">Среднее:</span>
+            <span className="text-text-secondary font-medium">{tr.tracker.avgCompletion}:</span>
             <span className="text-text-primary font-semibold">{averageProgress}%</span>
           </div>
           <ProgressBar value={averageProgress} height={5} className="mt-1" />

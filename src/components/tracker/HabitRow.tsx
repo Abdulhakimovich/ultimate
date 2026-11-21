@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { Habit } from '@/lib/types';
+import { useLanguageStore } from '@/store/languageStore';
+import { t } from '@/lib/i18n';
 
 interface HabitRowProps {
   habit: Habit;
@@ -11,6 +13,9 @@ interface HabitRowProps {
 }
 
 export default function HabitRow({ habit, onEdit, onDelete }: HabitRowProps) {
+  const language = useLanguageStore((s) => s.language);
+  const tr = t(language);
+
   return (
     <motion.div
       layout
@@ -29,14 +34,14 @@ export default function HabitRow({ habit, onEdit, onDelete }: HabitRowProps) {
         <button
           onClick={() => onEdit(habit)}
           className="p-1 rounded hover:bg-bg-card-alt text-text-muted hover:text-text-primary transition-colors"
-          aria-label={`Редактировать ${habit.name}`}
+          aria-label={`${tr.ui.edit} ${habit.name}`}
         >
           <Pencil size={11} />
         </button>
         <button
           onClick={() => onDelete(habit)}
           className="p-1 rounded hover:bg-bg-card-alt text-text-muted hover:text-accent-danger transition-colors"
-          aria-label={`Удалить ${habit.name}`}
+          aria-label={`${tr.ui.delete} ${habit.name}`}
         >
           <Trash2 size={11} />
         </button>

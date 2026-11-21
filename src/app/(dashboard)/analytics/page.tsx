@@ -350,7 +350,7 @@ export default function AnalyticsPage() {
                   {tr.analytics.insightMonday}
                 </span>
                 <span className="text-xs block mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                  Понедельник показывает наивысший процент завершения задач недели.
+                  {tr.analytics.insightMondayDesc}
                 </span>
               </div>
             </div>
@@ -364,7 +364,7 @@ export default function AnalyticsPage() {
                   {tr.analytics.insightMorning}
                 </span>
                 <span className="text-xs block mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                  Ранние отметки создают психологический импульс на весь оставшийся день.
+                  {tr.analytics.insightMorningDesc}
                 </span>
               </div>
             </div>
@@ -378,7 +378,7 @@ export default function AnalyticsPage() {
                   {tr.analytics.insightStreak}
                 </span>
                 <span className="text-xs block mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                  Каждый следующий день увеличивает ценность вашей серии.
+                  {tr.analytics.insightStreakDesc}
                 </span>
               </div>
             </div>

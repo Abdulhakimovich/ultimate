@@ -1,13 +1,20 @@
+'use client';
+
 import Link from 'next/link';
 import { CheckCircle2, Sparkles, Trophy } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import AuthHeaderNav from '@/components/auth/AuthHeaderNav';
+import { useLanguageStore } from '@/store/languageStore';
+import { t } from '@/lib/i18n';
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const language = useLanguageStore((s) => s.language);
+  const tr = t(language);
+
   return (
     <div
       className="min-h-screen flex flex-col justify-between relative overflow-hidden"
@@ -40,10 +47,10 @@ export default function AuthLayout({
 
           <div className="space-y-2">
             <h1 className="font-display font-extrabold text-3xl xl:text-4xl tracking-tight text-[var(--text-primary)]">
-              Создавай дисциплину каждый день
+              {tr.auth.heroTitle}
             </h1>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-              Личный дашборд привычек, продуктивности и побед. Превращайте рутину в систему неизбежного успеха.
+              {tr.auth.heroSubtitle}
             </p>
           </div>
 
@@ -54,7 +61,7 @@ export default function AuthLayout({
                 <CheckCircle2 size={15} />
               </div>
               <p className="text-xs text-[var(--text-primary)] font-medium leading-relaxed">
-                Интеллектуальный трекер с сериями, сеточным анализом и динамическим прогрессом
+                {tr.auth.benefit1}
               </p>
             </div>
 
@@ -63,7 +70,7 @@ export default function AuthLayout({
                 <Sparkles size={15} />
               </div>
               <p className="text-xs text-[var(--text-primary)] font-medium leading-relaxed">
-                Недельный планер задач, фокусных заметок и продуктивных привычек
+                {tr.auth.benefit2}
               </p>
             </div>
 
@@ -72,14 +79,14 @@ export default function AuthLayout({
                 <Trophy size={15} />
               </div>
               <p className="text-xs text-[var(--text-primary)] font-medium leading-relaxed">
-                Научно обоснованная методология «Atomic Habits» с системой наград
+                {tr.auth.benefit3}
               </p>
             </div>
           </div>
 
           {/* 1 Encouraging line */}
           <div className="p-3.5 rounded-xl border border-[var(--border-bright)] bg-[var(--electric-glow)]/40 text-xs text-[var(--text-secondary)] italic">
-            «Дисциплина — это мост между вашими целями и вашими достижениями.»
+            {tr.auth.quote}
           </div>
         </div>
 
@@ -96,7 +103,7 @@ export default function AuthLayout({
             className="text-xs font-medium tracking-wide text-center"
             style={{ color: 'var(--text-secondary)' }}
           >
-            Личный дашборд привычек, продуктивности и побед
+            {tr.auth.tagline}
           </p>
         </div>
 

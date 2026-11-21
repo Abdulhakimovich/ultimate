@@ -3,16 +3,15 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import { useHabitsStore } from '@/store/habitsStore';
+import { useLanguageStore } from '@/store/languageStore';
+import { t } from '@/lib/i18n';
 import {
   getMonthWeeks,
   toDateString,
   isToday,
   getFullDateRu,
-  formatRu,
-  getMonthName,
 } from '@/lib/utils/dates';
 import { isHabitCompletedOnDate } from '@/lib/utils/calculations';
-import { DAY_NAMES_SHORT } from '@/lib/types';
 import type { Habit } from '@/lib/types';
 import MiniCalendar from './MiniCalendar';
 import HabitRow from './HabitRow';
@@ -36,6 +35,8 @@ export default function MonthlyTrackerTable() {
   const toggleCompletion = useHabitsStore((s) => s.toggleCompletion);
   const setMonthlyGoalText = useHabitsStore((s) => s.setMonthlyGoalText);
   const setHabitTarget = useHabitsStore((s) => s.setHabitTarget);
+  const language = useLanguageStore((s) => s.language);
+  const tr = t(language);
 
   const [showModal, setShowModal] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
@@ -90,26 +91,26 @@ export default function MonthlyTrackerTable() {
       if (editingHabit) {
         updateHabit(editingHabit.id, habitFields);
         setHabitTarget(editingHabit.id, target);
-        toast({ message: 'Привычка обновлена', variant: 'success' });
+        toast({ message: tr.toast.habitUpdated, variant: 'success' });
       } else {
         const created = addHabit(habitFields);
         setHabitTarget(created.id, target);
-        toast({ message: 'Привычка добавлена', variant: 'success' });
+        toast({ message: tr.toast.habitAdded, variant: 'success' });
       }
       setEditingHabit(null);
     },
-    [editingHabit, addHabit, updateHabit, setHabitTarget, toast],
+    [editingHabit, addHabit, updateHabit, setHabitTarget, toast, tr.toast.habitUpdated, tr.toast.habitAdded],
   );
 
   const handleDeleteHabit = useCallback(
     (habit: Habit) => {
       deleteHabit(habit.id);
       toast({
-        message: `«${habit.name}» удалена`,
+        message: `«${habit.name}» — ${tr.toast.habitDeleted.toLowerCase()}`,
         variant: 'info',
       });
     },
-    [deleteHabit, toast],
+    [deleteHabit, toast, tr.toast.habitDeleted],
   );
 
   if (isLoading) {
@@ -134,7 +135,7 @@ export default function MonthlyTrackerTable() {
 
           <div className="bg-bg-card rounded-lg p-3 shadow-sm">
             <h3 className="text-xs font-semibold text-text-secondary mb-1">
-              Ежедневные привычки
+              {tr.tracker.habits}
             </h3>
             <p className="text-xs text-text-muted mb-3 capitalize">
               {getFullDateRu(new Date())}
@@ -146,7 +147,7 @@ export default function MonthlyTrackerTable() {
                 <div className="text-center py-6">
                   <p className="text-3xl mb-2">📋</p>
                   <p className="text-xs text-text-muted">
-                    Добавьте первую привычку, чтобы начать отслеживать прогресс
+                    {tr.tracker.noHabitsDesc}
                   </p>
                 </div>
               ) : (
@@ -171,15 +172,15 @@ export default function MonthlyTrackerTable() {
                 setShowModal(true);
               }}
               className="mt-3 w-full flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs text-accent-blue hover:bg-accent-blue/10 transition-colors border border-dashed border-accent-blue/30"
-              aria-label="Добавить привычку"
+              aria-label={tr.tracker.addHabit}
             >
               <Plus size={14} />
-              Добавить привычку
+              {tr.tracker.addHabit}
             </button>
 
             {/* Footer */}
             <p className="text-xs text-text-muted mt-2 text-center">
-              Всего привычек: {habits.length}
+              {tr.tracker.totalHabits}: {habits.length}
             </p>
           </div>
         </div>
@@ -189,15 +190,15 @@ export default function MonthlyTrackerTable() {
           {/* Month Goal */}
           <div className="bg-bg-card rounded-lg p-3 shadow-sm mb-3">
             <label className="text-xs font-semibold text-text-secondary">
-              Цель месяца:
+              {tr.tracker.monthGoal}:
             </label>
             <input
               type="text"
               value={goalText}
               onChange={(e) => handleGoalChange(e.target.value)}
-              placeholder="Опишите вашу цель на этот месяц..."
+              placeholder={`${tr.tracker.monthGoal}...`}
               className="mt-1 w-full px-3 py-2 rounded-lg border border-bg-card-alt bg-bg-primary text-sm text-text-primary outline-none focus:border-accent-blue transition-colors"
-              aria-label="Цель месяца"
+              aria-label={tr.tracker.monthGoal}
             />
           </div>
 
@@ -205,7 +206,7 @@ export default function MonthlyTrackerTable() {
           {habits.length === 0 ? (
             <div className="bg-bg-card rounded-lg p-8 text-center shadow-sm">
               <p className="text-text-muted text-sm">
-                Нажмите «Добавить привычку» чтобы начать
+                {tr.tracker.noHabitsDesc}
               </p>
             </div>
           ) : (
@@ -219,7 +220,7 @@ export default function MonthlyTrackerTable() {
                   {/* Week header */}
                   <div className="bg-bg-header/50 px-3 py-1.5 flex items-center gap-2">
                     <span className="text-xs font-semibold text-text-secondary">
-                      Неделя {weekIndex + 1}
+                      {tr.tracker.week} {weekIndex + 1}
                     </span>
                     <div className="flex gap-1 ml-auto">
                       {weekDays.map((day) => {
@@ -233,7 +234,7 @@ export default function MonthlyTrackerTable() {
                                 : 'text-text-muted'
                             }`}
                           >
-                            {DAY_NAMES_SHORT[dayOfWeek]}
+                            {tr.tracker.weekdays[dayOfWeek]}
                             <br />
                             {day.getDate()}
                           </span>
@@ -271,7 +272,7 @@ export default function MonthlyTrackerTable() {
                                     toggleCompletion(habit.id, dateStr)
                                   }
                                   isToday={isToday(day)}
-                                  ariaLabel={`${habit.name} — ${formatRu(day, 'd MMM')}`}
+                                  ariaLabel={`${habit.name} — ${day.getDate()} ${tr.months[day.getMonth()]}`}
                                 />
                               </div>
                             );

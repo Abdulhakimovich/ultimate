@@ -3,6 +3,8 @@
 import { useEffect, useRef, useCallback, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useLanguageStore } from '@/store/languageStore';
+import { t } from '@/lib/i18n';
 
 type ModalSize = 'sm' | 'md' | 'lg';
 
@@ -86,6 +88,8 @@ export default function Modal({
   size = 'md',
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const language = useLanguageStore((s) => s.language);
+  const tr = t(language);
 
   // Focus trap
   useFocusTrap(panelRef, isOpen);
@@ -135,7 +139,7 @@ export default function Modal({
             ref={panelRef}
             role="dialog"
             aria-modal="true"
-            aria-label={title ?? 'Диалоговое окно'}
+            aria-label={title ?? tr.ui.dialog}
             className={`relative z-10 w-full ${sizeClasses[size]} mx-4 rounded-2xl p-6`}
             style={{
               background: 'var(--bg-card)',
@@ -157,7 +161,7 @@ export default function Modal({
                   type="button"
                   onClick={onClose}
                   className="rounded-lg p-1.5 text-text-muted hover:bg-bg-card-alt hover:text-text-primary transition-colors"
-                  aria-label="Закрыть"
+                  aria-label={tr.ui.close}
                 >
                   <X size={18} />
                 </button>
@@ -170,7 +174,7 @@ export default function Modal({
                 type="button"
                 onClick={onClose}
                 className="absolute right-3 top-3 rounded-lg p-1.5 text-text-muted hover:bg-bg-card-alt hover:text-text-primary transition-colors"
-                aria-label="Закрыть"
+                aria-label={tr.ui.close}
               >
                 <X size={18} />
               </button>

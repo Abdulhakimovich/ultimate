@@ -60,7 +60,7 @@ export default function DailyNotes({ title, dateStr, field, values }: DailyNotes
               onChange={(e) => handleChange(i, e.target.value)}
               placeholder="..."
               className="flex-1 text-xs bg-transparent border-b border-transparent hover:border-[#3D5A7A] focus:border-[#00D4FF] text-text-primary outline-none py-0.5 placeholder:text-[#3D5A7A]"
-              aria-label={`${title}, строка ${i + 1}`}
+              aria-label={`${title} (${i + 1})`}
             />
           </div>
         ))}

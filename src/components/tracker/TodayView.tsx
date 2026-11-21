@@ -182,7 +182,7 @@ export default function TodayView({
                 type="button"
                 role="checkbox"
                 aria-checked={isDoneToday}
-                aria-label={`${habit.name}: ${isDoneToday ? 'Выполнено' : 'Отметить'}`}
+                aria-label={`${habit.name}: ${isDoneToday ? tr.tracker.cellDone : tr.tracker.checkHabit}`}
                 onClick={() => handleToggle(habit.id)}
                 className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-2xl flex items-center justify-center cursor-pointer transition-all active:scale-90 shadow-sm"
                 style={{
