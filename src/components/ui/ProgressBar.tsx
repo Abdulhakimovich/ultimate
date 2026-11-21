@@ -34,7 +34,7 @@ export default function ProgressBar({
   return (
     <div className={className}>
       {showLabel && (
-        <div className="flex justify-between text-[9px] mb-0.5" style={{ color: 'var(--text-muted)' }}>
+        <div className="flex justify-between text-xs mb-0.5" style={{ color: 'var(--text-muted)' }}>
           <span>0%</span>
           <span style={{ color: 'var(--electric)', fontWeight: 700 }}>{clamped}%</span>
           <span>100%</span>

@@ -48,7 +48,7 @@ export default function StreakBadge({
       <div
         className={`
           inline-flex items-center gap-1 rounded-full font-mono font-bold
-          ${size === 'sm' ? 'px-2 py-0.5 text-[11px]' : size === 'lg' ? 'px-3.5 py-1.5 text-sm' : 'px-2.5 py-1 text-xs'}
+          ${size === 'sm' ? 'px-2 py-0.5 text-xs' : size === 'lg' ? 'px-3.5 py-1.5 text-sm' : 'px-2.5 py-1 text-xs'}
         `}
         style={{
           background: isFire ? 'rgba(245, 158, 11, 0.15)' : 'var(--bg-elevated)',
@@ -62,7 +62,7 @@ export default function StreakBadge({
           style={{ color: isFire ? 'var(--accent-gold)' : 'var(--text-muted)' }}
         />
         <span className="tabular-nums">{streak}</span>
-        <span className="text-[10px] font-normal uppercase opacity-75">{tr.tracker.days}</span>
+        <span className="text-xs font-normal uppercase opacity-75">{tr.tracker.days}</span>
       </div>
 
       {showMilestone && milestone && (

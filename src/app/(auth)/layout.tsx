@@ -56,7 +56,7 @@ export default function AuthLayout({
       </div>
 
       {/* Footer copyright */}
-      <div className="py-4 text-center text-[11px] font-mono select-none" style={{ color: 'var(--text-muted)' }}>
+      <div className="py-4 text-center text-xs font-mono select-none" style={{ color: 'var(--text-muted)' }}>
         ULTimate © {new Date().getFullYear()} • Built for Peak Performance
       </div>
     </div>

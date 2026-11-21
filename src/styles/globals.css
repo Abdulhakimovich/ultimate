@@ -1,11 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
   /* Tailwind CSS v4 Theme definitions */
-  --font-sans:    'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
-  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  --font-sans:    var(--font-sans), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: var(--font-display), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    var(--font-mono), 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-bg-primary:     var(--bg-primary);
+  --color-bg-secondary:   var(--bg-secondary);
+  --color-bg-card:        var(--bg-card);
+  --color-bg-card-alt:    var(--bg-card-alt);
+  --color-bg-elevated:    var(--bg-elevated);
+  --color-bg-header:      var(--bg-header);
+  --color-bg-header-dark: var(--bg-header);
+  --color-bg-selected:    var(--electric);
+
+  --color-text-primary:   var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted:     var(--text-muted);
+  --color-text-bright:    var(--text-bright);
+  --color-text-on-dark:   #FFFFFF;
+
+  --color-electric:       var(--electric);
+  --color-electric-dim:   var(--electric-dim);
+  --color-electric-bright:var(--electric-bright);
+  --color-blue-mid:       var(--blue-mid);
+  --color-blue-deep:      var(--blue-deep);
+  --color-blue-neon:      var(--blue-neon);
+
+  --color-accent-blue:    var(--electric);
+  --color-accent-green:   var(--accent-green);
+  --color-accent-green-dim: var(--accent-green-dim);
+  --color-accent-purple:  var(--accent-purple);
+  --color-accent-orange:  var(--accent-orange);
+  --color-accent-red:     var(--accent-red);
+  --color-accent-danger:  var(--accent-red);
+  --color-accent-gold:    var(--accent-gold);
+
+  --color-border:         var(--border);
+  --color-border-bright:  var(--border-bright);
+  --color-border-subtle:  var(--border-subtle);
 }
 
 /* ==========================================================================
@@ -38,6 +72,7 @@
   --accent-orange:       #F97316;
   --accent-red:          #EF4444;
   --accent-gold:         #F59E0B;
+  --accent-gold-text:    #F59E0B;
 
   /* Harmonious per-habit palette tokens (WCAG AA tested) */
   --habit-1: #0076F9; /* Electric Blue */
@@ -51,7 +86,7 @@
 
   --text-primary:        #F8FAFC;
   --text-secondary:      #94A3B8;
-  --text-muted:          #64748B;
+  --text-muted:          #8E9FB5;
   --text-bright:         #FFFFFF;
 
   --border:              rgba(255, 255, 255, 0.08);
@@ -86,6 +121,7 @@
   --accent-orange:       #EA580C;
   --accent-red:          #DC2626;
   --accent-gold:         #D97706;
+  --accent-gold-text:    #B45309;
 
   /* Harmonious per-habit palette tokens in light mode */
   --habit-1: #0066FF;
@@ -99,7 +135,7 @@
 
   --text-primary:        #0F172A;
   --text-secondary:      #475569;
-  --text-muted:          #94A3B8;
+  --text-muted:          #64748B;
   --text-bright:         #020617;
 
   --border:              rgba(15, 23, 42, 0.08);
@@ -113,7 +149,7 @@
    BASE & RESET
    ========================================================================== */
 html {
-  font-size: 14px;
+  font-size: 100%;
   color-scheme: var(--color-scheme, dark);
   scroll-behavior: smooth;
 }
@@ -210,7 +246,11 @@ body {
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.surface-card:hover {
+.surface-card-interactive {
+  cursor: pointer;
+}
+
+.surface-card-interactive:hover {
   border-color: var(--border-bright);
 }
 

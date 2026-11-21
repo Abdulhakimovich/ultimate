@@ -94,7 +94,7 @@ export default function MonthlyAreaChart() {
           <button
             type="button"
             onClick={() => setViewMode('entire')}
-            className={`px-2.5 py-0.5 rounded text-[11px] font-mono transition-all ${
+            className={`px-2.5 py-0.5 rounded text-xs font-mono transition-all ${
               viewMode === 'entire'
                 ? 'bg-[var(--electric)] text-[#07090E] font-bold shadow-sm'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -105,7 +105,7 @@ export default function MonthlyAreaChart() {
           <button
             type="button"
             onClick={() => setViewMode('monthly')}
-            className={`px-2.5 py-0.5 rounded text-[11px] font-mono transition-all ${
+            className={`px-2.5 py-0.5 rounded text-xs font-mono transition-all ${
               viewMode === 'monthly'
                 ? 'bg-[var(--electric)] text-[#07090E] font-bold shadow-sm'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'

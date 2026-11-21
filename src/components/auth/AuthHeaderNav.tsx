@@ -119,7 +119,7 @@ export default function AuthHeaderNav() {
                   }`}
                 >
                   <span>{lang.fullLabel}</span>
-                  <span className="text-[10px] opacity-60 font-mono">{lang.label}</span>
+                  <span className="text-xs opacity-60 font-mono">{lang.label}</span>
                 </button>
               ))}
             </div>

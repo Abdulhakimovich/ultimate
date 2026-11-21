@@ -32,13 +32,13 @@ export default function ProgressSummaryPanel() {
 
   return (
     <div className="w-[180px] shrink-0 bg-bg-card rounded-lg p-3 shadow-sm">
-      <h3 className="text-[10px] font-semibold text-text-secondary text-center mb-1">
+      <h3 className="text-xs font-semibold text-text-secondary text-center mb-1">
         Прогресс за месяц
       </h3>
-      <p className="text-[9px] text-text-muted text-center mb-3">по привычкам</p>
+      <p className="text-xs text-text-muted text-center mb-3">по привычкам</p>
 
       {/* Column headers */}
-      <div className="grid grid-cols-3 gap-1 text-[9px] font-medium text-text-muted mb-2 text-center">
+      <div className="grid grid-cols-3 gap-1 text-xs font-medium text-text-muted mb-2 text-center">
         <span>Всего</span>
         <span>Цель</span>
         <span>Прогресс</span>
@@ -48,22 +48,22 @@ export default function ProgressSummaryPanel() {
       <div className="space-y-2">
         {progressData.map(({ habit, completed, target, progress }) => (
           <div key={habit.id} className="space-y-0.5">
-            <div className="flex items-center gap-1 text-[10px]">
+            <div className="flex items-center gap-1 text-xs">
               <span>{habit.icon}</span>
               <span className="truncate text-text-primary flex-1">{habit.name}</span>
             </div>
             <div className="grid grid-cols-3 gap-1 items-center text-center">
-              <span className="text-[10px] text-text-primary font-medium">{completed}</span>
+              <span className="text-xs text-text-primary font-medium">{completed}</span>
               <input
                 type="number"
                 value={target}
                 onChange={(e) => setHabitTarget(habit.id, parseInt(e.target.value) || 0)}
-                className="w-full text-[10px] text-center bg-bg-primary border border-bg-card-alt rounded px-1 py-0.5 text-text-primary outline-none focus:border-accent-blue"
+                className="w-full text-xs text-center bg-bg-primary border border-bg-card-alt rounded px-1 py-0.5 text-text-primary outline-none focus:border-accent-blue"
                 min={1}
                 max={31}
                 aria-label={`Цель для ${habit.name}`}
               />
-              <span className="text-[10px] text-text-secondary">{progress}%</span>
+              <span className="text-xs text-text-secondary">{progress}%</span>
             </div>
             <ProgressBar value={progress} height={4} />
           </div>
@@ -73,7 +73,7 @@ export default function ProgressSummaryPanel() {
       {/* Average footer */}
       {habits.length > 0 && (
         <div className="mt-3 pt-2 border-t border-bg-card-alt">
-          <div className="flex items-center justify-between text-[10px]">
+          <div className="flex items-center justify-between text-xs">
             <span className="text-text-secondary font-medium">Среднее:</span>
             <span className="text-text-primary font-semibold">{averageProgress}%</span>
           </div>

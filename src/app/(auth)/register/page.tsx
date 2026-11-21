@@ -234,7 +234,7 @@ function RegisterForm() {
       {/* Divider */}
       <div className="flex items-center gap-3">
         <div className="flex-1 h-px bg-[var(--border)]" />
-        <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-muted)]">
+        <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-muted)]">
           {tr.auth.orContinueWith}
         </span>
         <div className="flex-1 h-px bg-[var(--border)]" />
@@ -265,7 +265,7 @@ function RegisterForm() {
             />
           </div>
           {errors.name && (
-            <p className="text-[10px] mt-1 text-[var(--accent-red)] font-medium">{errors.name.message}</p>
+            <p className="text-xs mt-1 text-[var(--accent-red)] font-medium">{errors.name.message}</p>
           )}
         </div>
 
@@ -292,7 +292,7 @@ function RegisterForm() {
             />
           </div>
           {errors.email && (
-            <p className="text-[10px] mt-1 text-[var(--accent-red)] font-medium">{errors.email.message}</p>
+            <p className="text-xs mt-1 text-[var(--accent-red)] font-medium">{errors.email.message}</p>
           )}
         </div>
 
@@ -327,7 +327,7 @@ function RegisterForm() {
             </button>
           </div>
           {errors.password && (
-            <p className="text-[10px] mt-1 text-[var(--accent-red)] font-medium">{errors.password.message}</p>
+            <p className="text-xs mt-1 text-[var(--accent-red)] font-medium">{errors.password.message}</p>
           )}
         </div>
 
@@ -354,7 +354,7 @@ function RegisterForm() {
             />
           </div>
           {errors.confirmPassword && (
-            <p className="text-[10px] mt-1 text-[var(--accent-red)] font-medium">
+            <p className="text-xs mt-1 text-[var(--accent-red)] font-medium">
               {errors.confirmPassword.message}
             </p>
           )}

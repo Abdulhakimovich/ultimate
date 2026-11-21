@@ -123,7 +123,7 @@ export default function WeeklyPlannerView() {
               {tr.planner.offlineJournalPrompt} • {weekRangeLabel}
             </p>
           </div>
-          <div className="text-right text-[10px] text-gray-500 font-mono">
+          <div className="text-right text-xs text-gray-500 font-mono">
             {formatDotDate(new Date())}
           </div>
         </div>
@@ -150,7 +150,7 @@ export default function WeeklyPlannerView() {
                     : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border)]'
                 }`}
               >
-                <div className="text-[10px] uppercase font-mono">{tr.tracker.weekdays[idx]}</div>
+                <div className="text-xs uppercase font-mono">{tr.tracker.weekdays[idx]}</div>
                 <div className="text-xs font-mono">{day.getDate()}</div>
               </button>
             );

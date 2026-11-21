@@ -100,7 +100,7 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
           strokeWidth={5}
           color={RING_COLOR_VALUES[dayIndex]}
         />
-        <span className="text-[10px] uppercase font-bold mt-1 tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+        <span className="text-xs uppercase font-bold mt-1 tracking-wider" style={{ color: 'var(--text-secondary)' }}>
           {stats.completed}/{stats.total} {tr.planner.completed}
         </span>
       </div>
@@ -126,7 +126,7 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
           </AnimatePresence>
 
           {tasks.length === 0 && !showNewTask && (
-            <p className="text-[11px] text-center py-4" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-xs text-center py-4" style={{ color: 'var(--text-muted)' }}>
               {tr.planner.noTasks}
             </p>
           )}
@@ -172,7 +172,7 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
 
         {/* Task Footer Stats */}
         <div
-          className="flex justify-between text-[10px] font-mono pt-2 border-t"
+          className="flex justify-between text-xs font-mono pt-2 border-t"
           style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
         >
           <span>✓ {stats.completed}</span>

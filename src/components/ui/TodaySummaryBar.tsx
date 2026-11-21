@@ -110,7 +110,7 @@ export default function TodaySummaryBar() {
               </button>
             ))}
             {remainingToday.length > 4 && (
-              <span className="text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>
+              <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
                 +{remainingToday.length - 4}
               </span>
             )}

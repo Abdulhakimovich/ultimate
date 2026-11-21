@@ -103,7 +103,7 @@ export default function ProgressSection({ stats, loading }: Props) {
                 className="p-3.5 rounded-xl bg-[var(--bg-elevated)] border-hairline flex flex-col justify-between space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium leading-tight truncate" style={{ color: 'var(--text-secondary)' }}>
+                  <span className="text-xs font-medium leading-tight truncate" style={{ color: 'var(--text-secondary)' }}>
                     {it.label}
                   </span>
                   <div

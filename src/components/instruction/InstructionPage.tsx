@@ -135,7 +135,7 @@ export default function InstructionPage() {
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div className="space-y-1.5 flex-1">
               <span
-                className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider block"
+                className="text-xs sm:text-xs font-bold uppercase tracking-wider block"
                 style={{ color: 'var(--electric)' }}
               >
                 {content.book.eyebrow}

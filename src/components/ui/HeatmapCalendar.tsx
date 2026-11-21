@@ -126,7 +126,7 @@ export default function HeatmapCalendar() {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-1.5 text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>
+        <div className="flex items-center gap-1.5 text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
           <span>{tr.analytics.less}</span>
           <div className="w-2.5 h-2.5 rounded-[2px] border border-[var(--border-subtle)]" style={{ background: 'var(--bg-elevated)' }} title="0%" />
           <div className="w-2.5 h-2.5 rounded-[2px] border border-[rgba(0,118,249,0.35)]" style={{ background: 'rgba(0, 118, 249, 0.22)' }} title="1-25%" />
@@ -141,7 +141,7 @@ export default function HeatmapCalendar() {
       <div className="overflow-x-auto pb-1">
         <div className="min-w-[540px]">
           {/* Month labels row */}
-          <div className="flex text-[10px] font-mono mb-1.5 pl-6" style={{ color: 'var(--text-muted)' }}>
+          <div className="flex text-xs font-mono mb-1.5 pl-6" style={{ color: 'var(--text-muted)' }}>
             {weeks.map((_, idx) => {
               const match = monthLabels.find((m) => m.colIndex === idx);
               return (
@@ -155,7 +155,7 @@ export default function HeatmapCalendar() {
           {/* Grid: 7 rows x 18 cols */}
           <div className="flex">
             {/* Weekday indicator labels */}
-            <div className="flex flex-col justify-between pr-2 text-[9px] font-mono select-none" style={{ color: 'var(--text-muted)' }}>
+            <div className="flex flex-col justify-between pr-2 text-xs font-mono select-none" style={{ color: 'var(--text-muted)' }}>
               {weekdayShorts.map((lbl, idx) => (
                 <div key={idx} className="h-[13px] leading-[13px] text-right">
                   {lbl}

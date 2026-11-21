@@ -214,7 +214,7 @@ export default function AnalyticsPage() {
             <div className="text-2xl sm:text-3xl font-bold font-mono tabular-nums tracking-tight" style={{ color: 'var(--accent-gold)' }}>
               {stats.currentStreak} <span className="text-xs font-normal uppercase opacity-75">{tr.tracker.days}</span>
             </div>
-            <p className="text-[11px] mt-1" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
               {tr.milestones.streak7Desc}
             </p>
           </div>
@@ -234,7 +234,7 @@ export default function AnalyticsPage() {
             <div className="text-2xl sm:text-3xl font-bold font-mono tabular-nums tracking-tight" style={{ color: 'var(--electric)' }}>
               {stats.bestStreak} <span className="text-xs font-normal uppercase opacity-75">{tr.tracker.days}</span>
             </div>
-            <p className="text-[11px] mt-1" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
               {tr.milestones.streak30Title}
             </p>
           </div>
@@ -254,7 +254,7 @@ export default function AnalyticsPage() {
             <div className="text-2xl sm:text-3xl font-bold font-mono tabular-nums tracking-tight" style={{ color: 'var(--accent-green)' }}>
               {stats.completionRate}%
             </div>
-            <p className="text-[11px] mt-1" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
               {tr.tracker.monthProgress}
             </p>
           </div>
@@ -274,7 +274,7 @@ export default function AnalyticsPage() {
             <div className="text-2xl sm:text-3xl font-bold font-mono tabular-nums tracking-tight" style={{ color: 'var(--accent-purple)' }}>
               {stats.totalCheckins}
             </div>
-            <p className="text-[11px] mt-1" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
               {tr.analytics.subtitle.split(',')[0]}
             </p>
           </div>
@@ -323,7 +323,7 @@ export default function AnalyticsPage() {
                     <span className="text-xs font-semibold block" style={{ color: 'var(--text-primary)' }}>
                       {h.name}
                     </span>
-                    <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
+                    <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
                       #{idx + 1} • {h.count} {tr.tracker.days}
                     </span>
                   </div>
@@ -371,7 +371,7 @@ export default function AnalyticsPage() {
                 <span className="text-xs font-semibold block" style={{ color: 'var(--text-primary)' }}>
                   {tr.analytics.insightMonday}
                 </span>
-                <span className="text-[11px] block mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                <span className="text-xs block mt-0.5" style={{ color: 'var(--text-secondary)' }}>
                   Понедельник показывает наивысший процент завершения задач недели.
                 </span>
               </div>
@@ -385,7 +385,7 @@ export default function AnalyticsPage() {
                 <span className="text-xs font-semibold block" style={{ color: 'var(--text-primary)' }}>
                   {tr.analytics.insightMorning}
                 </span>
-                <span className="text-[11px] block mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                <span className="text-xs block mt-0.5" style={{ color: 'var(--text-secondary)' }}>
                   Ранние отметки создают психологический импульс на весь оставшийся день.
                 </span>
               </div>
@@ -399,7 +399,7 @@ export default function AnalyticsPage() {
                 <span className="text-xs font-semibold block" style={{ color: 'var(--text-primary)' }}>
                   {tr.analytics.insightStreak}
                 </span>
-                <span className="text-[11px] block mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                <span className="text-xs block mt-0.5" style={{ color: 'var(--text-secondary)' }}>
                   Каждый следующий день увеличивает ценность вашей серии.
                 </span>
               </div>

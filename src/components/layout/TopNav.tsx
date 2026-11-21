@@ -201,7 +201,7 @@ export default function TopNav() {
                       }}
                     >
                       <span className="font-sans">{opt.fullLabel}</span>
-                      <span className="font-mono text-[10px] opacity-75">{opt.label}</span>
+                      <span className="font-mono text-xs opacity-75">{opt.label}</span>
                     </button>
                   ))}
                 </motion.div>
@@ -259,7 +259,7 @@ export default function TopNav() {
               aria-label="User menu"
             >
               <div
-                className="w-6 h-6 rounded-md flex items-center justify-center font-bold text-[10px] font-mono"
+                className="w-7 h-7 rounded-md flex items-center justify-center font-bold text-xs font-mono"
                 style={{
                   background: 'var(--electric-glow)',
                   color: 'var(--electric)',
@@ -292,7 +292,7 @@ export default function TopNav() {
                         </div>
                       )}
                       {userEmail && (
-                        <div className="text-[11px] truncate opacity-70" style={{ color: 'var(--text-secondary)' }}>
+                        <div className="text-xs truncate opacity-70" style={{ color: 'var(--text-secondary)' }}>
                           {userEmail}
                         </div>
                       )}

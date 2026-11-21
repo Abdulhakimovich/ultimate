@@ -135,7 +135,7 @@ export default function WeeklySummaryHeader() {
           {/* Dynamic Sprint Velocity Indicator */}
           <div className="mt-3 flex items-center gap-2 flex-wrap">
             <span
-              className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border-hairline flex items-center gap-1"
+              className="text-xs font-mono font-bold px-2 py-0.5 rounded-md border-hairline flex items-center gap-1"
               style={{
                 background: 'var(--electric-glow)',
                 color: 'var(--electric)',
@@ -147,7 +147,7 @@ export default function WeeklySummaryHeader() {
                 {weeklyStats.percentage}% {tr.analytics.sprintVelocity}
               </span>
             </span>
-            <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
+            <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
               {weeklyStats.totalCompleted}/{weeklyStats.totalTasks} {tr.planner.completed}
             </span>
           </div>
@@ -182,7 +182,7 @@ export default function WeeklySummaryHeader() {
               size={72}
               strokeWidth={7}
             />
-            <span className="text-[10px] font-mono font-bold mt-1 text-center" style={{ color: 'var(--accent-green)' }}>
+            <span className="text-xs font-mono font-bold mt-1 text-center" style={{ color: 'var(--accent-green)' }}>
               {weeklyStats.totalCompleted} / {weeklyStats.totalTasks} {tr.planner.completed}
             </span>
           </div>
@@ -199,7 +199,7 @@ export default function WeeklySummaryHeader() {
             </p>
           ) : (
             <div className="overflow-x-auto max-h-[150px] overflow-y-auto">
-              <table className="w-full text-[10px]">
+              <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-[var(--border)]">
                     <th className="text-left py-1 pr-2 font-semibold" style={{ color: 'var(--text-secondary)' }}>

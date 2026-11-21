@@ -1,7 +1,26 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter, Montserrat, JetBrains_Mono } from 'next/font/google';
 import '@/styles/globals.css';
 import ThemeProvider from '@/components/providers/ThemeProvider';
 import PwaProvider from '@/components/providers/PwaProvider';
+
+const inter = Inter({
+  subsets: ['latin', 'latin-ext', 'cyrillic'],
+  display: 'swap',
+  variable: '--font-sans',
+});
+
+const montserrat = Montserrat({
+  subsets: ['latin', 'latin-ext', 'cyrillic'],
+  display: 'swap',
+  variable: '--font-display',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin', 'latin-ext', 'cyrillic'],
+  display: 'swap',
+  variable: '--font-mono',
+});
 
 export const metadata: Metadata = {
   title: 'Ultimate — Habit Tracker',
@@ -37,11 +56,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru" suppressHydrationWarning>
+    <html lang="ru" suppressHydrationWarning className={`${inter.variable} ${montserrat.variable} ${jetbrainsMono.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} suppressHydrationWarning />
       </head>
-      <body className="min-h-screen antialiased" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <body className="min-h-screen antialiased font-sans" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
         <ThemeProvider>
           <PwaProvider>
             {children}

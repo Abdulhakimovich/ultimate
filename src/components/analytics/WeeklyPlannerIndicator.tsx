@@ -156,7 +156,7 @@ export default function WeeklyPlannerIndicator() {
                 {tr.analytics.weeklyPlannerAnalysis}
               </h3>
               <span
-                className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border-hairline"
+                className="text-xs font-mono font-bold px-2 py-0.5 rounded-md border-hairline"
                 style={{
                   background: stats.paceBg,
                   color: stats.paceColor,
@@ -167,7 +167,7 @@ export default function WeeklyPlannerIndicator() {
               </span>
             </div>
             <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-              {tr.analytics.weeklyPlannerSubtitle} • <span className="font-mono text-[11px]">{weekRange}</span>
+              {tr.analytics.weeklyPlannerSubtitle} • <span className="font-mono text-xs">{weekRange}</span>
             </p>
           </div>
         </div>
@@ -219,7 +219,7 @@ export default function WeeklyPlannerIndicator() {
             />
           </div>
 
-          <div className="flex items-center justify-between text-[11px] font-mono mt-2" style={{ color: 'var(--text-secondary)' }}>
+          <div className="flex items-center justify-between text-xs font-mono mt-2" style={{ color: 'var(--text-secondary)' }}>
             <span className="flex items-center gap-1">
               <CheckCircle2 size={11} className="text-[var(--electric)]" />
               <span>{stats.completedTasks} {tr.analytics.tasksCompleted.toLowerCase()}</span>
@@ -237,7 +237,7 @@ export default function WeeklyPlannerIndicator() {
             <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
               {tr.analytics.dailyCompletion}
             </span>
-            <span className="text-[10px] font-mono text-[var(--text-muted)]">
+            <span className="text-xs font-mono text-[var(--text-muted)]">
               {tr.ui.today}
             </span>
           </div>
@@ -266,7 +266,7 @@ export default function WeeklyPlannerIndicator() {
 
                 {/* Day label */}
                 <span
-                  className={`text-[9px] font-mono mt-1 ${
+                  className={`text-xs font-mono mt-1 ${
                     d.isToday ? 'font-bold text-[var(--electric)]' : 'text-[var(--text-muted)]'
                   }`}
                 >
@@ -274,14 +274,14 @@ export default function WeeklyPlannerIndicator() {
                 </span>
 
                 {/* Tooltip on hover */}
-                <div className="absolute bottom-full mb-1 hidden group-hover:block z-20 px-2 py-1 rounded-md bg-[var(--bg-primary)] border-hairline text-[10px] font-mono whitespace-nowrap shadow-lg">
+                <div className="absolute bottom-full mb-1 hidden group-hover:block z-20 px-2 py-1 rounded-md bg-[var(--bg-primary)] border-hairline text-xs font-mono whitespace-nowrap shadow-lg">
                   {d.dayNum}: {d.done}/{d.total} {tr.planner.tasks} ({d.taskPct}%)
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="text-[10px] font-mono text-center mt-1" style={{ color: 'var(--text-muted)' }}>
+          <div className="text-xs font-mono text-center mt-1" style={{ color: 'var(--text-muted)' }}>
             Пн • Вт • Ср • Чт • Пт • Сб • Вс
           </div>
         </div>
@@ -307,9 +307,9 @@ export default function WeeklyPlannerIndicator() {
           </div>
 
           {/* Breakdown mini-meters */}
-          <div className="space-y-1.5 text-[11px] font-mono">
+          <div className="space-y-1.5 text-xs font-mono">
             <div>
-              <div className="flex justify-between text-[10px] mb-0.5" style={{ color: 'var(--text-secondary)' }}>
+              <div className="flex justify-between text-xs mb-0.5" style={{ color: 'var(--text-secondary)' }}>
                 <span>{tr.planner.tasks} ({tr.planner.completed})</span>
                 <span className="text-[var(--electric)] font-bold">{stats.taskRate}%</span>
               </div>
@@ -322,7 +322,7 @@ export default function WeeklyPlannerIndicator() {
             </div>
 
             <div>
-              <div className="flex justify-between text-[10px] mb-0.5" style={{ color: 'var(--text-secondary)' }}>
+              <div className="flex justify-between text-xs mb-0.5" style={{ color: 'var(--text-secondary)' }}>
                 <span>{tr.tracker.habit} ({tr.analytics.heatmapTitle.split(' ')[0]})</span>
                 <span className="text-[var(--accent-green)] font-bold">{stats.habitRate}%</span>
               </div>

@@ -163,7 +163,7 @@ export default function LegacyImportModal() {
             </div>
             <div>
               <h2 className="font-display text-base font-bold">{titleText}</h2>
-              <p className="text-[11px] text-[var(--text-muted)]">Ultimate Cloud Sync</p>
+              <p className="text-xs text-[var(--text-muted)]">Ultimate Cloud Sync</p>
             </div>
           </div>
 
@@ -190,7 +190,7 @@ export default function LegacyImportModal() {
                     ? 'Import xatoligi'
                     : 'Import failed'}
                 </p>
-                <p className="text-[11px] opacity-90 mt-0.5">{importError}</p>
+                <p className="text-xs opacity-90 mt-0.5">{importError}</p>
               </div>
             </div>
           )}

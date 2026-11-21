@@ -134,8 +134,8 @@ export default function DailyBarChart() {
   return (
     <div className="space-y-3">
       {/* Metric Indicators Legend in Ascending Order: Red -> Orange -> Gold -> Azure -> Electric Blue */}
-      <div className="flex items-center justify-between flex-wrap gap-2 text-[10px] font-mono font-semibold pb-1">
-        <span className="text-[11px] font-bold" style={{ color: 'var(--text-secondary)' }}>
+      <div className="flex items-center justify-between flex-wrap gap-2 text-xs font-mono font-semibold pb-1">
+        <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>
           {language === 'ru' ? 'Шкала в порядке возрастания:' : language === 'uz' ? 'O‘sish tartibidagi shkala:' : 'Ascending Velocity Scale:'}
         </span>
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -188,7 +188,7 @@ export default function DailyBarChart() {
 
       {/* Scrollable Data Table with sticky row labels */}
       <div className="overflow-x-auto pb-1">
-        <table className="w-full text-[10px] text-center font-mono tabular-nums border-collapse" style={{ minWidth: 'max-content' }}>
+        <table className="w-full text-xs text-center font-mono tabular-nums border-collapse" style={{ minWidth: 'max-content' }}>
           <tbody>
             <tr className="border-b border-[var(--border-subtle)]">
               <td className="sticky left-0 z-10 text-left pr-3 py-1 font-bold whitespace-nowrap bg-[var(--bg-card)]" style={{ color: 'var(--electric)' }}>

@@ -136,7 +136,7 @@ export default function MonthlyTrackerTable() {
             <h3 className="text-xs font-semibold text-text-secondary mb-1">
               Ежедневные привычки
             </h3>
-            <p className="text-[10px] text-text-muted mb-3 capitalize">
+            <p className="text-xs text-text-muted mb-3 capitalize">
               {getFullDateRu(new Date())}
             </p>
 
@@ -178,7 +178,7 @@ export default function MonthlyTrackerTable() {
             </button>
 
             {/* Footer */}
-            <p className="text-[10px] text-text-muted mt-2 text-center">
+            <p className="text-xs text-text-muted mt-2 text-center">
               Всего привычек: {habits.length}
             </p>
           </div>
@@ -218,7 +218,7 @@ export default function MonthlyTrackerTable() {
                 >
                   {/* Week header */}
                   <div className="bg-bg-header/50 px-3 py-1.5 flex items-center gap-2">
-                    <span className="text-[10px] font-semibold text-text-secondary">
+                    <span className="text-xs font-semibold text-text-secondary">
                       Неделя {weekIndex + 1}
                     </span>
                     <div className="flex gap-1 ml-auto">
@@ -227,7 +227,7 @@ export default function MonthlyTrackerTable() {
                         return (
                           <span
                             key={day.toISOString()}
-                            className={`text-[9px] w-8 text-center ${
+                            className={`text-xs w-8 text-center ${
                               isToday(day)
                                 ? 'font-bold text-accent-blue'
                                 : 'text-text-muted'
@@ -251,7 +251,7 @@ export default function MonthlyTrackerTable() {
                       >
                         <div className="flex items-center gap-1 w-[110px] shrink-0">
                           <span className="text-xs">{habit.icon}</span>
-                          <span className="text-[10px] truncate text-text-primary">
+                          <span className="text-xs truncate text-text-primary">
                             {habit.name}
                           </span>
                         </div>

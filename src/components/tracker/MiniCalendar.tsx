@@ -44,7 +44,7 @@ export default function MiniCalendar({ onDayClick }: MiniCalendarProps) {
       {/* Day headers */}
       <div className="grid grid-cols-7 px-2 pt-2">
         {dayHeaders.map((d) => (
-          <div key={d} className="text-center text-[10px] font-medium text-text-muted py-1">
+          <div key={d} className="text-center text-xs font-medium text-text-muted py-1">
             {d}
           </div>
         ))}
@@ -65,7 +65,7 @@ export default function MiniCalendar({ onDayClick }: MiniCalendarProps) {
               key={day.toISOString()}
               onClick={() => onDayClick?.(day)}
               className={`
-                w-full aspect-square flex items-center justify-center rounded-full text-[11px]
+                w-full aspect-square flex items-center justify-center rounded-full text-xs
                 transition-colors
                 ${today
                   ? 'bg-accent-blue text-white font-bold'

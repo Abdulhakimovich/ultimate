@@ -316,7 +316,7 @@ export default function UltimateMonthlyTracker() {
                 {tr.tracker.title}
               </h1>
               <span
-                className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono flex items-center gap-1.5"
+                className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider font-mono flex items-center gap-1.5"
                 style={{
                   background: 'var(--electric-glow)',
                   color: 'var(--electric)',
@@ -394,7 +394,7 @@ export default function UltimateMonthlyTracker() {
           </div>
 
           <div className="flex-1 max-w-xl flex items-center gap-3">
-            <span className="text-[10px] font-bold uppercase tracking-widest font-mono" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-xs font-bold uppercase tracking-widest font-mono" style={{ color: 'var(--text-secondary)' }}>
               {tr.tracker.progress}:
             </span>
             <div className="flex-1">
@@ -426,7 +426,7 @@ export default function UltimateMonthlyTracker() {
             <TrendingUp size={16} />
           </div>
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
               {tr.tracker.monthProgress}
             </span>
             <span className="font-mono font-bold text-base sm:text-lg tabular-nums" style={{ color: 'var(--electric)' }}>
@@ -440,7 +440,7 @@ export default function UltimateMonthlyTracker() {
             <Target size={16} />
           </div>
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
               {tr.tracker.avgCompletion}
             </span>
             <span className="font-mono font-bold text-base sm:text-lg tabular-nums" style={{ color: 'var(--accent-green)' }}>
@@ -457,11 +457,11 @@ export default function UltimateMonthlyTracker() {
             <Flame size={16} className="animate-flame" />
           </div>
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
               {tr.tracker.streakDays}
             </span>
             <span className="font-mono font-bold text-base sm:text-lg tabular-nums" style={{ color: 'var(--accent-gold)' }}>
-              {bestStreak} <span className="text-[10px] uppercase font-normal">{tr.tracker.days}</span>
+              {bestStreak} <span className="text-xs uppercase font-normal">{tr.tracker.days}</span>
             </span>
           </div>
         </div>
@@ -471,7 +471,7 @@ export default function UltimateMonthlyTracker() {
             <Award size={16} />
           </div>
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
               {tr.tracker.totalHabits}
             </span>
             <span className="font-mono font-bold text-base sm:text-lg tabular-nums" style={{ color: 'var(--accent-purple)' }}>
@@ -529,7 +529,7 @@ export default function UltimateMonthlyTracker() {
                   <th
                     key={wIdx}
                     colSpan={weekDays.length}
-                    className="text-center py-1 text-[10px] font-bold uppercase tracking-wider border-r border-[var(--border)]"
+                    className="text-center py-1 text-xs font-bold uppercase tracking-wider border-r border-[var(--border)]"
                     style={{
                       background: 'var(--bg-header)',
                       color: 'var(--electric)',
@@ -540,13 +540,13 @@ export default function UltimateMonthlyTracker() {
                 ))}
 
                 {/* Right Summary Headers */}
-                <th rowSpan={2} className="text-center py-2 px-3 text-[10px] font-bold uppercase font-mono border-l border-[var(--border)]" style={{ color: 'var(--text-secondary)', width: '60px' }}>
+                <th rowSpan={2} className="text-center py-2 px-3 text-xs font-bold uppercase font-mono border-l border-[var(--border)]" style={{ color: 'var(--text-secondary)', width: '60px' }}>
                   {tr.tracker.goal}
                 </th>
-                <th rowSpan={2} className="text-center py-2 px-3 text-[10px] font-bold uppercase font-mono border-r border-[var(--border)]" style={{ color: 'var(--text-secondary)', width: '60px' }}>
+                <th rowSpan={2} className="text-center py-2 px-3 text-xs font-bold uppercase font-mono border-r border-[var(--border)]" style={{ color: 'var(--text-secondary)', width: '60px' }}>
                   {tr.tracker.fact}
                 </th>
-                <th rowSpan={2} className="text-center py-2 px-4 text-[10px] font-bold uppercase font-mono" style={{ color: 'var(--text-secondary)', width: '110px' }}>
+                <th rowSpan={2} className="text-center py-2 px-4 text-xs font-bold uppercase font-mono" style={{ color: 'var(--text-secondary)', width: '110px' }}>
                   {tr.tracker.progressCol}
                 </th>
               </tr>
@@ -574,10 +574,10 @@ export default function UltimateMonthlyTracker() {
                             : 'transparent',
                         }}
                       >
-                        <div className="text-[9px] font-bold uppercase" style={{ color: isWeekend ? 'var(--accent-orange)' : 'var(--text-secondary)' }}>
+                        <div className="text-xs font-bold uppercase" style={{ color: isWeekend ? 'var(--accent-orange)' : 'var(--text-secondary)' }}>
                           {tr.tracker.weekdays[dowIdx]}
                         </div>
-                        <div className="text-[11px] font-mono font-bold tabular-nums" style={{ color: today ? 'var(--electric)' : 'var(--text-primary)' }}>
+                        <div className="text-xs font-mono font-bold tabular-nums" style={{ color: today ? 'var(--electric)' : 'var(--text-primary)' }}>
                           {day.getDate()}
                         </div>
                       </th>
@@ -631,7 +631,7 @@ export default function UltimateMonthlyTracker() {
                                 {getHabitDisplayName(habit, language)}
                               </span>
                               {habitStreak > 0 && (
-                                <span className="text-[10px] font-mono text-[var(--accent-gold)] flex items-center gap-0.5 mt-0.5">
+                                <span className="text-xs font-mono text-[var(--accent-gold)] flex items-center gap-0.5 mt-0.5">
                                   <Flame size={10} className="animate-flame" />
                                   <span>{habitStreak} {tr.tracker.days}</span>
                                 </span>
@@ -727,7 +727,7 @@ export default function UltimateMonthlyTracker() {
                               }}
                             />
                           </div>
-                          <span className="font-mono text-[10px] font-bold tabular-nums w-8 text-right" style={{ color: 'var(--electric)' }}>
+                          <span className="font-mono text-xs font-bold tabular-nums w-8 text-right" style={{ color: 'var(--electric)' }}>
                             {pct}%
                           </span>
                         </div>
@@ -751,7 +751,7 @@ export default function UltimateMonthlyTracker() {
                       return (
                         <td
                           key={`pct-${day.getDate()}`}
-                          className="text-center font-mono font-bold text-[9px] tabular-nums border-r border-[var(--border-subtle)]"
+                          className="text-center font-mono font-bold text-xs tabular-nums border-r border-[var(--border-subtle)]"
                           style={{
                             color: pct === 100 ? 'var(--accent-green)' : pct >= 50 ? 'var(--electric)' : pct > 0 ? 'var(--text-primary)' : 'var(--text-muted)',
                           }}
@@ -767,13 +767,13 @@ export default function UltimateMonthlyTracker() {
 
                   {/* Completed Count Row */}
                   <tr className="bg-[var(--bg-elevated)] border-t border-[var(--border-subtle)]">
-                    <td className="sticky left-0 z-20 px-3 py-1 font-bold font-mono text-[11px] bg-[var(--bg-elevated)] border-r border-[var(--border)]" style={{ color: 'var(--electric)' }}>
+                    <td className="sticky left-0 z-20 px-3 py-1 font-bold font-mono text-xs bg-[var(--bg-elevated)] border-r border-[var(--border)]" style={{ color: 'var(--electric)' }}>
                       ✓ {tr.tracker.completed}
                     </td>
                     {allDays.map((day) => {
                       const stat = dayStats.find((d) => d.day === day.getDate());
                       return (
-                        <td key={`done-${day.getDate()}`} className="text-center font-mono text-[9px] tabular-nums font-semibold text-[var(--electric)] border-r border-[var(--border-subtle)]">
+                        <td key={`done-${day.getDate()}`} className="text-center font-mono text-xs tabular-nums font-semibold text-[var(--electric)] border-r border-[var(--border-subtle)]">
                           {stat?.done ?? 0}
                         </td>
                       );
@@ -924,7 +924,7 @@ export default function UltimateMonthlyTracker() {
                   <span>{mShort}</span>
                   {monthStat && monthStat.pct > 0 && (
                     <span
-                      className={`text-[9px] px-1 py-0.2 rounded font-mono ${
+                      className={`text-xs px-1 py-0.2 rounded font-mono ${
                         isCurrent
                           ? 'bg-[#07090E]/20 text-[#07090E]'
                           : 'bg-[var(--bg-card)] text-[var(--electric)]'
