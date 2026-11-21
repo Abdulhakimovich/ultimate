@@ -54,6 +54,8 @@ import { useToast } from '@/hooks/useToast';
 import Logo from '@/components/ui/Logo';
 import TodaySummaryBar from '@/components/ui/TodaySummaryBar';
 import HabitCell from '@/components/ui/HabitCell';
+import TodayView from './TodayView';
+import { useProfileStore } from '@/store/profileStore';
 
 function getCSSVar(name: string, fallback: string): string {
   if (typeof window === 'undefined') return fallback;
@@ -89,14 +91,28 @@ export default function UltimateMonthlyTracker() {
 
   const language         = useLanguageStore((s) => s.language);
   const tr               = t(language);
+  const profile          = useProfileStore((s) => s.profile);
 
   const [showModal, setShowModal]       = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [quoteIdx, setQuoteIdx]         = useState(0);
   const mounted                         = useMounted();
   const [isMobile, setIsMobile]         = useState(false);
+  const [mobileView, setMobileView]     = useState<'today' | 'grid'>('today');
   const [trendViewMode, setTrendViewMode] = useState<'entire' | 'monthly'>('entire');
   const { toast }                       = useToast();
+
+  const greetingText = useMemo(() => {
+    const hour = new Date().getHours();
+    let g = tr.greeting?.morning || 'Доброе утро';
+    if (hour >= 12 && hour < 18) {
+      g = tr.greeting?.afternoon || 'Добрый день';
+    } else if (hour >= 18 || hour < 5) {
+      g = tr.greeting?.evening || 'Добрый вечер';
+    }
+    const name = profile?.display_name || '';
+    return name ? `${g}, ${name}!` : `${g}!`;
+  }, [tr, profile?.display_name]);
 
   const year  = currentMonth.getFullYear();
   const month = currentMonth.getMonth() + 1; // 1-12
@@ -302,6 +318,18 @@ export default function UltimateMonthlyTracker() {
 
   return (
     <div className="space-y-5 max-w-[1600px] mx-auto pb-12">
+      {/* 0. Time-of-day greeting */}
+      <div className="surface-card p-4 sm:p-5 rounded-2xl border-hairline flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shadow-sm">
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold font-display tracking-tight" style={{ color: 'var(--text-primary)' }}>
+            {greetingText}
+          </h2>
+          <p className="text-xs sm:text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+            {tr.greeting?.encouragement}
+          </p>
+        </div>
+      </div>
+
       {/* 1. Daily Today Summary Action Bar */}
       <TodaySummaryBar />
 
@@ -481,8 +509,30 @@ export default function UltimateMonthlyTracker() {
         </div>
       </div>
 
-      {/* 4. Unified Sticky Habit Tracker Matrix (Desktop & Mobile) */}
-      <div className="surface-card rounded-2xl overflow-hidden border-hairline shadow-xl">
+      {/* Mobile "Today" View (below 768px by default) */}
+      {mobileView === 'today' ? (
+        <TodayView
+          habits={habits}
+          completions={completions}
+          todayStr={toDateString(new Date())}
+          onToggle={toggleCompletion}
+          onSwitchToGrid={() => setMobileView('grid')}
+          tr={tr}
+        />
+      ) : (
+        <div className="md:hidden flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setMobileView('today')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-[var(--border)] bg-[var(--bg-card)] text-[var(--electric)] active:scale-95"
+          >
+            ← {tr.greeting?.switchToToday || 'Сегодняшние привычки'}
+          </button>
+        </div>
+      )}
+
+      {/* 4. Unified Sticky Habit Tracker Matrix (Desktop always, Mobile when grid selected) */}
+      <div className={`surface-card rounded-2xl overflow-hidden border-hairline shadow-xl ${mobileView === 'today' ? 'hidden md:block' : 'block'}`}>
         {/* Table Action Bar */}
         <div className="p-3 sm:p-4 border-b border-[var(--border)] flex items-center justify-between bg-[var(--bg-header)]">
           <div className="flex items-center gap-2">
@@ -511,14 +561,14 @@ export default function UltimateMonthlyTracker() {
 
         {/* Scrollable Matrix with Sticky Habit Column */}
         <div className="overflow-x-auto relative">
-          <table className="w-full border-collapse text-left" style={{ minWidth: '940px' }}>
+          <table className="w-full border-collapse text-left" style={{ minWidth: '1060px' }}>
             <thead>
               {/* Header Row 1: Sticky corner + Week Group Headers */}
               <tr className="border-b border-[var(--border)]">
                 {/* Sticky Habit Column Header */}
                 <th
                   rowSpan={2}
-                  className="sticky left-0 z-30 p-3 text-xs font-bold uppercase tracking-wider bg-[var(--bg-card)] border-r border-[var(--border)] min-w-[220px] sm:min-w-[260px] shadow-[2px_0_6px_rgba(0,0,0,0.1)]"
+                  className="sticky left-0 z-30 p-3 text-xs font-bold uppercase tracking-wider bg-[var(--bg-card)] border-r border-[var(--border)] min-w-[220px] sm:min-w-[260px] shadow-[4px_0_12px_rgba(0,0,0,0.18)]"
                   style={{ color: 'var(--text-primary)' }}
                 >
                   {tr.tracker.habit}
@@ -540,13 +590,13 @@ export default function UltimateMonthlyTracker() {
                 ))}
 
                 {/* Right Summary Headers */}
-                <th rowSpan={2} className="text-center py-2 px-3 text-xs font-bold uppercase font-mono border-l border-[var(--border)]" style={{ color: 'var(--text-secondary)', width: '60px' }}>
+                <th rowSpan={2} className="text-center py-2 px-3 text-xs font-bold uppercase font-mono border-l border-[var(--border)]" style={{ color: 'var(--text-secondary)', width: '68px' }}>
                   {tr.tracker.goal}
                 </th>
-                <th rowSpan={2} className="text-center py-2 px-3 text-xs font-bold uppercase font-mono border-r border-[var(--border)]" style={{ color: 'var(--text-secondary)', width: '60px' }}>
+                <th rowSpan={2} className="text-center py-2 px-3 text-xs font-bold uppercase font-mono border-r border-[var(--border)]" style={{ color: 'var(--text-secondary)', width: '68px' }}>
                   {tr.tracker.fact}
                 </th>
-                <th rowSpan={2} className="text-center py-2 px-4 text-xs font-bold uppercase font-mono" style={{ color: 'var(--text-secondary)', width: '110px' }}>
+                <th rowSpan={2} className="text-center py-2 px-4 text-xs font-bold uppercase font-mono" style={{ color: 'var(--text-secondary)', width: '120px' }}>
                   {tr.tracker.progressCol}
                 </th>
               </tr>
@@ -565,12 +615,12 @@ export default function UltimateMonthlyTracker() {
                           today ? 'ring-1 ring-[var(--electric)] bg-[var(--electric-glow)]' : ''
                         }`}
                         style={{
-                          width: '32px',
-                          minWidth: '32px',
+                          width: '34px',
+                          minWidth: '34px',
                           background: today
                             ? 'var(--electric-glow)'
                             : isWeekend
-                            ? 'var(--bg-elevated)'
+                            ? 'rgba(255, 255, 255, 0.03)'
                             : 'transparent',
                         }}
                       >
@@ -622,7 +672,7 @@ export default function UltimateMonthlyTracker() {
                       className="group border-b border-[var(--border-subtle)] transition-colors hover:bg-[var(--bg-elevated)]"
                     >
                       {/* Sticky Left Column: Habit Info + Streak + Actions */}
-                      <td className="sticky left-0 z-20 px-3 py-2 bg-[var(--bg-card)] border-r border-[var(--border)] group-hover:bg-[var(--bg-elevated)] transition-colors shadow-[2px_0_6px_rgba(0,0,0,0.08)]">
+                      <td className="sticky left-0 z-20 px-3 py-2 bg-[var(--bg-card)] border-r border-[var(--border)] group-hover:bg-[var(--bg-elevated)] transition-colors shadow-[4px_0_12px_rgba(0,0,0,0.18)]">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2.5 min-w-0">
                             <span className="text-base flex-shrink-0">{habit.icon || '🎯'}</span>
@@ -702,7 +752,7 @@ export default function UltimateMonthlyTracker() {
                               isPast={isPast && !checked}
                               habitName={habit.name}
                               dateStr={dateStr}
-                              habitColor="var(--electric)"
+                              habitColor={habit.color || 'var(--electric)'}
                               onToggle={() => toggleCompletion(habit.id, dateStr)}
                             />
                           </td>
@@ -723,11 +773,11 @@ export default function UltimateMonthlyTracker() {
                               className="h-full rounded-full transition-all duration-300"
                               style={{
                                 width: `${Math.min(100, Math.max(0, pct))}%`,
-                                background: 'var(--electric)',
+                                background: habit.color || 'var(--electric)',
                               }}
                             />
                           </div>
-                          <span className="font-mono text-xs font-bold tabular-nums w-8 text-right" style={{ color: 'var(--electric)' }}>
+                          <span className="font-mono text-xs font-bold tabular-nums w-8 text-right" style={{ color: habit.color || 'var(--electric)' }}>
                             {pct}%
                           </span>
                         </div>

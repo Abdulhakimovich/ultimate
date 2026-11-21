@@ -2,10 +2,11 @@
 
 import { motion } from 'framer-motion';
 
-interface CheckboxProps {
+export interface CheckboxProps {
   checked: boolean;
   onChange: () => void;
   size?: 'sm' | 'md';
+  color?: string;
   ariaLabel?: string;
   disabled?: boolean;
 }
@@ -14,11 +15,12 @@ export default function Checkbox({
   checked,
   onChange,
   size = 'md',
+  color = 'var(--electric)',
   ariaLabel,
   disabled = false,
 }: CheckboxProps) {
-  const dimensions = size === 'sm' ? 16 : 20;
-  const checkSize  = size === 'sm' ? 10 : 12;
+  const dimensions = size === 'sm' ? 22 : 24;
+  const checkSize  = size === 'sm' ? 12 : 14;
 
   return (
     <button
@@ -28,13 +30,13 @@ export default function Checkbox({
       aria-label={ariaLabel}
       disabled={disabled}
       onClick={onChange}
-      className="relative flex-shrink-0 rounded-[3px] transition-all duration-150 cursor-pointer focus-visible:outline-none"
+      className="relative flex-shrink-0 rounded-md transition-all duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--electric)] before:content-[''] before:absolute before:-inset-2 before:min-w-[40px] before:min-h-[40px] before:pointer-events-auto flex items-center justify-center touch-manipulation"
       style={{
         width: dimensions,
         height: dimensions,
-        border: `1.5px solid ${checked ? 'var(--electric)' : 'var(--text-muted)'}`,
-        background: checked ? 'var(--electric)' : 'transparent',
-        boxShadow: checked ? '0 0 8px var(--electric-glow)' : 'none',
+        border: `2px solid ${checked ? color : 'var(--border)'}`,
+        background: checked ? color : 'transparent',
+        boxShadow: checked ? `0 0 8px ${color}40` : 'none',
       }}
     >
       {checked && (
@@ -50,8 +52,8 @@ export default function Checkbox({
         >
           <path
             d="M1.5 4.5L4.5 7.5L10.5 1.5"
-            stroke="var(--bg-primary)"
-            strokeWidth="2"
+            stroke="#FFFFFF"
+            strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
           />

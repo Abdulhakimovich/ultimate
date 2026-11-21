@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Check, Minus } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { triggerFeedback } from '@/lib/feedback';
 
 export interface HabitCellProps {
@@ -11,6 +11,7 @@ export interface HabitCellProps {
   habitName: string;
   dateStr: string;
   habitColor?: string;
+  color?: string;
   onToggle: () => void;
   disabled?: boolean;
 }
@@ -21,11 +22,12 @@ export default function HabitCell({
   isPast = false,
   habitName,
   dateStr,
-  habitColor = 'var(--electric)',
+  habitColor,
+  color,
   onToggle,
   disabled = false,
 }: HabitCellProps) {
-  // Determine state
+  const activeColor = color || habitColor || 'var(--electric)';
   const stateLabel = checked ? 'Done' : isPast ? 'Missed' : 'Not recorded';
 
   const handleToggle = () => {
@@ -50,30 +52,30 @@ export default function HabitCell({
           }
         }}
         className={`
-          relative w-7 h-7 sm:w-6 sm:h-6 rounded-md flex items-center justify-center
+          relative w-[26px] h-[26px] sm:w-[22px] sm:h-[22px] rounded-md flex items-center justify-center
           transition-all duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--electric)]
           touch-manipulation select-none
-          ${isToday ? 'ring-1 ring-[var(--electric)] shadow-[0_0_8px_var(--electric-glow)]' : ''}
+          before:content-[''] before:absolute before:-inset-2 before:min-w-[40px] before:min-h-[40px] before:pointer-events-auto
+          ${isToday && !checked ? 'ring-1 ring-[var(--electric)]' : ''}
         `}
         style={{
           background: checked
-            ? 'var(--electric-glow)'
+            ? activeColor
             : isToday
             ? 'var(--electric-glow)'
             : 'var(--bg-elevated)',
           border: checked
-            ? '1.5px solid var(--electric)'
+            ? `1.5px solid ${activeColor}`
             : isToday
-            ? '1px solid var(--electric)'
+            ? '1.5px solid var(--electric)'
             : '1px solid var(--border)',
-          boxShadow: checked ? '0 0 10px var(--electric-glow)' : 'none',
+          boxShadow: checked ? `0 0 8px ${activeColor}55` : 'none',
         }}
       >
         {checked ? (
           <Check
-            size={14}
-            className="animate-check-pop stroke-[3]"
-            style={{ color: 'var(--electric)' }}
+            size={13}
+            className="animate-check-pop stroke-[3] text-white"
           />
         ) : isPast ? (
           <div
