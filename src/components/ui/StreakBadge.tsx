@@ -4,6 +4,7 @@ import React from 'react';
 import { Flame } from 'lucide-react';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
+import { getDaysUnit } from '@/lib/utils/plural';
 
 export interface StreakBadgeProps {
   streak: number;
@@ -74,7 +75,7 @@ export default function StreakBadge({
           style={{ color: flameTier.color }}
         />
         <span className="tabular-nums">{streak}</span>
-        <span className="text-xs font-normal uppercase opacity-75">{tr.tracker.days}</span>
+        <span className="text-xs font-normal uppercase opacity-75">{getDaysUnit(streak, language, true)}</span>
       </div>
 
       {showMilestone && milestone && (

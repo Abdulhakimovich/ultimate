@@ -16,6 +16,26 @@ export interface HabitCellProps {
   disabled?: boolean;
 }
 
+function getLuminance(color: string): number {
+  if (!color || color.startsWith('var(')) return 0.2;
+  const clean = color.replace('#', '');
+  if (clean.length === 3) {
+    const r = parseInt(clean[0] + clean[0], 16) / 255;
+    const g = parseInt(clean[1] + clean[1], 16) / 255;
+    const b = parseInt(clean[2] + clean[2], 16) / 255;
+    const [rl, gl, bl] = [r, g, b].map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+    return rl * 0.2126 + gl * 0.7152 + bl * 0.0722;
+  }
+  if (clean.length === 6) {
+    const r = parseInt(clean.substring(0, 2), 16) / 255;
+    const g = parseInt(clean.substring(2, 4), 16) / 255;
+    const b = parseInt(clean.substring(4, 6), 16) / 255;
+    const [rl, gl, bl] = [r, g, b].map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+    return rl * 0.2126 + gl * 0.7152 + bl * 0.0722;
+  }
+  return 0.2;
+}
+
 export default function HabitCell({
   checked,
   isToday = false,
@@ -28,6 +48,7 @@ export default function HabitCell({
   disabled = false,
 }: HabitCellProps) {
   const activeColor = color || habitColor || 'var(--electric)';
+  const checkColor = getLuminance(activeColor) > 0.42 ? '#0A1428' : '#FFFFFF';
   const stateLabel = checked ? 'Done' : isPast ? 'Missed' : 'Not recorded';
 
   const handleToggle = () => {
@@ -75,7 +96,8 @@ export default function HabitCell({
         {checked ? (
           <Check
             size={13}
-            className="animate-check-pop stroke-[3] text-white"
+            className="animate-check-pop stroke-[3]"
+            style={{ color: checkColor }}
           />
         ) : isPast ? (
           <div

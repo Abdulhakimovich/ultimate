@@ -97,28 +97,36 @@ export default function DailyBarChart() {
     const start = startOfMonth(currentMonth);
     const end   = endOfMonth(currentMonth);
     const days  = eachDayOfInterval({ start, end });
+    const todayStr = toDateString(new Date());
 
     return days.map((day) => {
       const dateStr        = toDateString(day);
-      const completedCount = habits.filter((h) => isHabitCompletedOnDate(completions, h.id, dateStr)).length;
+      const isFuture       = dateStr > todayStr;
+      const completedCount = isFuture
+        ? null
+        : habits.filter((h) => isHabitCompletedOnDate(completions, h.id, dateStr)).length;
       const total          = habits.length;
-      const percentage     = calculateDailyCompletion(completedCount, total);
+      const percentage     = isFuture || completedCount === null
+        ? null
+        : calculateDailyCompletion(completedCount, total);
+
       return {
         day:          day.getDate(),
         percentage,
         completed:    completedCount,
-        notCompleted: total - completedCount,
+        notCompleted: isFuture || completedCount === null ? null : total - completedCount,
         isToday:      isToday(day),
+        isFuture,
       };
     });
   }, [mounted, habits, completions, currentMonth]);
 
   const { maxVal, minVal } = useMemo(() => {
-    if (chartData.length === 0) return { maxVal: -1, minVal: -1 };
-    const pcts = chartData.map((d) => d.percentage);
+    const validPcts = chartData.map((d) => d.percentage).filter((p): p is number => p !== null);
+    if (validPcts.length === 0) return { maxVal: -1, minVal: -1 };
     return {
-      maxVal: Math.max(...pcts),
-      minVal: Math.min(...pcts),
+      maxVal: Math.max(...validPcts),
+      minVal: Math.min(...validPcts),
     };
   }, [chartData]);
 
@@ -195,6 +203,14 @@ export default function DailyBarChart() {
                 %
               </td>
               {chartData.map((d) => {
+                if (d.percentage === null) {
+                  return (
+                    <td key={`pct-${d.day}`} className="px-1 py-1 font-mono text-[var(--text-muted)] opacity-25">
+                      —
+                    </td>
+                  );
+                }
+
                 const tier = getVelocityTier(d.percentage, minVal, maxVal);
                 const isPeak = maxVal > minVal && d.percentage === maxVal;
                 const isMin = maxVal > minVal && d.percentage === minVal;
@@ -222,8 +238,8 @@ export default function DailyBarChart() {
                 ✓
               </td>
               {chartData.map((d) => (
-                <td key={`done-${d.day}`} className="px-1 py-1 font-semibold" style={{ color: 'var(--electric)' }}>
-                  {d.completed}
+                <td key={`done-${d.day}`} className="px-1 py-1 font-semibold" style={{ color: d.completed === null ? 'var(--text-muted)' : 'var(--electric)', opacity: d.completed === null ? 0.25 : 1 }}>
+                  {d.completed === null ? '—' : d.completed}
                 </td>
               ))}
             </tr>
@@ -232,8 +248,8 @@ export default function DailyBarChart() {
                 ✗
               </td>
               {chartData.map((d) => (
-                <td key={`miss-${d.day}`} className="px-1 py-1 font-semibold" style={{ color: 'var(--accent-red)' }}>
-                  {d.notCompleted}
+                <td key={`miss-${d.day}`} className="px-1 py-1 font-semibold" style={{ color: d.notCompleted === null ? 'var(--text-muted)' : 'var(--accent-red)', opacity: d.notCompleted === null ? 0.25 : 1 }}>
+                  {d.notCompleted === null ? '—' : d.notCompleted}
                 </td>
               ))}
             </tr>
@@ -244,7 +260,7 @@ export default function DailyBarChart() {
       {/* Bar Chart with clean responsive ticks */}
       <div style={{ height: '170px' }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} barSize={isMobile ? 5 : 8} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <BarChart data={chartData} barSize={isMobile ? 5 : 8} margin={{ top: 8, right: 18, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
             <XAxis
               dataKey="day"
@@ -259,8 +275,8 @@ export default function DailyBarChart() {
               tickLine={false}
               domain={[0, 100]}
               ticks={[0, 25, 50, 75, 100]}
-              width={35}
-              unit="%"
+              width={42}
+              tickFormatter={(v: number) => `${v}%`}
             />
             <Tooltip
               contentStyle={{
@@ -271,11 +287,14 @@ export default function DailyBarChart() {
                 color: textPrimary,
                 boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
               }}
-              formatter={(value: any) => [`${value}%`, tr.tracker.completed]}
+              formatter={(value: any) => [value !== null && value !== undefined ? `${value}%` : '—', tr.tracker.completed]}
               labelFormatter={(label) => `${tr.tracker.todayDate}: ${label} ${tr.months[currentMonth.getMonth()]}`}
             />
-            <Bar dataKey="percentage" minPointSize={6} radius={[3, 3, 0, 0]} animationDuration={500}>
+            <Bar dataKey="percentage" minPointSize={0} radius={[3, 3, 0, 0]} animationDuration={500}>
               {chartData.map((entry, i) => {
+                if (entry.percentage === null) {
+                  return <Cell key={`cell-${i}`} fill="transparent" />;
+                }
                 const tier = getVelocityTier(entry.percentage, minVal, maxVal);
                 return (
                   <Cell

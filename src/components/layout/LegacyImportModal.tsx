@@ -210,9 +210,9 @@ export default function LegacyImportModal() {
               type="button"
               onClick={handleImport}
               disabled={isImporting}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-[#07090E] transition-all hover:scale-105 active:scale-95 shadow-md disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-md disabled:opacity-50"
               style={{
-                background: 'linear-gradient(135deg, var(--electric), var(--blue-neon))',
+                background: '#0A5FD6',
               }}
             >
               {isImporting ? (

@@ -62,25 +62,30 @@ export interface HabitIcon {
   key: string;
   emoji: string;
   label: string;
+  labels: {
+    ru: string;
+    en: string;
+    uz: string;
+  };
 }
 
 export const HABIT_ICONS: HabitIcon[] = [
-  { key: 'sleep', emoji: '🌙', label: 'Сон' },
-  { key: 'reading', emoji: '📚', label: 'Чтение' },
-  { key: 'smoothie', emoji: '🥤', label: 'Смузи' },
-  { key: 'steps', emoji: '👣', label: 'Шаги' },
-  { key: 'water', emoji: '💧', label: 'Вода' },
-  { key: 'exercise', emoji: '🏃', label: 'Упражнения' },
-  { key: 'meditation', emoji: '🧘', label: 'Медитация' },
-  { key: 'vitamins', emoji: '💊', label: 'Витамины' },
-  { key: 'journal', emoji: '✍️', label: 'Дневник' },
-  { key: 'coding', emoji: '💻', label: 'Код' },
-  { key: 'music', emoji: '🎵', label: 'Музыка' },
-  { key: 'cooking', emoji: '🍳', label: 'Готовка' },
-  { key: 'cleaning', emoji: '🧹', label: 'Уборка' },
-  { key: 'stretching', emoji: '🤸', label: 'Растяжка' },
-  { key: 'no-sugar', emoji: '🚫', label: 'Без сахара' },
-  { key: 'walk', emoji: '🚶', label: 'Прогулка' },
+  { key: 'reading', emoji: 'reading', label: 'Чтение', labels: { ru: 'Чтение', en: 'Reading', uz: 'Kitob o‘qish' } },
+  { key: 'exercise', emoji: 'exercise', label: 'Спорт', labels: { ru: 'Спорт', en: 'Exercise', uz: 'Mashqlar' } },
+  { key: 'water', emoji: 'water', label: 'Вода', labels: { ru: 'Вода', en: 'Water', uz: 'Suv ichish' } },
+  { key: 'sleep', emoji: 'sleep', label: 'Сон', labels: { ru: 'Сон', en: 'Sleep', uz: 'Uyqu' } },
+  { key: 'meditation', emoji: 'meditation', label: 'Медитация', labels: { ru: 'Медитация', en: 'Meditation', uz: 'Meditatsiya' } },
+  { key: 'languages', emoji: 'languages', label: 'Языки', labels: { ru: 'Языки', en: 'Languages', uz: 'Tillar' } },
+  { key: 'walk', emoji: 'walk', label: 'Прогулка', labels: { ru: 'Прогулка', en: 'Walk', uz: 'Sayr qilish' } },
+  { key: 'journal', emoji: 'journal', label: 'Дневник', labels: { ru: 'Дневник', en: 'Journal', uz: 'Kundalik' } },
+  { key: 'coding', emoji: 'coding', label: 'Кодинг', labels: { ru: 'Кодинг', en: 'Coding', uz: 'Dasturlash' } },
+  { key: 'vitamins', emoji: 'vitamins', label: 'Витамины', labels: { ru: 'Витамины', en: 'Vitamins', uz: 'Vitaminlar' } },
+  { key: 'music', emoji: 'music', label: 'Музыка', labels: { ru: 'Музыка', en: 'Music', uz: 'Musiqa' } },
+  { key: 'cooking', emoji: 'cooking', label: 'Готовка', labels: { ru: 'Готовка', en: 'Cooking', uz: 'Taom tayyorlash' } },
+  { key: 'cleaning', emoji: 'cleaning', label: 'Уборка', labels: { ru: 'Уборка', en: 'Cleaning', uz: 'Tozalash' } },
+  { key: 'no-sugar', emoji: 'no-sugar', label: 'Без сахара', labels: { ru: 'Без сахара', en: 'No Sugar', uz: 'Shakarsiz' } },
+  { key: 'target', emoji: 'target', label: 'Цель', labels: { ru: 'Цель', en: 'Target', uz: 'Maqsad' } },
+  { key: 'heart', emoji: 'heart', label: 'Здоровье', labels: { ru: 'Здоровье', en: 'Health', uz: 'Salomatlik' } },
 ];
 
 export const HABIT_COLORS = [

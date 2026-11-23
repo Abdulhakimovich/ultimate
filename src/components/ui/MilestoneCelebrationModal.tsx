@@ -3,6 +3,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X } from 'lucide-react';
+import { useLanguageStore } from '@/store/languageStore';
+import { t } from '@/lib/i18n';
 
 export interface MilestoneInfo {
   days: number;
@@ -20,6 +22,9 @@ export default function MilestoneCelebrationModal({
   milestone,
   onClose,
 }: MilestoneCelebrationModalProps) {
+  const language = useLanguageStore((s) => s.language);
+  const tr = t(language);
+
   if (!milestone) return null;
 
   return (
@@ -75,13 +80,12 @@ export default function MilestoneCelebrationModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2.5 px-4 rounded-xl font-bold text-xs font-display transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg cursor-pointer"
+            className="w-full py-2.5 px-4 rounded-xl font-bold text-xs font-display transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg cursor-pointer text-white"
             style={{
-              background: 'linear-gradient(135deg, var(--electric), var(--blue-mid))',
-              color: '#07090E',
+              background: '#0A5FD6',
             }}
           >
-            Продолжить путь →
+            {tr.milestones.continueJourney}
           </button>
         </motion.div>
       </div>

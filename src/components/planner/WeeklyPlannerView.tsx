@@ -144,7 +144,7 @@ export default function WeeklyPlannerView() {
                 onClick={() => setSelectedMobileDay(idx)}
                 className={`flex-1 py-2 px-2.5 rounded-xl text-center text-xs font-bold transition-all border ${
                   isSelected
-                    ? 'bg-[var(--electric)] text-[#07090E] border-[var(--electric)] shadow-md'
+                    ? 'bg-[#0A5FD6] text-white border-[#0A5FD6] shadow-md'
                     : today
                     ? 'bg-[var(--electric-glow)] text-[var(--electric)] border-[var(--border-bright)]'
                     : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border)]'

@@ -23,6 +23,8 @@ import WeeklyPlannerIndicator from '@/components/analytics/WeeklyPlannerIndicato
 import HeatmapCalendar from '@/components/ui/HeatmapCalendar';
 import PageHeader from '@/components/ui/PageHeader';
 import EmptyStateIllustration from '@/components/ui/EmptyStateIllustration';
+import HabitIcon from '@/components/ui/HabitIcon';
+import { getDaysUnit, formatDays } from '@/lib/utils/plural';
 
 export default function AnalyticsPage() {
   const currentMonth    = useHabitsStore((s) => s.currentMonth);
@@ -190,10 +192,10 @@ export default function AnalyticsPage() {
           </div>
           <div className="mt-3">
             <div className="text-2xl sm:text-3xl font-bold font-mono tabular-nums tracking-tight" style={{ color: 'var(--accent-gold)' }}>
-              {stats.currentStreak} <span className="text-xs font-normal uppercase opacity-75">{tr.tracker.days}</span>
+              {stats.currentStreak} <span className="text-xs font-normal uppercase opacity-75">{getDaysUnit(stats.currentStreak, language, true)}</span>
             </div>
             <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-              {tr.milestones.streak7Desc}
+              {tr.analytics.currentStreakCaption}
             </p>
           </div>
         </div>
@@ -210,10 +212,10 @@ export default function AnalyticsPage() {
           </div>
           <div className="mt-3">
             <div className="text-2xl sm:text-3xl font-bold font-mono tabular-nums tracking-tight" style={{ color: 'var(--electric)' }}>
-              {stats.bestStreak} <span className="text-xs font-normal uppercase opacity-75">{tr.tracker.days}</span>
+              {stats.bestStreak} <span className="text-xs font-normal uppercase opacity-75">{getDaysUnit(stats.bestStreak, language, true)}</span>
             </div>
             <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-              {tr.milestones.streak30Title}
+              {tr.analytics.bestStreakCaption}
             </p>
           </div>
         </div>
@@ -233,7 +235,7 @@ export default function AnalyticsPage() {
               {stats.completionRate}%
             </div>
             <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-              {tr.tracker.monthProgress}
+              {tr.analytics.completionRateCaption}
             </p>
           </div>
         </div>
@@ -253,7 +255,7 @@ export default function AnalyticsPage() {
               {stats.totalCheckins}
             </div>
             <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-              {tr.analytics.subtitle.split(',')[0]}
+              {tr.analytics.totalCheckinsCaption}
             </p>
           </div>
         </div>
@@ -296,13 +298,15 @@ export default function AnalyticsPage() {
             {stats.topHabits.map((h, idx) => (
               <div key={h.id} className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-elevated)] border-hairline">
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">{h.icon}</span>
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[var(--electric-glow)] text-[var(--electric)] shrink-0">
+                    <HabitIcon icon={h.icon} size={15} />
+                  </div>
                   <div>
                     <span className="text-xs font-semibold block" style={{ color: 'var(--text-primary)' }}>
                       {h.name}
                     </span>
                     <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
-                      #{idx + 1} • {h.count} {tr.tracker.days}
+                      #{idx + 1} • {formatDays(h.count, language)}
                     </span>
                   </div>
                 </div>
@@ -322,7 +326,9 @@ export default function AnalyticsPage() {
                 {stats.weakHabits.map((h) => (
                   <div key={h.id} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--bg-elevated)] border-hairline mb-1.5">
                     <div className="flex items-center gap-2">
-                      <span>{h.icon}</span>
+                      <div className="w-6 h-6 rounded-md flex items-center justify-center bg-[rgba(249,115,22,0.15)] text-[var(--accent-orange)] shrink-0">
+                        <HabitIcon icon={h.icon} size={13} />
+                      </div>
                       <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{h.name}</span>
                     </div>
                     <span className="text-xs font-mono font-bold text-[var(--accent-orange)]">{h.rate}%</span>

@@ -364,10 +364,10 @@ function RegisterForm() {
         <button
           type="submit"
           disabled={isLoading || !isSupabaseConfigured}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-[#07090E] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md disabled:opacity-50 mt-2"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-white transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md disabled:opacity-50 mt-2"
           style={{
-            background: 'linear-gradient(135deg, var(--electric), var(--blue-neon))',
-            boxShadow: '0 4px 16px var(--electric-glow)',
+            background: 'linear-gradient(135deg, #0A5FD6, #0076F9)',
+            boxShadow: '0 4px 16px rgba(10, 95, 214, 0.4)',
           }}
         >
           {isLoading ? (

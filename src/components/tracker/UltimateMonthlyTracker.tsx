@@ -11,21 +11,11 @@ import {
   Flame,
   TrendingUp,
   Award,
-  Calendar as CalendarIcon,
   ChevronUp,
   ChevronDown,
   Edit2,
   Trash2,
 } from 'lucide-react';
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
 import { useHabitsStore } from '@/store/habitsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
@@ -48,32 +38,30 @@ import type { Habit } from '@/lib/types';
 import { getHabitDisplayName } from '@/lib/utils/habitDisplay';
 import AddHabitModal from './AddHabitModal';
 import { useToast } from '@/hooks/useToast';
-import Logo from '@/components/ui/Logo';
 import TodaySummaryBar from '@/components/ui/TodaySummaryBar';
 import HabitCell from '@/components/ui/HabitCell';
+import HabitIcon from '@/components/ui/HabitIcon';
+import { formatDays } from '@/lib/utils/plural';
 import TodayView from './TodayView';
 import ConfettiBurst from '@/components/ui/ConfettiBurst';
 import MilestoneCelebrationModal, { MilestoneInfo } from '@/components/ui/MilestoneCelebrationModal';
 import EmptyStateIllustration from '@/components/ui/EmptyStateIllustration';
 import { useProfileStore } from '@/store/profileStore';
 
-function getCSSVar(name: string, fallback: string): string {
-  if (typeof window === 'undefined') return fallback;
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
-}
-
 function getDayOfWeek(date: Date): number {
   return (date.getDay() + 6) % 7; // Mon=0 … Sun=6
 }
 
-function getWeekLabel(weekIdx: number, tr: ReturnType<typeof t>): string {
+function getWeekLabel(weekIdx: number, colSpan: number, tr: ReturnType<typeof t>): string {
+  if (colSpan < 3) {
+    return `W${weekIdx + 1}`;
+  }
   return `${tr.tracker.week} ${weekIdx + 1}`;
 }
 
 export default function UltimateMonthlyTracker() {
   const habits           = useHabitsStore((s) => s.habits);
   const completions      = useHabitsStore((s) => s.completions);
-  const allCompletions   = useHabitsStore((s) => s.allCompletions);
   const currentMonth     = useHabitsStore((s) => s.currentMonth);
   const monthlyGoal      = useHabitsStore((s) => s.monthlyGoal);
   const isLoading        = useHabitsStore((s) => s.isLoading);
@@ -82,7 +70,6 @@ export default function UltimateMonthlyTracker() {
   const loadMonthlyGoal  = useHabitsStore((s) => s.loadMonthlyGoal);
   const toggleCompletion = useHabitsStore((s) => s.toggleCompletion);
   const navigateMonth    = useHabitsStore((s) => s.navigateMonth);
-  const setCurrentMonth  = useHabitsStore((s) => s.setCurrentMonth);
   const addHabit         = useHabitsStore((s) => s.addHabit);
   const updateHabit      = useHabitsStore((s) => s.updateHabit);
   const deleteHabit      = useHabitsStore((s) => s.deleteHabit);
@@ -97,9 +84,7 @@ export default function UltimateMonthlyTracker() {
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [quoteIdx, setQuoteIdx]         = useState(0);
   const mounted                         = useMounted();
-  const [isMobile, setIsMobile]         = useState(false);
   const [mobileView, setMobileView]     = useState<'today' | 'grid'>('today');
-  const [trendViewMode, setTrendViewMode] = useState<'entire' | 'monthly'>('entire');
   const { toast }                       = useToast();
 
   const greetingText = useMemo(() => {
@@ -110,19 +95,13 @@ export default function UltimateMonthlyTracker() {
     } else if (hour >= 18 || hour < 5) {
       g = tr.greeting?.evening || 'Добрый вечер';
     }
-    const name = profile?.display_name || '';
-    return name ? `${g}, ${name}!` : `${g}!`;
+    const fullName = profile?.display_name?.trim() || '';
+    const firstName = fullName ? fullName.split(/\s+/)[0] : '';
+    return firstName ? `${g}, ${firstName}!` : `${g}!`;
   }, [tr, profile?.display_name]);
 
   const year  = currentMonth.getFullYear();
   const month = currentMonth.getMonth() + 1; // 1-12
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   useEffect(() => {
     loadHabits();
@@ -271,38 +250,6 @@ export default function UltimateMonthlyTracker() {
     toast({ message: tr.toast.habitUpdated, variant: 'info' });
   };
 
-  const chartData = useMemo(() => {
-    if (!mounted) return [];
-    return dayStats.map((d) => ({
-      day: d.day,
-      pct: d.pct,
-      done: d.done,
-      isToday: d.isToday,
-    }));
-  }, [mounted, dayStats]);
-
-  const annualChartData = useMemo(() => {
-    if (!mounted || habits.length === 0) return [];
-    return tr.shortMonths.map((mShort, idx) => {
-      const targetMonth = idx + 1;
-      const monthPrefix = `${year}-${String(targetMonth).padStart(2, '0')}`;
-      const monthCompletions = allCompletions.filter((c) => c.completed_date.startsWith(monthPrefix));
-      const daysInTargetMonth = new Date(year, targetMonth, 0).getDate();
-      const totalPossible = daysInTargetMonth * habits.length;
-      const pct = totalPossible > 0 ? Math.round((monthCompletions.length / totalPossible) * 100) : 0;
-      const isSelectedMonth = idx === month - 1;
-      return {
-        name: mShort,
-        fullMonth: `${tr.months[idx]} ${year}`,
-        pct,
-        done: monthCompletions.length,
-        totalPossible,
-        isCurrentMonth: isSelectedMonth,
-        monthIdx: idx,
-      };
-    });
-  }, [mounted, habits.length, tr.shortMonths, tr.months, year, allCompletions, month]);
-
   const motivationLevel = useMemo(() => {
     if (overallPct >= 80) return language === 'ru' ? 'Легенда Дисциплины' : language === 'uz' ? 'Intizom Afsonasi' : 'Discipline Legend';
     if (overallPct >= 60) return language === 'ru' ? 'Мастер Продуктивности' : language === 'uz' ? "Mahorat Cho'qqisi" : 'Productivity Master';
@@ -338,14 +285,6 @@ export default function UltimateMonthlyTracker() {
     [deleteHabit, toast, tr]
   );
 
-  const handleMonthTabSelect = useCallback(
-    (targetMonthIdx: number) => {
-      const newDate = new Date(year, targetMonthIdx, 1);
-      setCurrentMonth(newDate);
-    },
-    [year, setCurrentMonth]
-  );
-
   const monthLabel = `${tr.months[month - 1]} ${year}`;
 
   if (!mounted || isLoading) {
@@ -379,8 +318,6 @@ export default function UltimateMonthlyTracker() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1.5 flex-wrap">
-              <Logo size="md" priority />
-              <div className="h-5 w-[1px] bg-[var(--border)] hidden sm:block" />
               <h1 className="font-display font-bold text-base sm:text-lg tracking-tight" style={{ color: 'var(--text-primary)' }}>
                 {tr.tracker.title}
               </h1>
@@ -448,42 +385,6 @@ export default function UltimateMonthlyTracker() {
             >
               <ChevronRight size={16} />
             </button>
-          </div>
-        </div>
-
-        {/* Top Month Progress Bar */}
-        <div className="mt-4 pt-3 border-t border-[var(--border)] flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
-              {tr.tracker.habits}
-            </span>
-            <span className="text-xs font-mono font-bold" style={{ color: 'var(--text-secondary)' }}>
-              ({habits.length})
-            </span>
-          </div>
-
-          <div className="flex-1 max-w-xl flex items-center gap-3">
-            <span className="text-xs font-bold uppercase tracking-widest font-mono" style={{ color: 'var(--text-secondary)' }}>
-              {tr.tracker.progress}:
-            </span>
-            <div className="flex-1">
-              <div className="h-2 rounded-full w-full bg-[var(--bg-elevated)] overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${Math.min(100, Math.max(0, overallPct))}%`,
-                    background: overallPct >= 75 ? 'var(--accent-green)' : 'var(--electric)',
-                    boxShadow: '0 0 10px var(--electric-glow)',
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-sm px-2.5 py-0.5 rounded-lg tabular-nums" style={{ color: 'var(--electric)', background: 'var(--electric-glow)', border: '1px solid var(--border-bright)' }}>
-              {overallPct.toFixed(1)}%
-            </span>
           </div>
         </div>
       </div>
@@ -591,8 +492,8 @@ export default function UltimateMonthlyTracker() {
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs transition-all hover:scale-105 active:scale-95 shadow-sm"
             style={{
-              background: 'linear-gradient(135deg, var(--electric), var(--blue-mid))',
-              color: '#07090E',
+              background: '#0A5FD6',
+              color: '#FFFFFF',
             }}
           >
             <Plus size={14} />
@@ -626,7 +527,7 @@ export default function UltimateMonthlyTracker() {
                       color: 'var(--electric)',
                     }}
                   >
-                    {getWeekLabel(wIdx, tr)}
+                    {getWeekLabel(wIdx, weekDays.length, tr)}
                   </th>
                 ))}
 
@@ -711,7 +612,12 @@ export default function UltimateMonthlyTracker() {
                       <td className="sticky left-0 z-20 px-3 py-2 bg-[var(--bg-card)] border-r border-[var(--border)] group-hover:bg-[var(--bg-elevated)] transition-colors shadow-[4px_0_12px_rgba(0,0,0,0.18)]">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <span className="text-base flex-shrink-0">{habit.icon || '🎯'}</span>
+                            <div
+                              className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                              style={{ background: (habit.color || 'var(--electric)') + '25', color: habit.color || 'var(--electric)' }}
+                            >
+                              <HabitIcon icon={habit.icon || 'target'} size={14} />
+                            </div>
                             <div className="min-w-0">
                               <span className="text-xs font-semibold block truncate" style={{ color: 'var(--text-primary)' }} title={getHabitDisplayName(habit, language)}>
                                 {getHabitDisplayName(habit, language)}
@@ -719,7 +625,7 @@ export default function UltimateMonthlyTracker() {
                               {habitStreak > 0 && (
                                 <span className="text-xs font-mono text-[var(--accent-gold)] flex items-center gap-0.5 mt-0.5">
                                   <Flame size={10} className="animate-flame" />
-                                  <span>{habitStreak} {tr.tracker.days}</span>
+                                  <span>{formatDays(habitStreak, language)}</span>
                                 </span>
                               )}
                             </div>
@@ -870,159 +776,6 @@ export default function UltimateMonthlyTracker() {
               )}
             </tbody>
           </table>
-        </div>
-
-        {/* 5. Integrated Trend Diagram & Month Tabs (Inside same card with habits) */}
-        <div className="p-4 sm:p-5 border-t border-[var(--border)] space-y-3 bg-[var(--bg-card)]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center border-hairline"
-                style={{ background: 'var(--electric-glow)', borderColor: 'var(--electric)' }}
-              >
-                <TrendingUp size={15} style={{ color: 'var(--electric)' }} />
-              </div>
-              <div>
-                <h3 className="font-display font-bold text-sm tracking-tight flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
-                  <span>{tr.analytics.executionTrend}</span>
-                  <span className="text-xs font-mono font-semibold text-[var(--electric)] px-2 py-0.5 rounded-md bg-[var(--electric-glow)] border-hairline">
-                    {trendViewMode === 'entire' ? `${tr.analytics.entirePeriod} (${year})` : monthLabel}
-                  </span>
-                </h3>
-              </div>
-            </div>
-
-            {/* View mode toggle pills */}
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[var(--bg-elevated)] border-hairline self-start sm:self-auto">
-              <button
-                type="button"
-                onClick={() => setTrendViewMode('entire')}
-                className={`px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-all ${
-                  trendViewMode === 'entire'
-                    ? 'bg-[var(--electric)] text-[#07090E] shadow-sm font-bold'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                {tr.analytics.allMonths}
-              </button>
-              <button
-                type="button"
-                onClick={() => setTrendViewMode('monthly')}
-                className={`px-3 py-1 rounded-lg text-xs font-mono font-semibold transition-all ${
-                  trendViewMode === 'monthly'
-                    ? 'bg-[var(--electric)] text-[#07090E] shadow-sm font-bold'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                {tr.analytics.dailyView}
-              </button>
-            </div>
-          </div>
-
-          <div style={{ height: '140px' }} className="w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={(trendViewMode === 'entire' ? annualChartData : chartData) as any[]}
-                margin={{ top: 5, right: 5, left: -20, bottom: 0 }}
-                onClick={(state: any) => {
-                  if (trendViewMode === 'entire' && state?.activePayload?.[0]?.payload?.monthIdx !== undefined) {
-                    handleMonthTabSelect(state.activePayload[0].payload.monthIdx);
-                  }
-                }}
-              >
-                <defs>
-                  <linearGradient id="electricBlueDiagramGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--electric)" stopOpacity={0.45} />
-                    <stop offset="60%" stopColor="var(--electric)" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="var(--electric)" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
-                <XAxis
-                  dataKey={trendViewMode === 'entire' ? 'name' : 'day'}
-                  tick={{ fontSize: 9, fill: getCSSVar('--text-muted', '#64748B'), fontFamily: 'JetBrains Mono' }}
-                  axisLine={false}
-                  tickLine={false}
-                  interval={trendViewMode === 'entire' ? 0 : (isMobile ? 4 : 0)}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  tick={{ fontSize: 9, fill: getCSSVar('--text-muted', '#64748B'), fontFamily: 'JetBrains Mono' }}
-                  axisLine={false}
-                  tickLine={false}
-                  ticks={[25, 50, 75, 100]}
-                  width={35}
-                  unit="%"
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: getCSSVar('--bg-card', '#111624'),
-                    border: `1px solid ${getCSSVar('--electric', '#0076F9')}`,
-                    borderRadius: 8,
-                    fontSize: 11,
-                    color: getCSSVar('--text-primary', '#F8FAFC'),
-                  }}
-                  formatter={(val: unknown) => [`${val ?? 0}%`, tr.tracker.progress]}
-                  labelFormatter={(lbl: unknown, payload: readonly { payload?: { fullMonth?: string } }[]) => {
-                    if (trendViewMode === 'entire') {
-                      return payload?.[0]?.payload?.fullMonth || String(lbl);
-                    }
-                    return `${tr.tracker.todayDate}: ${String(lbl)} ${tr.months[month - 1]}`;
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="pct"
-                  stroke="var(--electric)"
-                  strokeWidth={2.5}
-                  fill="url(#electricBlueDiagramGrad)"
-                  animationDuration={600}
-                  dot={{ r: trendViewMode === 'entire' ? 3.5 : 2.5, fill: 'var(--electric)', strokeWidth: 0 }}
-                  activeDot={{ r: 5, fill: '#FFFFFF', stroke: 'var(--electric)', strokeWidth: 2.5 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Bottom Month Navigation Tabs */}
-          <div className="pt-3 flex items-center gap-1 overflow-x-auto border-t border-[var(--border)]">
-            <div
-              className="px-3 py-1 rounded-lg text-xs font-bold font-mono flex items-center gap-1.5 cursor-default bg-[var(--bg-elevated)] text-[var(--text-secondary)] border-hairline shrink-0"
-            >
-              <CalendarIcon size={12} />
-              <span>{tr.yearLabel} {year}</span>
-            </div>
-
-            {tr.shortMonths.map((mShort, idx) => {
-              const isCurrent = idx === month - 1;
-              const monthStat = annualChartData[idx];
-              return (
-                <button
-                  key={mShort}
-                  type="button"
-                  onClick={() => handleMonthTabSelect(idx)}
-                  className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all shrink-0 flex items-center gap-1.5 ${
-                    isCurrent
-                      ? 'bg-[var(--electric)] text-[#07090E] shadow-sm'
-                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  <span>{mShort}</span>
-                  {monthStat && monthStat.pct > 0 && (
-                    <span
-                      className={`text-xs px-1 py-0.2 rounded font-mono ${
-                        isCurrent
-                          ? 'bg-[#07090E]/20 text-[#07090E]'
-                          : 'bg-[var(--bg-card)] text-[var(--electric)]'
-                      }`}
-                    >
-                      {monthStat.pct}%
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
         </div>
       </div>
 

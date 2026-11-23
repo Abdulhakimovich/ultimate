@@ -88,8 +88,8 @@ export default function EmptyStateIllustration({
   const buttonClass =
     'inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-md cursor-pointer';
   const buttonStyle = {
-    background: 'linear-gradient(135deg, var(--electric), var(--blue-mid))',
-    color: '#07090E',
+    background: '#0A5FD6',
+    color: '#FFFFFF',
   };
 
   return (

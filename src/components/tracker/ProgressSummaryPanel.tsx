@@ -7,6 +7,7 @@ import { t } from '@/lib/i18n';
 import { toDateString, startOfMonth, endOfMonth } from '@/lib/utils/dates';
 import { calculateHabitProgress, calculateAverageProgress, countCompletionsInRange } from '@/lib/utils/calculations';
 import ProgressBar from '@/components/ui/ProgressBar';
+import HabitIcon from '@/components/ui/HabitIcon';
 
 export default function ProgressSummaryPanel() {
   const habits = useHabitsStore((s) => s.habits);
@@ -52,8 +53,8 @@ export default function ProgressSummaryPanel() {
       <div className="space-y-2">
         {progressData.map(({ habit, completed, target, progress }) => (
           <div key={habit.id} className="space-y-0.5">
-            <div className="flex items-center gap-1 text-xs">
-              <span>{habit.icon}</span>
+            <div className="flex items-center gap-1.5 text-xs">
+              <HabitIcon icon={habit.icon} size={13} className="shrink-0" />
               <span className="truncate text-text-primary flex-1">{habit.name}</span>
             </div>
             <div className="grid grid-cols-3 gap-1 items-center text-center">

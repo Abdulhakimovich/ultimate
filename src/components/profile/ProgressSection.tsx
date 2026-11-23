@@ -4,6 +4,7 @@ import React from 'react';
 import { Target, CheckCircle2, Flame, Award, TrendingUp, Sparkles } from 'lucide-react';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
+import { getDaysUnit } from '@/lib/utils/plural';
 import Skeleton from '@/components/ui/Skeleton';
 import type { HabitStats } from '@/lib/stats';
 
@@ -54,7 +55,7 @@ export default function ProgressSection({ stats, loading }: Props) {
     {
       label: tr.profile.currentStreak,
       value: stats.currentStreak,
-      unit: tr.tracker.days,
+      unit: getDaysUnit(stats.currentStreak, language),
       icon: Flame,
       color: 'var(--accent-gold)',
       bg: 'rgba(245, 158, 11, 0.15)',
@@ -63,7 +64,7 @@ export default function ProgressSection({ stats, loading }: Props) {
     {
       label: tr.profile.bestStreak,
       value: stats.bestStreak,
-      unit: tr.tracker.days,
+      unit: getDaysUnit(stats.bestStreak, language),
       icon: Award,
       color: 'var(--accent-purple)',
       bg: 'rgba(139, 92, 246, 0.15)',

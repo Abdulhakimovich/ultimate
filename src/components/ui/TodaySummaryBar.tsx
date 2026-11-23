@@ -61,8 +61,8 @@ export default function TodaySummaryBar() {
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
             style={{
-              background: isAllDone ? 'var(--electric)' : 'var(--electric-glow)',
-              color: isAllDone ? '#07090E' : 'var(--electric)',
+              background: isAllDone ? '#0A5FD6' : 'var(--electric-glow)',
+              color: isAllDone ? '#FFFFFF' : 'var(--electric)',
             }}
           >
             {isAllDone ? (

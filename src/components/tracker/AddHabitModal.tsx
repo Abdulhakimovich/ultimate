@@ -9,6 +9,7 @@ import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
 import { HABIT_ICONS, HABIT_COLORS } from '@/lib/types';
 import type { Habit } from '@/lib/types';
+import HabitIcon from '@/components/ui/HabitIcon';
 
 const habitSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50, 'Max 50 characters'),
@@ -138,26 +139,29 @@ export default function AddHabitModal({
             {tr.habits.icon}
           </label>
           <div className="grid grid-cols-8 gap-1.5 p-2 rounded-xl" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)' }}>
-            {HABIT_ICONS.map((icon) => (
-              <button
-                key={icon.key}
-                type="button"
-                onClick={() => setValue('icon', icon.emoji)}
-                className={`
-                  flex items-center justify-center w-8 h-8 rounded-lg text-base
-                  transition-all border
-                  ${
-                    selectedIcon === icon.emoji
-                      ? 'border-[var(--electric)] bg-[var(--border-bright)] scale-110 shadow-[0_0_8px_var(--electric-muted)]'
-                      : 'border-transparent hover:bg-[var(--border-subtle)]'
-                  }
-                `}
-                title={icon.label}
-                aria-label={icon.label}
-              >
-                {icon.emoji}
-              </button>
-            ))}
+            {HABIT_ICONS.map((icon) => {
+              const label = icon.labels?.[language] || icon.label;
+              return (
+                <button
+                  key={icon.key}
+                  type="button"
+                  onClick={() => setValue('icon', icon.key)}
+                  className={`
+                    flex items-center justify-center w-8 h-8 rounded-lg text-base
+                    transition-all border
+                    ${
+                      selectedIcon === icon.key || selectedIcon === icon.emoji
+                        ? 'border-[var(--electric)] bg-[var(--border-bright)] scale-110 shadow-[0_0_8px_var(--electric-muted)] text-[var(--electric)]'
+                        : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
+                    }
+                  `}
+                  title={label}
+                  aria-label={label}
+                >
+                  <HabitIcon icon={icon.key} size={16} />
+                </button>
+              );
+            })}
           </div>
         </div>
 

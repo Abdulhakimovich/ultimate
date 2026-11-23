@@ -7,6 +7,7 @@ import { isHabitCompletedOnDate } from '@/lib/utils/calculations';
 import { toDateString } from '@/lib/utils/dates';
 import { triggerFeedback } from '@/lib/feedback';
 import { t } from '@/lib/i18n';
+import HabitIcon from '@/components/ui/HabitIcon';
 
 interface TodayViewProps {
   habits: Habit[];
@@ -139,9 +140,11 @@ export default function TodayView({
               <div className="flex-1 min-w-0 pr-2">
                 <div className="flex items-center gap-2 mb-2">
                   <div
-                    className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                    style={{ background: habitColor }}
-                  />
+                    className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
+                    style={{ background: habitColor + '25', color: habitColor }}
+                  >
+                    <HabitIcon icon={habit.icon} size={12} />
+                  </div>
                   <span className="font-semibold text-sm truncate text-[var(--text-primary)]">
                     {habit.name}
                   </span>

@@ -19,7 +19,7 @@ import { calculateTaskStats, calculateWeeklyProgress, isHabitCompletedOnDate, ca
 import DonutRing from '@/components/ui/DonutRing';
 import Checkbox from '@/components/ui/Checkbox';
 import ProgressBar from '@/components/ui/ProgressBar';
-import Logo from '@/components/ui/Logo';
+import HabitIcon from '@/components/ui/HabitIcon';
 import { getHabitDisplayName } from '@/lib/utils/habitDisplay';
 import { Zap } from 'lucide-react';
 
@@ -101,8 +101,6 @@ export default function WeeklySummaryHeader() {
         {/* Left: Brand + Date Selector */}
         <div className="flex flex-col justify-center">
           <div className="flex items-center gap-3 mb-2 flex-wrap">
-            <Logo size="sm" priority />
-            <div className="h-4 w-[1px] bg-[var(--border)] hidden sm:block" />
             <h1 className="font-display text-sm sm:text-base font-bold tracking-tight" style={{ color: 'var(--text-secondary)' }}>
               {tr.planner.title}
             </h1>
@@ -220,9 +218,9 @@ export default function WeeklySummaryHeader() {
                     const habitName = getHabitDisplayName(habit, language);
                     return (
                       <tr key={habit.id} className="border-b border-[var(--border-subtle)]">
-                        <td className="py-1.5 pr-2 truncate max-w-[120px]" style={{ color: 'var(--text-primary)' }} title={habitName}>
-                          <span className="mr-1.5">{habit.icon}</span>
-                          {habitName}
+                        <td className="py-1.5 pr-2 truncate max-w-[120px] flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }} title={habitName}>
+                          <HabitIcon icon={habit.icon} size={13} className="shrink-0" />
+                          <span className="truncate">{habitName}</span>
                         </td>
                         {weekCompletions.map((checked, di) => (
                           <td key={di} className="text-center py-1 px-0.5">
