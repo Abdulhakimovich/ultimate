@@ -144,7 +144,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto pb-12">
+    <div className="space-y-6 max-w-[1440px] mx-auto pb-12">
       {/* 1. Header & Month Navigator */}
       <PageHeader
         title={tr.analytics.title}
@@ -162,7 +162,7 @@ export default function AnalyticsPage() {
             <ChevronLeft size={16} />
           </button>
           <div
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold font-mono tracking-tight text-center min-w-[130px]"
+            className="px-3.5 py-1.5 rounded-xl text-xs font-semibold tracking-tight text-center min-w-[130px]"
             style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
           >
             {monthLabel}

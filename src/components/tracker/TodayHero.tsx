@@ -310,7 +310,7 @@ export default function TodayHero({ onCheckHabit }: TodayHeroProps) {
                   {doneToday}
                   <span className="text-xl sm:text-2xl text-[var(--muted)] font-normal">/{totalHabits}</span>
                 </span>
-                <span className="text-[11px] sm:text-xs font-semibold tracking-[0.18em] text-[var(--text2)]">
+                <span className="text-xs font-semibold tracking-[0.18em] text-[var(--text2)]">
                   {tr.tracker.doneTodayLabel}
                 </span>
               </div>

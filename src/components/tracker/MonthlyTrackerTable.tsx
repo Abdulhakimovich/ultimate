@@ -56,9 +56,10 @@ export default function MonthlyTrackerTable() {
     loadMonthlyGoal(year, month);
   }, [year, month, loadCompletions, loadMonthlyGoal]);
 
+  const goalValue = monthlyGoal?.goal_text || '';
   useEffect(() => {
-    setGoalText(monthlyGoal?.goal_text || '');
-  }, [monthlyGoal?.goal_text]);
+    setGoalText((prev) => (prev !== goalValue ? goalValue : prev));
+  }, [goalValue]);
 
   const weeks = useMemo(() => getMonthWeeks(currentMonth), [currentMonth]);
 

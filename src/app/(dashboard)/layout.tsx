@@ -34,7 +34,7 @@ export default async function DashboardLayout({
         aria-hidden="true"
       />
       <TopNav />
-      <main className="flex-1 max-w-[1600px] w-full mx-auto px-3 py-4 relative z-10">
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-3 sm:px-6 py-4 relative z-10">
         <PageTransition>{children}</PageTransition>
       </main>
       <LegacyImportModal />

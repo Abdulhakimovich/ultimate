@@ -29,13 +29,14 @@ import { createClient } from '@/lib/supabase/client';
 import { playCheckSound } from '@/lib/feedback';
 import { t, LANGUAGE_OPTIONS } from '@/lib/i18n';
 import Logo from '@/components/ui/Logo';
+import { useMounted } from '@/hooks/useMounted';
 
 export default function TopNav() {
   const pathname = usePathname();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [langOpen, setLangOpen]         = useState(false);
   const [mobileMenuOpen, setMobileMenu] = useState(false);
-  const [mounted, setMounted]           = useState(false);
+  const mounted                         = useMounted();
   const [userEmail, setUserEmail]       = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -68,7 +69,6 @@ export default function TopNav() {
   const tr              = t(displayLanguage);
 
   useEffect(() => {
-    setMounted(true);
     try {
       const supabase = createClient();
       supabase.auth.getUser().then(({ data }) => {
@@ -105,7 +105,7 @@ export default function TopNav() {
         borderBottom: '1px solid var(--border)',
       }}
     >
-      <nav className="h-full max-w-[1600px] mx-auto px-4 flex items-center justify-between">
+      <nav className="h-full max-w-[1440px] mx-auto px-4 flex items-center justify-between">
         {/* Left: Brand Logo */}
         <div className="flex items-center gap-6">
           <Link

@@ -85,7 +85,7 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
         }}
       >
         {today && (
-          <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-[var(--blue)] text-white shadow-sm">
+          <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-xs font-mono font-bold uppercase tracking-wider bg-[var(--blue)] text-white shadow-sm">
             TODAY
           </div>
         )}

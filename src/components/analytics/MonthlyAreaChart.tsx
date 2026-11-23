@@ -126,14 +126,14 @@ export default function MonthlyAreaChart() {
     <div className="space-y-3">
       {/* Subheader with View Toggle */}
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <span className="text-xs font-mono font-semibold text-[var(--electric)] px-2 py-0.5 rounded-md bg-[var(--electric-glow)] border-hairline">
+        <span className="text-xs font-semibold text-[var(--electric)] px-2 py-0.5 rounded-md bg-[var(--electric-glow)] border-hairline">
           {viewMode === 'entire' ? `${tr.analytics.entirePeriod} (${year})` : `${tr.months[currentMonth.getMonth()]} ${year}`}
         </span>
         <div className="flex items-center gap-1 p-0.5 rounded-lg bg-[var(--bg-elevated)] border-hairline">
           <button
             type="button"
             onClick={() => setViewMode('entire')}
-            className={`px-2.5 py-0.5 rounded text-xs font-mono transition-all ${
+            className={`px-2.5 py-0.5 rounded text-xs font-medium transition-all ${
               viewMode === 'entire'
                 ? 'bg-[#0A5FD6] text-white font-bold shadow-sm'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
@@ -144,7 +144,7 @@ export default function MonthlyAreaChart() {
           <button
             type="button"
             onClick={() => setViewMode('monthly')}
-            className={`px-2.5 py-0.5 rounded text-xs font-mono transition-all ${
+            className={`px-2.5 py-0.5 rounded text-xs font-medium transition-all ${
               viewMode === 'monthly'
                 ? 'bg-[#0A5FD6] text-white font-bold shadow-sm'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'

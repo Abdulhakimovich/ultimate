@@ -241,7 +241,7 @@ export default function UltimateMonthlyTracker() {
   }
 
   return (
-    <div className="space-y-5 max-w-[1600px] mx-auto pb-12">
+    <div className="space-y-5 max-w-[1440px] mx-auto pb-12">
       {/* 1. Today Hero (Single Unified Motivation Center) */}
       <TodayHero onCheckHabit={handleToggleHabit} />
 

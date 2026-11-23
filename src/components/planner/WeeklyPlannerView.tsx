@@ -55,7 +55,7 @@ export default function WeeklyPlannerView() {
 
   if (isLoading || weekDays.length === 0) {
     return (
-      <div className="space-y-4 max-w-[1600px] mx-auto">
+      <div className="space-y-4 max-w-[1440px] mx-auto">
         <div className="h-[200px] rounded-2xl skeleton-shimmer" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
           {Array.from({ length: 7 }).map((_, i) => (
@@ -69,7 +69,7 @@ export default function WeeklyPlannerView() {
   const weekRangeLabel = `${formatDotDate(weekDays[0])} — ${formatDotDate(weekDays[6])}`;
 
   return (
-    <div className="space-y-4 max-w-[1600px] mx-auto pb-12">
+    <div className="space-y-4 max-w-[1440px] mx-auto pb-12">
       {/* 1. Week Navigation Bar */}
       <div className="flex items-center justify-between px-4 py-2.5 rounded-2xl surface-card">
         <button
