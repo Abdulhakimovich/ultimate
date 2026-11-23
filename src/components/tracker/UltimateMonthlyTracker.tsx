@@ -12,6 +12,7 @@ import {
   Edit2,
   Trash2,
   Check,
+  MoreHorizontal,
 } from 'lucide-react';
 import { useHabitsStore } from '@/store/habitsStore';
 import { useLanguageStore } from '@/store/languageStore';
@@ -72,6 +73,7 @@ export default function UltimateMonthlyTracker() {
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const mounted                         = useMounted();
   const [mobileView, setMobileView]     = useState<'today' | 'grid'>('today');
+  const [mobileMenuHabitId, setMobileMenuHabitId] = useState<string | null>(null);
   const { toast }                       = useToast();
 
   const year  = currentMonth.getFullYear();
@@ -423,25 +425,25 @@ export default function UltimateMonthlyTracker() {
                             </div>
                           </div>
 
-                          {/* Quick Actions (Reorder + Edit/Delete) */}
-                          <div className="flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                          {/* Desktop Quick Actions (visible on hover/focus) */}
+                          <div className="hidden sm:flex items-center gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                             <button
                               type="button"
                               onClick={() => handleMoveHabit(hIdx, 'up')}
                               disabled={hIdx === 0}
-                              className="p-1 rounded hover:bg-[var(--panel)] disabled:opacity-20"
+                              className="p-1 rounded hover:bg-[var(--line)] disabled:opacity-20 text-[var(--text2)] hover:text-[var(--text)] transition-colors"
                               title={tr.tracker.moveUp}
                             >
-                              <ChevronUp size={12} />
+                              <ChevronUp size={13} />
                             </button>
                             <button
                               type="button"
                               onClick={() => handleMoveHabit(hIdx, 'down')}
                               disabled={hIdx === habits.length - 1}
-                              className="p-1 rounded hover:bg-[var(--panel)] disabled:opacity-20"
+                              className="p-1 rounded hover:bg-[var(--line)] disabled:opacity-20 text-[var(--text2)] hover:text-[var(--text)] transition-colors"
                               title={tr.tracker.moveDown}
                             >
-                              <ChevronDown size={12} />
+                              <ChevronDown size={13} />
                             </button>
                             <button
                               type="button"
@@ -449,19 +451,78 @@ export default function UltimateMonthlyTracker() {
                                 setEditingHabit(habit);
                                 setShowModal(true);
                               }}
-                              className="p-1 rounded hover:text-[var(--blue-text)]"
+                              className="p-1 rounded hover:bg-[var(--line)] text-[var(--text2)] hover:text-[var(--blue-text)] transition-colors"
                               title={tr.tracker.editHabit}
                             >
-                              <Edit2 size={12} />
+                              <Edit2 size={13} />
                             </button>
                             <button
                               type="button"
                               onClick={() => handleDeleteHabit(habit)}
-                              className="p-1 rounded hover:text-[var(--accent-red)]"
+                              className="p-1 rounded hover:bg-[var(--line)] text-[var(--text2)] hover:text-[var(--accent-red)] transition-colors"
                               title={tr.tracker.deleteHabit}
                             >
-                              <Trash2 size={12} />
+                              <Trash2 size={13} />
                             </button>
+                          </div>
+
+                          {/* Mobile Touch Menu ("⋯") */}
+                          <div className="sm:hidden relative">
+                            <button
+                              type="button"
+                              onClick={() => setMobileMenuHabitId(mobileMenuHabitId === habit.id ? null : habit.id)}
+                              className="p-1.5 rounded text-[var(--text2)] hover:text-[var(--text)] active:bg-[var(--line)] transition-colors"
+                              aria-label={tr.tracker.editHabit}
+                            >
+                              <MoreHorizontal size={15} />
+                            </button>
+                            {mobileMenuHabitId === habit.id && (
+                              <div className="absolute right-0 top-full mt-1 z-50 bg-[var(--panel)] border border-[var(--line-strong)] rounded-xl shadow-2xl py-1.5 min-w-[140px] flex flex-col">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleMoveHabit(hIdx, 'up');
+                                    setMobileMenuHabitId(null);
+                                  }}
+                                  disabled={hIdx === 0}
+                                  className="px-3.5 py-2 text-xs text-left flex items-center gap-2 hover:bg-[var(--raised)] disabled:opacity-30 text-[var(--text)]"
+                                >
+                                  <ChevronUp size={13} /> {tr.tracker.moveUp}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleMoveHabit(hIdx, 'down');
+                                    setMobileMenuHabitId(null);
+                                  }}
+                                  disabled={hIdx === habits.length - 1}
+                                  className="px-3.5 py-2 text-xs text-left flex items-center gap-2 hover:bg-[var(--raised)] disabled:opacity-30 text-[var(--text)]"
+                                >
+                                  <ChevronDown size={13} /> {tr.tracker.moveDown}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingHabit(habit);
+                                    setShowModal(true);
+                                    setMobileMenuHabitId(null);
+                                  }}
+                                  className="px-3.5 py-2 text-xs text-left flex items-center gap-2 hover:bg-[var(--raised)] text-[var(--blue-text)]"
+                                >
+                                  <Edit2 size={13} /> {tr.tracker.editHabit}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleDeleteHabit(habit);
+                                    setMobileMenuHabitId(null);
+                                  }}
+                                  className="px-3.5 py-2 text-xs text-left flex items-center gap-2 hover:bg-[var(--raised)] text-[var(--accent-red)]"
+                                >
+                                  <Trash2 size={13} /> {tr.tracker.deleteHabit}
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -597,6 +658,7 @@ export default function UltimateMonthlyTracker() {
         }}
         onSave={handleSaveHabit}
         editHabit={editingHabit}
+        existingHabits={habits}
       />
 
       {/* Motivation: Confetti & Milestone Celebration */}

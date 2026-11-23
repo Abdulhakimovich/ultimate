@@ -89,9 +89,16 @@ export const HABIT_ICONS: HabitIcon[] = [
 ];
 
 export const HABIT_COLORS = [
-  '#C8B89A', '#6B5040', '#A08060', '#5A3A2A',
-  '#D4C4A8', '#8B6550', '#3B6EA5', '#6B8E6B',
-  '#5B8DB8', '#9B7EC8', '#C8843C', '#C87050',
+  '#0A5CFF', // Electric Blue
+  '#10B981', // Emerald
+  '#8B5CF6', // Vivid Purple
+  '#F59E0B', // Warm Amber
+  '#F97316', // Coral Orange
+  '#EC4899', // Rose Pink
+  '#06B6D4', // Bright Cyan
+  '#EF4444', // Crimson Red
+  '#6366F1', // Indigo
+  '#14B8A6', // Teal
 ];
 
 export const DAY_NAMES_SHORT = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const;

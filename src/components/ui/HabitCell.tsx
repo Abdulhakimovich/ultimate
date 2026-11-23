@@ -93,7 +93,7 @@ export default function HabitCell({
           }
         }}
         className={`
-          relative z-10 w-[24px] h-[24px] sm:w-[22px] sm:h-[22px] rounded-[4px] flex items-center justify-center
+          relative z-10 w-[24px] h-[24px] rounded-[5px] flex items-center justify-center
           transition-all duration-150 focus-visible:ring-2 focus-visible:ring-[var(--blue)]
           touch-manipulation select-none
           before:content-[''] before:absolute before:-inset-2 before:min-w-[40px] before:min-h-[40px] before:pointer-events-auto

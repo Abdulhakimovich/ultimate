@@ -26,6 +26,15 @@ interface AddHabitModalProps {
   onSave: (data: { name: string; icon: string; color: string; target: number }) => void;
   editHabit?: Habit | null;
   initialTarget?: number;
+  existingHabits?: Habit[];
+}
+
+function getAutoColor(existingHabits?: Habit[], editHabit?: Habit | null): string {
+  if (editHabit?.color) return editHabit.color;
+  if (!existingHabits || existingHabits.length === 0) return HABIT_COLORS[0];
+  const used = new Set(existingHabits.map((h) => h.color?.toLowerCase()));
+  const unused = HABIT_COLORS.find((c) => !used.has(c.toLowerCase()));
+  return unused || HABIT_COLORS[existingHabits.length % HABIT_COLORS.length];
 }
 
 export default function AddHabitModal({
@@ -34,9 +43,12 @@ export default function AddHabitModal({
   onSave,
   editHabit,
   initialTarget = 30,
+  existingHabits,
 }: AddHabitModalProps) {
   const language = useLanguageStore((s) => s.language);
   const tr = t(language);
+
+  const defaultColor = getAutoColor(existingHabits, editHabit);
 
   const {
     register,
@@ -50,7 +62,7 @@ export default function AddHabitModal({
     defaultValues: {
       name: editHabit?.name || '',
       icon: editHabit?.icon || HABIT_ICONS[0].emoji,
-      color: editHabit?.color || HABIT_COLORS[0],
+      color: defaultColor,
       target: initialTarget,
     },
   });
@@ -60,11 +72,11 @@ export default function AddHabitModal({
       reset({
         name: editHabit?.name || '',
         icon: editHabit?.icon || HABIT_ICONS[0].emoji,
-        color: editHabit?.color || HABIT_COLORS[0],
+        color: getAutoColor(existingHabits, editHabit),
         target: initialTarget,
       });
     }
-  }, [isOpen, editHabit, initialTarget, reset]);
+  }, [isOpen, editHabit, initialTarget, reset, existingHabits]);
 
   const selectedIcon = watch('icon');
   const selectedColor = watch('color');
@@ -206,12 +218,7 @@ export default function AddHabitModal({
           </button>
           <button
             type="submit"
-            className="px-5 py-2 rounded-xl text-xs font-bold transition-all"
-            style={{
-              background: 'linear-gradient(135deg, var(--electric) 0%, var(--blue-mid) 100%)',
-              color: 'var(--bg-primary)',
-              boxShadow: '0 0 16px var(--electric-muted)',
-            }}
+            className="px-5 py-2 rounded-xl text-xs font-bold text-white transition-all bg-[var(--blue-button)] hover:opacity-90 shadow-[0_0_16px_var(--electric-muted)]"
           >
             {tr.ui.save}
           </button>
