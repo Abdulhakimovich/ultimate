@@ -246,22 +246,26 @@ export default function WeeklyPlannerIndicator() {
           <div className="grid grid-cols-7 gap-1.5 h-20 items-end py-1">
             {stats.dailyBreakdown.map((d) => (
               <div key={d.dateStr} className="flex flex-col items-center h-full justify-end group relative">
-                {/* Bar */}
-                <div className="w-full bg-[var(--bg-card)] rounded-[3px] h-12 flex items-end overflow-hidden border border-[var(--border-subtle)]">
-                  <div
-                    className="w-full rounded-[2px] transition-all duration-300"
-                    style={{
-                      height: `${Math.max(d.total > 0 ? d.taskPct : (d.habitPct > 0 ? d.habitPct * 0.4 : 4), 4)}%`,
-                      background: d.isToday
-                        ? 'var(--electric)'
-                        : d.taskPct >= 80
-                        ? 'var(--blue-neon)'
-                        : d.taskPct > 0
-                        ? 'rgba(0, 118, 249, 0.6)'
-                        : 'var(--border-subtle)',
-                      boxShadow: d.isToday ? '0 0 6px var(--electric-glow)' : 'none',
-                    }}
-                  />
+                {/* Bar / Baseline */}
+                <div className="w-full bg-[var(--bg-card)] rounded-[3px] h-12 flex items-end overflow-hidden border border-[var(--border-subtle)] relative">
+                  {d.total === 0 && d.habitPct === 0 ? (
+                    <div className="w-full h-[2px] bg-[var(--border-bright)] absolute bottom-0 left-0 opacity-60" />
+                  ) : (
+                    <div
+                      className="w-full rounded-[2px] transition-all duration-300"
+                      style={{
+                        height: `${Math.max(d.total > 0 ? d.taskPct : (d.habitPct > 0 ? d.habitPct * 0.4 : 6), 6)}%`,
+                        background: d.isToday
+                          ? 'var(--electric)'
+                          : d.taskPct >= 80
+                          ? 'var(--blue-neon)'
+                          : d.taskPct > 0
+                          ? 'rgba(0, 118, 249, 0.6)'
+                          : 'var(--border-subtle)',
+                        boxShadow: d.isToday ? '0 0 6px var(--electric-glow)' : 'none',
+                      }}
+                    />
+                  )}
                 </div>
 
                 {/* Day label */}

@@ -17,64 +17,6 @@ function getCSSVar(name: string, fallback: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 }
 
-interface VelocityTier {
-  color: string;
-  bg: string;
-  border: string;
-}
-
-function getVelocityTier(pct: number, minVal: number, maxVal: number): VelocityTier {
-  if (maxVal > minVal) {
-    if (pct === maxVal && maxVal > 0) {
-      return {
-        color: 'var(--electric)',
-        bg: 'var(--electric-glow)',
-        border: 'var(--electric)',
-      };
-    }
-    if (pct === minVal) {
-      return {
-        color: 'var(--accent-red)',
-        bg: 'rgba(239, 68, 68, 0.16)',
-        border: 'var(--accent-red)',
-      };
-    }
-  }
-
-  // Ascending scale: Red (0-29%) -> Orange (30-59%) -> Gold (60-79%) -> Azure (80-89%) -> Electric Blue (90-100%)
-  if (pct === 0) {
-    return {
-      color: 'var(--accent-red)',
-      bg: 'rgba(239, 68, 68, 0.14)',
-      border: 'rgba(239, 68, 68, 0.40)',
-    };
-  } else if (pct < 30) {
-    return {
-      color: 'var(--accent-orange)',
-      bg: 'rgba(249, 115, 22, 0.14)',
-      border: 'rgba(249, 115, 22, 0.40)',
-    };
-  } else if (pct < 60) {
-    return {
-      color: 'var(--accent-gold)',
-      bg: 'rgba(245, 158, 11, 0.14)',
-      border: 'rgba(245, 158, 11, 0.40)',
-    };
-  } else if (pct < 85) {
-    return {
-      color: 'var(--blue-neon)',
-      bg: 'rgba(2, 179, 255, 0.16)',
-      border: 'rgba(2, 179, 255, 0.40)',
-    };
-  } else {
-    return {
-      color: 'var(--electric)',
-      bg: 'var(--electric-glow)',
-      border: 'var(--electric)',
-    };
-  }
-}
-
 export default function DailyBarChart() {
   const mounted = useMounted();
   const [isMobile, setIsMobile] = useState(false);
@@ -114,21 +56,11 @@ export default function DailyBarChart() {
         day:          day.getDate(),
         percentage,
         completed:    completedCount,
-        notCompleted: isFuture || completedCount === null ? null : total - completedCount,
         isToday:      isToday(day),
         isFuture,
       };
     });
   }, [mounted, habits, completions, currentMonth]);
-
-  const { maxVal, minVal } = useMemo(() => {
-    const validPcts = chartData.map((d) => d.percentage).filter((p): p is number => p !== null);
-    if (validPcts.length === 0) return { maxVal: -1, minVal: -1 };
-    return {
-      maxVal: Math.max(...validPcts),
-      minVal: Math.min(...validPcts),
-    };
-  }, [chartData]);
 
   if (!mounted) return <div className="h-[200px] rounded-xl skeleton-shimmer" />;
 
@@ -141,60 +73,7 @@ export default function DailyBarChart() {
 
   return (
     <div className="space-y-3">
-      {/* Metric Indicators Legend in Ascending Order: Red -> Orange -> Gold -> Azure -> Electric Blue */}
-      <div className="flex items-center justify-between flex-wrap gap-2 text-xs font-mono font-semibold pb-1">
-        <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>
-          {language === 'ru' ? 'Шкала в порядке возрастания:' : language === 'uz' ? 'O‘sish tartibidagi shkala:' : 'Ascending Velocity Scale:'}
-        </span>
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span
-            className="flex items-center gap-1 px-2 py-0.5 rounded border"
-            style={{ color: 'var(--accent-red)', borderColor: 'rgba(239, 68, 68, 0.45)', background: 'rgba(239, 68, 68, 0.12)' }}
-            title="0–29% (Lowest)"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-red)] inline-block shadow-sm" />
-            0–29%
-          </span>
-          <span className="opacity-40 text-xs">→</span>
-          <span
-            className="flex items-center gap-1 px-2 py-0.5 rounded border"
-            style={{ color: 'var(--accent-orange)', borderColor: 'rgba(249, 115, 22, 0.45)', background: 'rgba(249, 115, 22, 0.12)' }}
-            title="30–59% (Low)"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-orange)] inline-block shadow-sm" />
-            30–59%
-          </span>
-          <span className="opacity-40 text-xs">→</span>
-          <span
-            className="flex items-center gap-1 px-2 py-0.5 rounded border"
-            style={{ color: 'var(--accent-gold)', borderColor: 'rgba(245, 158, 11, 0.45)', background: 'rgba(245, 158, 11, 0.12)' }}
-            title="60–79% (Mid)"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-gold)] inline-block shadow-sm" />
-            60–79%
-          </span>
-          <span className="opacity-40 text-xs">→</span>
-          <span
-            className="flex items-center gap-1 px-2 py-0.5 rounded border"
-            style={{ color: 'var(--blue-neon)', borderColor: 'rgba(2, 179, 255, 0.45)', background: 'rgba(2, 179, 255, 0.14)' }}
-            title="80–89% (High)"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--blue-neon)] inline-block shadow-sm" />
-            80–89%
-          </span>
-          <span className="opacity-40 text-xs">→</span>
-          <span
-            className="flex items-center gap-1 px-2 py-0.5 rounded border font-bold shadow-sm"
-            style={{ color: 'var(--electric)', borderColor: 'var(--electric)', background: 'var(--electric-glow)' }}
-            title="90–100% (Peak / Highest)"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--electric)] inline-block shadow-sm" />
-            90–100%
-          </span>
-        </div>
-      </div>
-
-      {/* Scrollable Data Table with sticky row labels */}
+      {/* Scrollable Data Table with sticky row labels (removed red ✗ row and ascending velocity legend) */}
       <div className="overflow-x-auto pb-1">
         <table className="w-full text-xs text-center font-mono tabular-nums border-collapse" style={{ minWidth: 'max-content' }}>
           <tbody>
@@ -211,21 +90,14 @@ export default function DailyBarChart() {
                   );
                 }
 
-                const tier = getVelocityTier(d.percentage, minVal, maxVal);
-                const isPeak = maxVal > minVal && d.percentage === maxVal;
-                const isMin = maxVal > minVal && d.percentage === minVal;
-
                 return (
                   <td
                     key={`pct-${d.day}`}
-                    className="px-1 py-1 font-mono transition-colors"
-                    style={{
-                      color: tier.color,
-                      background: tier.bg,
-                      fontWeight: isPeak || isMin ? 800 : 600,
-                      border: isPeak || isMin ? `1px solid ${tier.border}` : '1px solid transparent',
-                      borderRadius: '4px',
-                    }}
+                    className={`px-1 py-1 font-mono transition-colors rounded ${
+                      d.percentage > 0
+                        ? 'text-[var(--blue-text)] bg-[var(--blue-soft)] font-bold'
+                        : 'text-[var(--text-muted)] bg-[var(--bg-elevated)] font-medium'
+                    }`}
                     title={`${d.day}: ${d.percentage}%`}
                   >
                     {d.percentage}%
@@ -233,7 +105,7 @@ export default function DailyBarChart() {
                 );
               })}
             </tr>
-            <tr className="border-b border-[var(--border-subtle)]">
+            <tr>
               <td className="sticky left-0 z-10 text-left pr-3 py-1 font-bold whitespace-nowrap bg-[var(--bg-card)]" style={{ color: 'var(--electric)' }}>
                 ✓
               </td>
@@ -243,21 +115,11 @@ export default function DailyBarChart() {
                 </td>
               ))}
             </tr>
-            <tr>
-              <td className="sticky left-0 z-10 text-left pr-3 py-1 font-bold whitespace-nowrap bg-[var(--bg-card)]" style={{ color: 'var(--accent-red)' }}>
-                ✗
-              </td>
-              {chartData.map((d) => (
-                <td key={`miss-${d.day}`} className="px-1 py-1 font-semibold" style={{ color: d.notCompleted === null ? 'var(--text-muted)' : 'var(--accent-red)', opacity: d.notCompleted === null ? 0.25 : 1 }}>
-                  {d.notCompleted === null ? '—' : d.notCompleted}
-                </td>
-              ))}
-            </tr>
           </tbody>
         </table>
       </div>
 
-      {/* Bar Chart with clean responsive ticks */}
+      {/* Bar Chart with clean single electric blue hue for completed days */}
       <div style={{ height: '170px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} barSize={isMobile ? 5 : 8} margin={{ top: 8, right: 18, left: 0, bottom: 0 }}>
@@ -292,14 +154,13 @@ export default function DailyBarChart() {
             />
             <Bar dataKey="percentage" minPointSize={0} radius={[3, 3, 0, 0]} animationDuration={500}>
               {chartData.map((entry, i) => {
-                if (entry.percentage === null) {
+                if (entry.percentage === null || entry.percentage === 0) {
                   return <Cell key={`cell-${i}`} fill="transparent" />;
                 }
-                const tier = getVelocityTier(entry.percentage, minVal, maxVal);
                 return (
                   <Cell
                     key={`cell-${i}`}
-                    fill={tier.color}
+                    fill="var(--electric)"
                   />
                 );
               })}

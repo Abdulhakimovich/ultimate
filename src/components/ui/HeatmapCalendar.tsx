@@ -17,12 +17,12 @@ export default function HeatmapCalendar() {
 
   const completionData = allCompletions.length > 0 ? allCompletions : completions;
 
-  // Generate the last 18 weeks (approx 126 days) ending today
+  // Generate 53 weeks (approx 371 days ending on current week's Sunday) to fill the card
   const { weeks, monthLabels } = useMemo(() => {
     const today = new Date();
-    // Find the Sunday of the current week (or end of week)
     const dayOfWeek = (today.getDay() + 6) % 7; // Mon=0..Sun=6
-    const totalDays = 18 * 7; // 18 weeks
+    const totalWeeks = 53;
+    const totalDays = totalWeeks * 7;
     const startDate = new Date(today);
     startDate.setDate(today.getDate() - (totalDays - 1 - (6 - dayOfWeek)));
 
@@ -42,9 +42,8 @@ export default function HeatmapCalendar() {
       curr.setDate(curr.getDate() + 1);
     }
 
-    // Group into columns of 7 days (Monday..Sunday)
     const weekCols: (typeof days)[] = [];
-    for (let w = 0; w < 18; w++) {
+    for (let w = 0; w < totalWeeks; w++) {
       weekCols.push(days.slice(w * 7, (w + 1) * 7));
     }
 
@@ -63,38 +62,6 @@ export default function HeatmapCalendar() {
     return { weeks: weekCols, monthLabels: mLabels };
   }, [habits, completionData, tr.shortMonths]);
 
-  function getCellStyle(pct: number): { background: string; border: string; boxShadow?: string } {
-    if (pct === 0) {
-      return {
-        background: 'var(--bg-elevated)',
-        border: '1px solid var(--border-subtle)',
-      };
-    }
-    if (pct <= 0.25) {
-      return {
-        background: 'rgba(0, 118, 249, 0.22)',
-        border: '1px solid rgba(0, 118, 249, 0.35)',
-      };
-    }
-    if (pct <= 0.5) {
-      return {
-        background: 'rgba(0, 118, 249, 0.45)',
-        border: '1px solid rgba(0, 118, 249, 0.55)',
-      };
-    }
-    if (pct <= 0.75) {
-      return {
-        background: 'rgba(0, 118, 249, 0.72)',
-        border: '1px solid var(--electric)',
-      };
-    }
-    return {
-      background: 'var(--electric)',
-      border: '1px solid var(--border-bright)',
-      boxShadow: '0 0 6px var(--electric-glow)',
-    };
-  }
-
   const weekdayShorts = [
     tr.tracker.weekdays[0], // Mon
     '',
@@ -106,74 +73,84 @@ export default function HeatmapCalendar() {
   ];
 
   return (
-    <div className="surface-card p-5 rounded-2xl space-y-3">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+    <div className="surface-card p-5 sm:p-6 rounded-2xl space-y-3.5">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center border-hairline shrink-0"
-            style={{ background: 'var(--electric-glow)', borderColor: 'var(--electric)' }}
+            style={{ background: 'var(--blue-soft)', borderColor: 'var(--blue)' }}
           >
-            <CalendarIcon size={14} style={{ color: 'var(--electric)' }} />
+            <CalendarIcon size={14} className="text-[var(--blue-text)]" />
           </div>
           <div>
-            <h3 className="font-display font-bold text-sm tracking-tight" style={{ color: 'var(--text-primary)' }}>
+            <h3 className="font-display font-bold text-sm tracking-tight text-[var(--text-primary)]">
               {tr.analytics.heatmapTitle}
             </h3>
-            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-xs text-[var(--text-secondary)]">
               {tr.analytics.heatmapSubtitle}
             </p>
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center gap-1.5 text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+        {/* Legend next to title on wide screens */}
+        <div className="flex items-center gap-1.5 text-xs font-mono text-[var(--text-muted)] self-end sm:self-center">
           <span>{tr.analytics.less}</span>
-          <div className="w-2.5 h-2.5 rounded-[2px] border border-[var(--border-subtle)]" style={{ background: 'var(--bg-elevated)' }} title="0%" />
-          <div className="w-2.5 h-2.5 rounded-[2px] border border-[rgba(0,118,249,0.35)]" style={{ background: 'rgba(0, 118, 249, 0.22)' }} title="1-25%" />
-          <div className="w-2.5 h-2.5 rounded-[2px] border border-[rgba(0,118,249,0.55)]" style={{ background: 'rgba(0, 118, 249, 0.45)' }} title="26-50%" />
-          <div className="w-2.5 h-2.5 rounded-[2px] border border-[var(--electric)]" style={{ background: 'rgba(0, 118, 249, 0.72)' }} title="51-75%" />
-          <div className="w-2.5 h-2.5 rounded-[2px] border border-[var(--border-bright)]" style={{ background: 'var(--electric)', boxShadow: '0 0 4px var(--electric-glow)' }} title="76-100%" />
+          <div className="w-3 h-3 rounded-[2px] bg-[var(--bg-elevated)] border border-[var(--border-subtle)]" title="0%" />
+          <div className="w-3 h-3 rounded-[2px] bg-[#BFDBFE] dark:bg-[rgba(10,92,255,0.28)] border border-[#93C5FD] dark:border-[rgba(10,92,255,0.45)]" title="1-25%" />
+          <div className="w-3 h-3 rounded-[2px] bg-[#60A5FA] dark:bg-[rgba(10,92,255,0.52)] border border-[#3B82F6] dark:border-[rgba(10,92,255,0.65)]" title="26-50%" />
+          <div className="w-3 h-3 rounded-[2px] bg-[#2563EB] dark:bg-[rgba(10,92,255,0.78)] border border-[#1D4ED8] dark:border-[var(--electric)]" title="51-75%" />
+          <div className="w-3 h-3 rounded-[2px] bg-[#1D4ED8] dark:bg-[var(--electric)] border border-[#1E40AF] dark:border-[var(--border-bright)] shadow-sm" title="76-100%" />
           <span>{tr.analytics.more}</span>
         </div>
       </div>
 
-      {/* Grid Container */}
+      {/* Grid Container - 53 weeks computed to fill container */}
       <div className="overflow-x-auto pb-1">
-        <div className="min-w-[540px]">
+        <div className="min-w-[680px] w-full">
           {/* Month labels row */}
-          <div className="flex text-xs font-mono mb-1.5 pl-6" style={{ color: 'var(--text-muted)' }}>
+          <div className="flex text-xs font-mono mb-1 pl-6 text-[var(--text-muted)] w-full">
             {weeks.map((_, idx) => {
               const match = monthLabels.find((m) => m.colIndex === idx);
               return (
-                <div key={idx} className="w-[15px] mr-1">
+                <div key={idx} className="flex-1 min-w-0 text-left overflow-visible whitespace-nowrap">
                   {match ? match.text : ''}
                 </div>
               );
             })}
           </div>
 
-          {/* Grid: 7 rows x 18 cols */}
-          <div className="flex">
+          {/* Grid: 7 rows x 53 cols */}
+          <div className="flex w-full items-center">
             {/* Weekday indicator labels */}
-            <div className="flex flex-col justify-between pr-2 text-xs font-mono select-none" style={{ color: 'var(--text-muted)' }}>
+            <div className="flex flex-col justify-between pr-2 text-xs font-mono select-none text-[var(--text-muted)] w-6 shrink-0 h-[100px]">
               {weekdayShorts.map((lbl, idx) => (
-                <div key={idx} className="h-[13px] leading-[13px] text-right">
+                <div key={idx} className="text-right leading-none">
                   {lbl}
                 </div>
               ))}
             </div>
 
             {/* Weeks columns */}
-            <div className="flex gap-1">
+            <div className="flex gap-[3px] flex-1 w-full justify-between">
               {weeks.map((col, colIdx) => (
-                <div key={colIdx} className="flex flex-col gap-1">
+                <div key={colIdx} className="flex flex-col gap-[3px] flex-1 min-w-[7px]">
                   {col.map((day) => {
-                    const style = getCellStyle(day.pct);
+                    let levelClass = 'bg-[var(--bg-elevated)] border border-[var(--border-subtle)]';
+                    if (day.pct > 0 && day.pct <= 0.25) {
+                      levelClass = 'bg-[#BFDBFE] dark:bg-[rgba(10,92,255,0.28)] border border-[#93C5FD] dark:border-[rgba(10,92,255,0.45)]';
+                    } else if (day.pct > 0.25 && day.pct <= 0.5) {
+                      levelClass = 'bg-[#60A5FA] dark:bg-[rgba(10,92,255,0.52)] border border-[#3B82F6] dark:border-[rgba(10,92,255,0.65)]';
+                    } else if (day.pct > 0.5 && day.pct <= 0.75) {
+                      levelClass = 'bg-[#2563EB] dark:bg-[rgba(10,92,255,0.78)] border border-[#1D4ED8] dark:border-[var(--electric)]';
+                    } else if (day.pct > 0.75) {
+                      levelClass = 'bg-[#1D4ED8] dark:bg-[var(--electric)] border border-[#1E40AF] dark:border-[var(--border-bright)] shadow-[0_0_4px_var(--electric-glow)]';
+                    }
+
                     return (
                       <div
                         key={day.dateStr}
-                        className="w-[13px] h-[13px] rounded-[3px] transition-transform hover:scale-125 cursor-pointer"
-                        style={style}
+                        className={`w-full aspect-square rounded-[2px] transition-transform hover:scale-125 cursor-pointer ${levelClass}`}
                         title={`${day.dateStr}: ${day.count} habits completed (${Math.round(day.pct * 100)}%)`}
                       />
                     );
