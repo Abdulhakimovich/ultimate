@@ -129,11 +129,7 @@ export default function ProfilePage() {
           <button
             type="button"
             onClick={() => loadProfile()}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md"
-            style={{
-              background: 'linear-gradient(135deg, var(--electric), var(--blue-neon))',
-              color: '#000',
-            }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all bg-[var(--blue-button)] hover:opacity-95 shadow-md"
           >
             <RefreshCw size={13} />
             <span>{tr.profile.retryLoad}</span>

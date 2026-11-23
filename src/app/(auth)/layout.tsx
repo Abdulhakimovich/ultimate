@@ -17,16 +17,13 @@ export default function AuthLayout({
 
   return (
     <div
-      className="min-h-screen flex flex-col justify-between relative overflow-hidden"
-      style={{
-        background: 'radial-gradient(ellipse at top, #0A1428 0%, var(--bg-primary) 70%)',
-      }}
+      className="min-h-screen flex flex-col justify-between relative overflow-hidden bg-[var(--bg-primary)]"
     >
       {/* Background ambient electric neon glow */}
       <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full pointer-events-none opacity-25 blur-3xl"
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full pointer-events-none opacity-20 dark:opacity-25 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, #00D2FF 0%, var(--electric) 50%, transparent 80%)',
+          background: 'radial-gradient(circle, var(--electric) 0%, transparent 70%)',
         }}
       />
 
@@ -119,7 +116,7 @@ export default function AuthLayout({
       </main>
 
       {/* Footer copyright */}
-      <footer className="py-4 text-center text-xs font-mono select-none" style={{ color: 'var(--text-muted)' }}>
+      <footer className="py-4 text-center text-xs select-none text-[var(--text-muted)]">
         ULTimate © {new Date().getFullYear()} • Built for Peak Performance
       </footer>
     </div>
