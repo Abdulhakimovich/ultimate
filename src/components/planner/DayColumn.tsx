@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, ChevronDown, BookOpen } from 'lucide-react';
 import { usePlannerStore } from '@/store/plannerStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
@@ -10,7 +10,6 @@ import { isToday, formatDotDate, toDateString } from '@/lib/utils/dates';
 import { calculateTaskStats } from '@/lib/utils/calculations';
 import { triggerFeedback } from '@/lib/feedback';
 import DonutRing from '@/components/ui/DonutRing';
-import EmptyStateIllustration from '@/components/ui/EmptyStateIllustration';
 import TaskRow from './TaskRow';
 import DailyNotes from './DailyNotes';
 
@@ -40,6 +39,7 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const today = isToday(date);
+  const [reflectionOpen, setReflectionOpen] = useState(today);
   const isWeekend = dayIndex >= 5;
   const stats = calculateTaskStats(tasks);
 
@@ -67,24 +67,31 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
   return (
     <div
       className={`flex flex-col rounded-2xl overflow-hidden transition-all surface-card ${
-        today ? 'ring-2 ring-[var(--electric)] shadow-[0_0_20px_var(--electric-glow)]' : ''
+        today
+          ? 'ring-2 ring-[var(--blue)] shadow-[0_0_24px_rgba(10,92,255,0.2)] border-[var(--blue)]'
+          : 'border border-[var(--border)]'
       }`}
     >
       {/* Column Header */}
       <div
-        className="px-3 py-2.5 text-center"
+        className="px-3 py-2.5 text-center relative"
         style={{
           background: today
-            ? 'var(--electric-glow)'
+            ? 'var(--blue-soft)'
             : isWeekend
             ? 'var(--bg-elevated)'
             : 'var(--bg-header)',
-          borderBottom: '1px solid var(--border)',
+          borderBottom: today ? '1px solid var(--blue)' : '1px solid var(--border)',
         }}
       >
+        {today && (
+          <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-[var(--blue)] text-white shadow-sm">
+            TODAY
+          </div>
+        )}
         <div
           className="font-display font-bold text-sm tracking-wide"
-          style={{ color: today ? 'var(--electric)' : isWeekend ? 'var(--accent-orange)' : 'var(--text-primary)' }}
+          style={{ color: today ? 'var(--blue-text)' : isWeekend ? 'var(--accent-orange)' : 'var(--text-primary)' }}
         >
           {tr.tracker.weekdays[dayIndex]}
         </div>
@@ -108,7 +115,7 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
 
       {/* Tasks Section */}
       <div className="p-3 flex-1 flex flex-col justify-between space-y-2">
-        <div className="space-y-1.5 flex-1 min-h-[80px]">
+        <div className="space-y-1.5 flex-1 min-h-[60px]">
           <AnimatePresence mode="popLayout">
             {tasks.map((task) => (
               <TaskRow
@@ -126,21 +133,10 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
             ))}
           </AnimatePresence>
 
-          {tasks.length === 0 && !showNewTask && (
-            <div className="py-2">
-              <EmptyStateIllustration
-                variant="planner"
-                title={tr.planner.noTasks}
-                actionLabel={tr.planner.addTask}
-                onAction={() => setShowNewTask(true)}
-              />
-            </div>
-          )}
-
           {/* New task input */}
           {showNewTask && (
-            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--electric)]">
-              <Plus size={13} style={{ color: 'var(--electric)' }} className="shrink-0" />
+            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--blue)]">
+              <Plus size={14} className="text-[var(--blue-text)] shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
@@ -155,26 +151,22 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
               />
             </div>
           )}
-        </div>
 
-        {/* Quick Add Button */}
-        {!showNewTask && (
-          <button
-            type="button"
-            onClick={() => {
-              setShowNewTask(true);
-              setTimeout(() => inputRef.current?.focus(), 50);
-            }}
-            className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-xl border border-dashed transition-all hover:bg-[var(--bg-elevated)] text-xs font-medium"
-            style={{
-              borderColor: 'var(--border)',
-              color: 'var(--text-secondary)',
-            }}
-          >
-            <Plus size={13} />
-            <span>{tr.planner.addTask}</span>
-          </button>
-        )}
+          {/* Compact ghost "+ Add task" row */}
+          {!showNewTask && (
+            <button
+              type="button"
+              onClick={() => {
+                setShowNewTask(true);
+                setTimeout(() => inputRef.current?.focus(), 50);
+              }}
+              className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-dashed transition-all hover:bg-[var(--bg-elevated)] text-xs font-medium border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-bright)]"
+            >
+              <Plus size={13} className="opacity-70" />
+              <span>{tr.planner.addTask}</span>
+            </button>
+          )}
+        </div>
 
         {/* Task Footer Stats */}
         <div
@@ -186,26 +178,45 @@ export default function DayColumn({ date, dayIndex }: DayColumnProps) {
         </div>
       </div>
 
-      {/* Notes Sections */}
-      <div className="px-3 pb-3 space-y-2">
-        <DailyNotes
-          title={tr.planner.notes}
-          dateStr={dateStr}
-          field="notes"
-          values={entry?.notes || ['', '', '', '']}
-        />
-        <DailyNotes
-          title={tr.planner.improvements}
-          dateStr={dateStr}
-          field="improvements"
-          values={entry?.improvements || ['', '', '', '']}
-        />
-        <DailyNotes
-          title={tr.planner.gratitude}
-          dateStr={dateStr}
-          field="gratitude"
-          values={entry?.gratitude || ['', '', '', '']}
-        />
+      {/* Collapsible Daily Reflection */}
+      <div className="px-3 pb-3 border-t border-[var(--border)] pt-2.5">
+        <button
+          type="button"
+          onClick={() => setReflectionOpen(!reflectionOpen)}
+          className="w-full flex items-center justify-between text-xs font-semibold py-1.5 px-2 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+          aria-expanded={reflectionOpen}
+        >
+          <span className="flex items-center gap-1.5">
+            <BookOpen size={13} className="text-[var(--electric)]" />
+            <span>{tr.planner.dailyReflection || 'Daily reflection'}</span>
+          </span>
+          <ChevronDown
+            size={13}
+            className={`transition-transform duration-200 ${reflectionOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {reflectionOpen && (
+          <div className="space-y-2 mt-2 pt-1 border-t border-[var(--border-subtle)]">
+            <DailyNotes
+              title={tr.planner.notes}
+              dateStr={dateStr}
+              field="notes"
+              values={entry?.notes || ['', '', '', '']}
+            />
+            <DailyNotes
+              title={tr.planner.improvements}
+              dateStr={dateStr}
+              field="improvements"
+              values={entry?.improvements || ['', '', '', '']}
+            />
+            <DailyNotes
+              title={tr.planner.gratitude}
+              dateStr={dateStr}
+              field="gratitude"
+              values={entry?.gratitude || ['', '', '', '']}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

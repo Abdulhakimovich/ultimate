@@ -19,8 +19,10 @@ export default function DailyNotes({ title, dateStr, field, values }: DailyNotes
 
   useEffect(() => {
     const vals = values.length >= 4 ? values : [...values, ...Array(4 - values.length).fill('')];
-    setLocalValues(vals);
-  }, [values]);
+    if (vals.some((v, idx) => v !== localValues[idx])) {
+      setLocalValues(vals);
+    }
+  }, [values, localValues]);
 
   const handleChange = useCallback(
     (index: number, value: string) => {
@@ -37,21 +39,16 @@ export default function DailyNotes({ title, dateStr, field, values }: DailyNotes
   );
 
   return (
-    <div className="mt-2">
+    <div className="mt-1.5">
       <div
-        className="text-xs font-semibold text-center mb-1 rounded py-0.5 tracking-wide"
-        style={{
-          background: 'var(--electric-glow)',
-          color: 'var(--text-secondary)',
-          border: '1px solid var(--border)',
-        }}
+        className="text-xs font-mono font-semibold text-center mb-1 rounded py-0.5 tracking-wide bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border)]"
       >
         {title}
       </div>
       <div className="space-y-0.5">
         {localValues.slice(0, 4).map((val, i) => (
-          <div key={i} className="flex items-center gap-1 px-1">
-            <span className="text-xs font-mono w-3 shrink-0" style={{ color: 'var(--text-muted)' }}>
+          <div key={i} className="flex items-center gap-1.5 px-1">
+            <span className="text-xs font-mono w-3.5 shrink-0 text-[var(--text-muted)]">
               {i + 1}.
             </span>
             <input
@@ -59,7 +56,7 @@ export default function DailyNotes({ title, dateStr, field, values }: DailyNotes
               value={val}
               onChange={(e) => handleChange(i, e.target.value)}
               placeholder="..."
-              className="flex-1 text-xs bg-transparent border-b border-transparent hover:border-[#3D5A7A] focus:border-[#00D4FF] text-text-primary outline-none py-0.5 placeholder:text-[#3D5A7A]"
+              className="flex-1 text-xs bg-transparent border-b border-transparent hover:border-[var(--line-strong)] focus:border-[var(--electric)] text-[var(--text-primary)] outline-none py-0.5 placeholder:text-[var(--text-muted)] transition-colors"
               aria-label={`${title} (${i + 1})`}
             />
           </div>

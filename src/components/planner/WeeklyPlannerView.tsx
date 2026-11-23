@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Printer } from 'lucide-react';
 import { usePlannerStore } from '@/store/plannerStore';
@@ -8,12 +8,14 @@ import { useHabitsStore } from '@/store/habitsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
 import { toDateString, isToday, formatDotDate } from '@/lib/utils/dates';
+import EmptyStateIllustration from '@/components/ui/EmptyStateIllustration';
 import WeeklySummaryHeader from './WeeklySummaryHeader';
 import DayColumn from './DayColumn';
 
 export default function WeeklyPlannerView() {
   const weekDays         = usePlannerStore((s) => s.weekDays);
   const currentWeekStart = usePlannerStore((s) => s.currentWeekStart);
+  const tasksByDate      = usePlannerStore((s) => s.tasksByDate);
   const loadWeekData     = usePlannerStore((s) => s.loadWeekData);
   const navigateWeek     = usePlannerStore((s) => s.navigateWeek);
   const isLoading        = usePlannerStore((s) => s.isLoading);
@@ -26,6 +28,10 @@ export default function WeeklyPlannerView() {
 
   // Selected Day Index for Mobile View (Default to Today if in current week, else 0)
   const [selectedMobileDay, setSelectedMobileDay] = useState(0);
+
+  const isWeekEmpty = useMemo(() => {
+    return weekDays.every((d) => (tasksByDate[toDateString(d)] || []).length === 0);
+  }, [weekDays, tasksByDate]);
 
   useEffect(() => {
     loadHabits();
@@ -131,6 +137,23 @@ export default function WeeklyPlannerView() {
 
       {/* 2. Summary Header Card */}
       <WeeklySummaryHeader />
+
+      {/* Show illustration at most once, and only if the whole week is empty */}
+      {isWeekEmpty && (
+        <div className="surface-card p-6 rounded-2xl flex flex-col items-center justify-center text-center border border-dashed border-[var(--border)]">
+          <EmptyStateIllustration
+            variant="planner"
+            title={tr.planner.weekNoTasks || tr.planner.noTasks}
+            actionLabel={tr.planner.addTask}
+            onAction={() => {
+              const target = weekDays.find((d) => isToday(d)) || weekDays[0];
+              if (target) {
+                usePlannerStore.getState().addTask(toDateString(target), tr.planner.newTaskPlaceholder);
+              }
+            }}
+          />
+        </div>
+      )}
 
       {/* 3. Mobile View: Responsive Day Pill Selector */}
       <div className="sm:hidden no-print">

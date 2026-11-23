@@ -153,23 +153,23 @@ export default function WeeklySummaryHeader() {
 
         {/* Center: Overall Progress Chart & Donut */}
         <div className="flex flex-col sm:flex-row items-center justify-around gap-4 py-2 border-y lg:border-y-0 lg:border-x border-[var(--border)] px-4">
-          <div className="w-full sm:w-36 h-24">
+          <div className="w-full sm:w-48 h-24">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+              <BarChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} width={30} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} interval={0} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} width={28} />
                 <Tooltip
                   contentStyle={{
                     background: 'var(--bg-elevated)',
                     border: '1px solid var(--border-bright)',
                     borderRadius: 8,
-                    fontSize: 10,
+                    fontSize: 12,
                     color: 'var(--text-primary)',
                   }}
                   formatter={(val: unknown) => [`${val}`, tr.planner.tasks]}
                 />
-                <Bar dataKey="tasks" fill="var(--electric)" radius={[2, 2, 0, 0]} />
+                <Bar dataKey="tasks" fill="var(--electric)" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -196,7 +196,7 @@ export default function WeeklySummaryHeader() {
               {tr.tracker.noHabits}
             </p>
           ) : (
-            <div className="overflow-x-auto max-h-[150px] overflow-y-auto">
+            <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-[var(--border)]">
