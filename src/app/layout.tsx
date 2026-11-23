@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Montserrat, JetBrains_Mono } from 'next/font/google';
+import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import '@/styles/globals.css';
 import ThemeProvider from '@/components/providers/ThemeProvider';
 import PwaProvider from '@/components/providers/PwaProvider';
@@ -10,8 +10,8 @@ const inter = Inter({
   variable: '--font-sans',
 });
 
-const montserrat = Montserrat({
-  subsets: ['latin', 'latin-ext', 'cyrillic'],
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin', 'latin-ext'],
   display: 'swap',
   variable: '--font-display',
 });
@@ -56,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru" suppressHydrationWarning className={`${inter.variable} ${montserrat.variable} ${jetbrainsMono.variable}`}>
+    <html lang="ru" suppressHydrationWarning className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} suppressHydrationWarning />
       </head>

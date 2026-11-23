@@ -3,8 +3,20 @@
 @theme {
   /* Tailwind CSS v4 Theme definitions */
   --font-sans:    var(--font-sans), 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: var(--font-display), 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), 'Space Grotesk', 'Montserrat', ui-sans-serif, system-ui, sans-serif;
   --font-mono:    var(--font-mono), 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-ground:         var(--ground);
+  --color-nav:            var(--nav);
+  --color-panel:          var(--panel);
+  --color-raised:         var(--raised);
+  --color-line:           var(--line);
+  --color-line-strong:    var(--line-strong);
+  --color-blue-text:      var(--blue-text);
+  --color-blue-glow:      var(--blue-glow);
+  --color-blue-soft:      var(--blue-soft);
+  --color-weekend:        var(--weekend);
+  --color-off:            var(--off);
 
   --color-bg-primary:     var(--bg-primary);
   --color-bg-secondary:   var(--bg-secondary);
@@ -43,77 +55,115 @@
 }
 
 /* ==========================================================================
-   DESIGN SYSTEM: KINETIC PRECISION
+   DESIGN SYSTEM: ULTIMATE PRECISION CYBER-OBSIDIAN
    ========================================================================== */
 
 /* DARK MODE (Default: Deep Aerospace Obsidian & Vivid Electric Blue) */
 :root,
 [data-theme="dark"] {
-  --bg-primary:          #07090E;
-  --bg-secondary:        #0C101A;
-  --bg-card:             #111624;
-  --bg-card-alt:         #171F32;
-  --bg-elevated:         #1D263D;
-  --bg-header:           #141B2D;
-  --bg-glass:            rgba(11, 16, 26, 0.92);
+  --ground:              #04060C;
+  --nav:                 rgba(4, 6, 12, 0.82);
+  --panel:               #09101F;
+  --raised:              #0E1830;
+  --line:                #16213E;
+  --line-strong:         #2A4580;
+  --text:                #EAF1FF;
+  --text2:               #A3B4D6;
+  --muted:               #7587AE;
+  --blue:                #0A5CFF;
+  --blue-text:           #4D9BFF;
+  --blue-glow:           rgba(10, 92, 255, 0.50);
+  --blue-soft:           rgba(10, 92, 255, 0.16);
+  --off:                 #101B36;
+  --grid:                rgba(77, 155, 255, 0.055);
+  --weekend:             #FFB454;
+  --ring-off:            #16224A;
 
-  --electric:            #0076F9; /* True Vivid Electric Blue (sampled directly from logo #0076F9) */
-  --electric-dim:        #005FE0;
-  --electric-glow:       rgba(0, 118, 249, 0.22);
-  --electric-muted:      rgba(0, 118, 249, 0.45);
-  --electric-bright:     #00A4FD;
-  --blue-mid:            #0076F9;
+  /* Aliases for semantic compatibility across dashboard */
+  --bg-primary:          var(--ground);
+  --bg-secondary:        var(--panel);
+  --bg-card:             var(--panel);
+  --bg-card-alt:         var(--raised);
+  --bg-elevated:         var(--raised);
+  --bg-header:           var(--nav);
+  --bg-glass:            var(--nav);
+
+  --electric:            var(--blue);
+  --electric-dim:        #0047E0;
+  --electric-glow:       var(--blue-glow);
+  --electric-muted:      var(--blue-soft);
+  --electric-bright:     var(--blue-text);
+  --blue-mid:            var(--blue);
   --blue-deep:           #00439A;
-  --blue-neon:           #02B3FF;
+  --blue-neon:           var(--blue-text);
 
-  --accent-green:        #10B981;
+  --accent-green:        #2FD07A;
   --accent-green-dim:    #059669;
-  --accent-purple:       #8B5CF6;
-  --accent-orange:       #F97316;
+  --accent-purple:       #9A6BFF;
+  --accent-orange:       #FF7B2E;
   --accent-red:          #EF4444;
-  --accent-gold:         #F59E0B;
-  --accent-gold-text:    #F59E0B;
+  --accent-gold:         #F7B500;
+  --accent-gold-text:    #F7B500;
 
   /* Harmonious per-habit palette tokens (WCAG AA tested) */
-  --habit-1: #0076F9; /* Electric Blue */
-  --habit-2: #02B3FF; /* Sky */
-  --habit-3: #818CF8; /* Indigo */
-  --habit-4: #34D399; /* Emerald */
-  --habit-5: #FBBF24; /* Amber */
-  --habit-6: #F472B6; /* Rose */
-  --habit-7: #A78BFA; /* Violet */
-  --habit-8: #FB923C; /* Coral */
+  --habit-1: #19C6E6; /* Cyan / Early rise */
+  --habit-2: #5AA2FF; /* Blue / Drink water */
+  --habit-3: #9A6BFF; /* Purple / Contrast shower */
+  --habit-4: #2FD07A; /* Green / English */
+  --habit-5: #FF7B2E; /* Orange / Fitness */
+  --habit-6: #F7B500; /* Gold / Reading */
+  --habit-7: #FF4D8D; /* Rose / Day planning */
+  --habit-8: #00E5FF; /* Aqua */
 
-  --text-primary:        #F8FAFC;
-  --text-secondary:      #94A3B8;
-  --text-muted:          #8E9FB5;
+  --text-primary:        var(--text);
+  --text-secondary:      var(--text2);
+  --text-muted:          var(--muted);
   --text-bright:         #FFFFFF;
 
-  --border:              rgba(255, 255, 255, 0.08);
-  --border-bright:       rgba(0, 118, 249, 0.40);
-  --border-subtle:       rgba(255, 255, 255, 0.05);
+  --border:              var(--line);
+  --border-bright:       var(--line-strong);
+  --border-subtle:       rgba(22, 33, 62, 0.6);
 
   --color-scheme: dark;
 }
 
-/* LIGHT MODE (First-class Arctic Slate & Deep Electric Blue) */
+/* LIGHT MODE (First-class Crisp Tech Slate & Deep Electric Blue) */
 [data-theme="light"] {
-  --bg-primary:          #F8FAFC;
-  --bg-secondary:        #F1F5F9;
-  --bg-card:             #FFFFFF;
-  --bg-card-alt:         #F8FAFC;
-  --bg-elevated:         #E2E8F0;
-  --bg-header:           #F1F5F9;
-  --bg-glass:            rgba(255, 255, 255, 0.94);
+  --ground:              #EDF2FA;
+  --nav:                 rgba(255, 255, 255, 0.84);
+  --panel:               #FFFFFF;
+  --raised:              #F3F6FD;
+  --line:                #D6DFF1;
+  --line-strong:         #9DB5E6;
+  --text:                #07112A;
+  --text2:               #3D4F78;
+  --muted:               #586A93;
+  --blue:                #0A5CFF;
+  --blue-text:           #0A52E0;
+  --blue-glow:           rgba(10, 92, 255, 0.28);
+  --blue-soft:           rgba(10, 92, 255, 0.08);
+  --off:                 #E4EAF7;
+  --grid:                rgba(10, 92, 255, 0.06);
+  --weekend:             #B45309;
+  --ring-off:            #D9E3F6;
 
-  --electric:            #0066FF;
-  --electric-dim:        #0052CC;
-  --electric-glow:       rgba(0, 102, 255, 0.16);
-  --electric-muted:      rgba(0, 102, 255, 0.35);
-  --electric-bright:     #0076F9;
-  --blue-mid:            #0066FF;
+  /* Aliases for semantic compatibility across dashboard */
+  --bg-primary:          var(--ground);
+  --bg-secondary:        var(--raised);
+  --bg-card:             var(--panel);
+  --bg-card-alt:         var(--raised);
+  --bg-elevated:         var(--raised);
+  --bg-header:           var(--nav);
+  --bg-glass:            var(--nav);
+
+  --electric:            var(--blue);
+  --electric-dim:        #0047E0;
+  --electric-glow:       var(--blue-glow);
+  --electric-muted:      var(--blue-soft);
+  --electric-bright:     var(--blue-text);
+  --blue-mid:            var(--blue);
   --blue-deep:           #00439A;
-  --blue-neon:           #0084FF;
+  --blue-neon:           var(--blue);
 
   --accent-green:        #059669;
   --accent-green-dim:    #047857;
@@ -124,23 +174,23 @@
   --accent-gold-text:    #B45309;
 
   /* Harmonious per-habit palette tokens in light mode */
-  --habit-1: #0066FF;
+  --habit-1: #0A5CFF;
   --habit-2: #0284C7;
-  --habit-3: #4F46E5;
+  --habit-3: #7C3AED;
   --habit-4: #059669;
-  --habit-5: #D97706;
-  --habit-6: #DB2777;
-  --habit-7: #7C3AED;
-  --habit-8: #EA580C;
+  --habit-5: #EA580C;
+  --habit-6: #D97706;
+  --habit-7: #DB2777;
+  --habit-8: #0891B2;
 
-  --text-primary:        #0F172A;
-  --text-secondary:      #475569;
-  --text-muted:          #64748B;
+  --text-primary:        var(--text);
+  --text-secondary:      var(--text2);
+  --text-muted:          var(--muted);
   --text-bright:         #020617;
 
-  --border:              rgba(15, 23, 42, 0.08);
-  --border-bright:       rgba(0, 102, 255, 0.40);
-  --border-subtle:       rgba(15, 23, 42, 0.04);
+  --border:              var(--line);
+  --border-bright:       var(--line-strong);
+  --border-subtle:       rgba(214, 223, 241, 0.6);
 
   --color-scheme: light;
 }
@@ -156,13 +206,58 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--ground);
+  background-image:
+    radial-gradient(1200px 480px at 50% -180px, var(--blue-glow), transparent 70%),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
+  background-position: center top, 0 0, 0 0;
+  color: var(--text);
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-height: 100vh;
   transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
               color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 640px) {
+  body {
+    background-image:
+      radial-gradient(520px 260px at 50% -80px, var(--blue-glow), transparent 70%),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+  }
+}
+
+/* Prototype Polygon & Chamfer Utilities */
+.clip-chamfer-outer {
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+
+.clip-chamfer-inner {
+  clip-path: polygon(0 0, calc(100% - 17px) 0, 100% 17px, 100% 100%, 17px 100%, 0 calc(100% - 17px));
+}
+
+.clip-chamfer-btn {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+.clip-chamfer-logo {
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+}
+
+.glow-blue {
+  filter: drop-shadow(0 0 10px var(--blue-glow));
+}
+
+.glow-blue-lg {
+  box-shadow: 0 0 16px var(--blue-glow);
+}
+
+.glow-blue-md {
+  box-shadow: 0 0 14px var(--blue-glow);
 }
 
 /* Tabular numerals for stats, counts, timer, and dates */
@@ -252,6 +347,61 @@ body {
 
 .surface-card-interactive:hover {
   border-color: var(--border-bright);
+}
+
+/* Cyber Brackets for cards */
+.cyber-card {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.cyber-card::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 14px;
+  height: 14px;
+  border-top: 2px solid var(--blue);
+  border-left: 2px solid var(--blue);
+  pointer-events: none;
+}
+
+.cyber-card::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 14px;
+  height: 14px;
+  border-bottom: 2px solid var(--blue);
+  border-right: 2px solid var(--blue);
+  pointer-events: none;
+}
+
+.cyber-card-sm::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid var(--blue);
+  border-left: 2px solid var(--blue);
+  pointer-events: none;
+}
+
+.cyber-card-sm::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid var(--blue);
+  border-right: 2px solid var(--blue);
+  pointer-events: none;
 }
 
 /* Skeleton shimmer */

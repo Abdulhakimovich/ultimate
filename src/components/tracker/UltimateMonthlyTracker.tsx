@@ -2,25 +2,21 @@
 
 import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { useMounted } from '@/hooks/useMounted';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
   ChevronRight,
   Plus,
-  Target,
   Flame,
-  TrendingUp,
-  Award,
   ChevronUp,
   ChevronDown,
   Edit2,
   Trash2,
+  Check,
 } from 'lucide-react';
 import { useHabitsStore } from '@/store/habitsStore';
 import { useLanguageStore } from '@/store/languageStore';
 import { t } from '@/lib/i18n';
 import {
-  getMonthWeeks,
   toDateString,
   isToday,
   startOfMonth,
@@ -38,7 +34,8 @@ import type { Habit } from '@/lib/types';
 import { getHabitDisplayName } from '@/lib/utils/habitDisplay';
 import AddHabitModal from './AddHabitModal';
 import { useToast } from '@/hooks/useToast';
-import TodaySummaryBar from '@/components/ui/TodaySummaryBar';
+import TodayHero from './TodayHero';
+import MonthStatsCards from './MonthStatsCards';
 import HabitCell from '@/components/ui/HabitCell';
 import HabitIcon from '@/components/ui/HabitIcon';
 import { formatDays } from '@/lib/utils/plural';
@@ -46,17 +43,9 @@ import TodayView from './TodayView';
 import ConfettiBurst from '@/components/ui/ConfettiBurst';
 import MilestoneCelebrationModal, { MilestoneInfo } from '@/components/ui/MilestoneCelebrationModal';
 import EmptyStateIllustration from '@/components/ui/EmptyStateIllustration';
-import { useProfileStore } from '@/store/profileStore';
 
 function getDayOfWeek(date: Date): number {
   return (date.getDay() + 6) % 7; // Mon=0 … Sun=6
-}
-
-function getWeekLabel(weekIdx: number, colSpan: number, tr: ReturnType<typeof t>): string {
-  if (colSpan < 3) {
-    return `W${weekIdx + 1}`;
-  }
-  return `${tr.tracker.week} ${weekIdx + 1}`;
 }
 
 export default function UltimateMonthlyTracker() {
@@ -78,27 +67,12 @@ export default function UltimateMonthlyTracker() {
 
   const language         = useLanguageStore((s) => s.language);
   const tr               = t(language);
-  const profile          = useProfileStore((s) => s.profile);
 
   const [showModal, setShowModal]       = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
-  const [quoteIdx, setQuoteIdx]         = useState(0);
   const mounted                         = useMounted();
   const [mobileView, setMobileView]     = useState<'today' | 'grid'>('today');
   const { toast }                       = useToast();
-
-  const greetingText = useMemo(() => {
-    const hour = new Date().getHours();
-    let g = tr.greeting?.morning || 'Доброе утро';
-    if (hour >= 12 && hour < 18) {
-      g = tr.greeting?.afternoon || 'Добрый день';
-    } else if (hour >= 18 || hour < 5) {
-      g = tr.greeting?.evening || 'Добрый вечер';
-    }
-    const fullName = profile?.display_name?.trim() || '';
-    const firstName = fullName ? fullName.split(/\s+/)[0] : '';
-    return firstName ? `${g}, ${firstName}!` : `${g}!`;
-  }, [tr, profile?.display_name]);
 
   const year  = currentMonth.getFullYear();
   const month = currentMonth.getMonth() + 1; // 1-12
@@ -112,15 +86,6 @@ export default function UltimateMonthlyTracker() {
     loadMonthlyGoal(year, month);
   }, [year, month, loadCompletions, loadMonthlyGoal]);
 
-  // Rotate inspirational quote
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setQuoteIdx((i) => (i + 1) % tr.tracker.inspirational.length);
-    }, 9000);
-    return () => clearInterval(timer);
-  }, [tr.tracker.inspirational.length]);
-
-  const weeks    = useMemo(() => getMonthWeeks(currentMonth), [currentMonth]);
   const startStr = useMemo(() => toDateString(startOfMonth(currentMonth)), [currentMonth]);
   const endStr   = useMemo(() => toDateString(endOfMonth(currentMonth)), [currentMonth]);
 
@@ -157,22 +122,6 @@ export default function UltimateMonthlyTracker() {
     if (analysisData.length === 0) return 0;
     return calculateAverageProgress(analysisData.map((d) => d.pct));
   }, [analysisData]);
-
-  // Best streak
-  const bestStreak = useMemo(() => {
-    if (habits.length === 0) return 0;
-    let best = 0;
-    let current = 0;
-    for (const d of dayStats) {
-      if (d.pct >= 60) {
-        current++;
-        best = Math.max(best, current);
-      } else {
-        current = 0;
-      }
-    }
-    return Math.max(best, 4);
-  }, [dayStats, habits.length]);
 
   // Per-habit streak calculation
   const getHabitStreak = useCallback(
@@ -250,13 +199,6 @@ export default function UltimateMonthlyTracker() {
     toast({ message: tr.toast.habitUpdated, variant: 'info' });
   };
 
-  const motivationLevel = useMemo(() => {
-    if (overallPct >= 80) return language === 'ru' ? 'Легенда Дисциплины' : language === 'uz' ? 'Intizom Afsonasi' : 'Discipline Legend';
-    if (overallPct >= 60) return language === 'ru' ? 'Мастер Продуктивности' : language === 'uz' ? "Mahorat Cho'qqisi" : 'Productivity Master';
-    if (overallPct >= 40) return language === 'ru' ? 'Уверенный Темп' : language === 'uz' ? 'Barqaror Qadam' : 'Steady Momentum';
-    return language === 'ru' ? 'Начало Пути' : language === 'uz' ? "Boshlang'ich Bosqich" : 'Path Starter';
-  }, [overallPct, language]);
-
   const handleSaveHabit = useCallback(
     (data: { name: string; icon: string; color: string; target: number }) => {
       const { target, ...fields } = data;
@@ -298,158 +240,11 @@ export default function UltimateMonthlyTracker() {
 
   return (
     <div className="space-y-5 max-w-[1600px] mx-auto pb-12">
-      {/* 0. Time-of-day greeting */}
-      <div className="surface-card p-4 sm:p-5 rounded-2xl border-hairline flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shadow-sm">
-        <div>
-          <h2 className="text-lg sm:text-xl font-bold font-display tracking-tight" style={{ color: 'var(--text-primary)' }}>
-            {greetingText}
-          </h2>
-          <p className="text-xs sm:text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-            {tr.greeting?.encouragement}
-          </p>
-        </div>
-      </div>
+      {/* 1. Today Hero (Single Unified Motivation Center) */}
+      <TodayHero onCheckHabit={handleToggleHabit} />
 
-      {/* 1. Daily Today Summary Action Bar */}
-      <TodaySummaryBar />
-
-      {/* 2. Top Header & Month Navigation */}
-      <div className="surface-card p-5 rounded-2xl relative overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-1.5 flex-wrap">
-              <h1 className="font-display font-bold text-base sm:text-lg tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                {tr.tracker.title}
-              </h1>
-              <span
-                className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider font-mono flex items-center gap-1.5"
-                style={{
-                  background: 'var(--electric-glow)',
-                  color: 'var(--electric)',
-                  border: '1px solid var(--border-bright)',
-                }}
-              >
-                <TrendingUp size={11} />
-                <span>{motivationLevel}</span>
-              </span>
-            </div>
-
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={quoteIdx}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.25 }}
-                className="text-xs font-medium max-w-2xl"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                ✨ {tr.tracker.inspirational[quoteIdx]}
-              </motion.p>
-            </AnimatePresence>
-          </div>
-
-          {/* Month Navigation Controls */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigateMonth('prev')}
-              className="p-2 rounded-xl transition-all hover:bg-[var(--bg-elevated)]"
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                color: 'var(--text-secondary)',
-              }}
-              aria-label={tr.tracker.prevMonth}
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <div
-              className="px-4 py-1.5 rounded-xl font-display font-bold text-xs sm:text-sm min-w-[140px] text-center"
-              style={{
-                background: 'var(--bg-elevated)',
-                border: '1px solid var(--border)',
-                color: 'var(--text-primary)',
-              }}
-            >
-              {monthLabel}
-            </div>
-            <button
-              onClick={() => navigateMonth('next')}
-              className="p-2 rounded-xl transition-all hover:bg-[var(--bg-elevated)]"
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                color: 'var(--text-secondary)',
-              }}
-              aria-label={tr.tracker.nextMonth}
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Hero Quick Stats Badges */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="surface-card p-3 rounded-xl flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[var(--electric-glow)] text-[var(--electric)] flex items-center justify-center flex-shrink-0">
-            <TrendingUp size={16} />
-          </div>
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
-              {tr.tracker.monthProgress}
-            </span>
-            <span className="font-mono font-bold text-base sm:text-lg tabular-nums" style={{ color: 'var(--electric)' }}>
-              {overallPct}%
-            </span>
-          </div>
-        </div>
-
-        <div className="surface-card p-3 rounded-xl flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[rgba(16,185,129,0.15)] text-[var(--accent-green)] flex items-center justify-center flex-shrink-0">
-            <Target size={16} />
-          </div>
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
-              {tr.tracker.avgCompletion}
-            </span>
-            <span className="font-mono font-bold text-base sm:text-lg tabular-nums" style={{ color: 'var(--accent-green)' }}>
-              {Math.round(
-                dayStats.filter((d) => d.pct > 0).reduce((a, b) => a + b.pct, 0) /
-                  Math.max(1, dayStats.filter((d) => d.pct > 0).length)
-              )}%
-            </span>
-          </div>
-        </div>
-
-        <div className="surface-card p-3 rounded-xl flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[rgba(245,158,11,0.15)] text-[var(--accent-gold)] flex items-center justify-center flex-shrink-0">
-            <Flame size={16} className="animate-flame" />
-          </div>
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
-              {tr.tracker.streakDays}
-            </span>
-            <span className="font-mono font-bold text-base sm:text-lg tabular-nums" style={{ color: 'var(--accent-gold)' }}>
-              {bestStreak} <span className="text-xs uppercase font-normal">{tr.tracker.days}</span>
-            </span>
-          </div>
-        </div>
-
-        <div className="surface-card p-3 rounded-xl flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[rgba(139,92,246,0.15)] text-[var(--accent-purple)] flex items-center justify-center flex-shrink-0">
-            <Award size={16} />
-          </div>
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-wider block" style={{ color: 'var(--text-secondary)' }}>
-              {tr.tracker.totalHabits}
-            </span>
-            <span className="font-mono font-bold text-base sm:text-lg tabular-nums" style={{ color: 'var(--accent-purple)' }}>
-              {habits.length}
-            </span>
-          </div>
-        </div>
-      </div>
+      {/* 2. Month Statistics Cards */}
+      <MonthStatsCards />
 
       {/* Mobile "Today" View (below 768px by default) */}
       {mobileView === 'today' ? (
@@ -473,116 +268,114 @@ export default function UltimateMonthlyTracker() {
         </div>
       )}
 
-      {/* 4. Unified Sticky Habit Tracker Matrix (Desktop always, Mobile when grid selected) */}
-      <div className={`surface-card rounded-2xl overflow-hidden border-hairline shadow-xl ${mobileView === 'today' ? 'hidden md:block' : 'block'}`}>
+      {/* 3. Unified Sticky Habit Tracker Matrix (Desktop always, Mobile when grid selected) */}
+      <div className={`cyber-card overflow-hidden transition-all ${mobileView === 'today' ? 'hidden md:block' : 'block'}`}>
         {/* Table Action Bar */}
-        <div className="p-3 sm:p-4 border-b border-[var(--border)] flex items-center justify-between bg-[var(--bg-header)]">
-          <div className="flex items-center gap-2">
-            <span className="font-display font-bold text-xs uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>
+        <div className="flex items-center justify-between gap-6 flex-wrap p-5 sm:p-6 border-b border-[var(--line)] bg-[var(--panel)]">
+          <div className="flex items-center gap-3.5">
+            <h2 className="m-0 font-display text-xl sm:text-2xl font-semibold tracking-[-0.01em] text-[var(--text)]">
               {tr.tracker.habits}
-            </span>
-            <span className="text-xs font-mono font-semibold" style={{ color: 'var(--text-secondary)' }}>
-              ({habits.length})
+            </h2>
+            <span className="px-2.5 py-0.5 font-display text-sm font-bold text-[var(--blue-text)] border border-[var(--line-strong)] bg-[var(--blue-soft)]">
+              {habits.length}
             </span>
           </div>
-          <button
-            onClick={() => {
-              setEditingHabit(null);
-              setShowModal(true);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs transition-all hover:scale-105 active:scale-95 shadow-sm"
-            style={{
-              background: '#0A5FD6',
-              color: '#FFFFFF',
-            }}
-          >
-            <Plus size={14} />
-            <span>{tr.tracker.addHabit}</span>
-          </button>
+
+          {/* Month Navigator Controls */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigateMonth('prev')}
+              className="w-10 h-10 flex items-center justify-center border border-[var(--line-strong)] bg-transparent text-[var(--text)] hover:bg-[var(--blue-soft)] transition-colors cursor-pointer"
+              aria-label={tr.tracker.prevMonth}
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <span className="min-w-[170px] text-center font-display text-sm sm:text-base font-semibold tracking-[0.14em] text-[var(--text)] uppercase">
+              {monthLabel}
+            </span>
+            <button
+              type="button"
+              onClick={() => navigateMonth('next')}
+              className="w-10 h-10 flex items-center justify-center border border-[var(--line-strong)] bg-transparent text-[var(--text)] hover:bg-[var(--blue-soft)] transition-colors cursor-pointer"
+              aria-label={tr.tracker.nextMonth}
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+
+          {/* Chamfered Add Habit Button */}
+          <div className="filter drop-shadow-[0_0_14px_var(--blue-glow)]">
+            <button
+              type="button"
+              onClick={() => {
+                setEditingHabit(null);
+                setShowModal(true);
+              }}
+              className="flex items-center gap-2.5 h-11 px-5 bg-[var(--blue)] border-0 text-[#FFFFFF] text-xs sm:text-sm font-semibold tracking-[0.14em] cursor-pointer clip-chamfer-btn hover:brightness-110 active:scale-95 transition-all"
+            >
+              <Plus size={16} strokeWidth={2.4} />
+              <span>{tr.tracker.addHabit.toUpperCase()}</span>
+            </button>
+          </div>
         </div>
 
         {/* Scrollable Matrix with Sticky Habit Column */}
         <div className="overflow-x-auto relative">
-          <table className="w-full border-collapse text-left" style={{ minWidth: '1060px' }}>
+          <table className="w-full border-collapse text-left" style={{ minWidth: '1140px' }}>
             <thead>
-              {/* Header Row 1: Sticky corner + Week Group Headers */}
-              <tr className="border-b border-[var(--border)]">
-                {/* Sticky Habit Column Header */}
+              {/* Header: HABIT, Days 1..N, DONE */}
+              <tr className="border-b border-[var(--line)]">
                 <th
-                  rowSpan={2}
-                  className="sticky left-0 z-30 p-3 text-xs font-bold uppercase tracking-wider bg-[var(--bg-card)] border-r border-[var(--border)] min-w-[220px] sm:min-w-[260px] shadow-[4px_0_12px_rgba(0,0,0,0.18)]"
-                  style={{ color: 'var(--text-primary)' }}
+                  className="sticky left-0 z-30 px-4 py-4 text-xs font-semibold tracking-[0.16em] uppercase bg-[var(--panel)] border-r border-[var(--line)] min-w-[220px] sm:min-w-[240px] text-[var(--muted)] shadow-[4px_0_12px_rgba(0,0,0,0.18)]"
                 >
                   {tr.tracker.habit}
                 </th>
 
-                {/* Week Header Spans */}
-                {weeks.map((weekDays, wIdx) => (
-                  <th
-                    key={wIdx}
-                    colSpan={weekDays.length}
-                    className="text-center py-1 text-xs font-bold uppercase tracking-wider border-r border-[var(--border)]"
-                    style={{
-                      background: 'var(--bg-header)',
-                      color: 'var(--electric)',
-                    }}
-                  >
-                    {getWeekLabel(wIdx, weekDays.length, tr)}
-                  </th>
-                ))}
-
-                {/* Right Summary Headers */}
-                <th rowSpan={2} className="text-center py-2 px-3 text-xs font-bold uppercase font-mono border-l border-[var(--border)]" style={{ color: 'var(--text-secondary)', width: '68px' }}>
-                  {tr.tracker.goal}
-                </th>
-                <th rowSpan={2} className="text-center py-2 px-3 text-xs font-bold uppercase font-mono border-r border-[var(--border)]" style={{ color: 'var(--text-secondary)', width: '68px' }}>
-                  {tr.tracker.fact}
-                </th>
-                <th rowSpan={2} className="text-center py-2 px-4 text-xs font-bold uppercase font-mono" style={{ color: 'var(--text-secondary)', width: '120px' }}>
-                  {tr.tracker.progressCol}
-                </th>
-              </tr>
-
-              {/* Header Row 2: Days (Weekday + Day Number) */}
-              <tr className="border-b border-[var(--border)]">
-                {weeks.map((weekDays) =>
-                  weekDays.map((day) => {
-                    const dowIdx = getDayOfWeek(day);
-                    const isWeekend = dowIdx >= 5;
-                    const today = isToday(day);
-                    return (
-                      <th
-                        key={toDateString(day)}
-                        className={`text-center py-1.5 px-0.5 border-r border-[var(--border-subtle)] ${
-                          today ? 'ring-1 ring-[var(--electric)] bg-[var(--electric-glow)]' : ''
-                        }`}
-                        style={{
-                          width: '34px',
-                          minWidth: '34px',
-                          background: today
-                            ? 'var(--electric-glow)'
-                            : isWeekend
-                            ? 'rgba(255, 255, 255, 0.03)'
-                            : 'transparent',
-                        }}
+                {allDays.map((day) => {
+                  const dowIdx = getDayOfWeek(day);
+                  const isWeekend = dowIdx >= 5;
+                  const today = isToday(day);
+                  return (
+                    <th
+                      key={toDateString(day)}
+                      className={`text-center py-3 px-1 border-r border-[var(--line)] ${
+                        today ? 'bg-[var(--blue-soft)]' : ''
+                      }`}
+                      style={{
+                        width: '36px',
+                        minWidth: '36px',
+                      }}
+                    >
+                      <div
+                        className="text-xs font-semibold uppercase mb-1"
+                        style={{ color: isWeekend ? 'var(--weekend)' : 'var(--text2)' }}
                       >
-                        <div className="text-xs font-bold uppercase" style={{ color: isWeekend ? 'var(--accent-orange)' : 'var(--text-secondary)' }}>
-                          {tr.tracker.weekdays[dowIdx]}
-                        </div>
-                        <div className="text-xs font-mono font-bold tabular-nums" style={{ color: today ? 'var(--electric)' : 'var(--text-primary)' }}>
-                          {day.getDate()}
-                        </div>
-                      </th>
-                    );
-                  })
-                )}
+                        {tr.tracker.weekdays[dowIdx]}
+                      </div>
+                      <div
+                        className={`text-xs font-display font-semibold mx-auto w-6 h-6 flex items-center justify-center rounded-sm ${
+                          today
+                            ? 'bg-[var(--blue)] text-[#FFFFFF] shadow-[0_0_10px_var(--blue-glow)] font-bold'
+                            : 'text-[var(--text)]'
+                        }`}
+                      >
+                        {day.getDate()}
+                      </div>
+                    </th>
+                  );
+                })}
+
+                <th className="text-right py-4 px-4 text-xs font-semibold tracking-[0.16em] uppercase text-[var(--muted)] min-w-[130px]">
+                  {tr.tracker.completed.toUpperCase()}
+                </th>
               </tr>
             </thead>
 
             <tbody>
               {habits.length === 0 ? (
                 <tr>
-                  <td colSpan={allDays.length + 4} className="py-8">
+                  <td colSpan={allDays.length + 2} className="py-12">
                     <EmptyStateIllustration
                       variant="tracker"
                       title={tr.tracker.noHabits}
@@ -600,31 +393,30 @@ export default function UltimateMonthlyTracker() {
                   const habitStreak = getHabitStreak(habit.id);
                   const analysis = analysisData.find((a) => a.habit.id === habit.id);
                   const fact = analysis?.fact ?? 0;
-                  const goal = analysis?.goal ?? 30;
-                  const pct  = analysis?.pct ?? 0;
+                  const goal = analysis?.goal ?? allDays.length;
 
                   return (
                     <tr
                       key={habit.id}
-                      className="group border-b border-[var(--border-subtle)] transition-colors hover:bg-[var(--bg-elevated)]"
+                      className="group border-b border-[var(--line)] transition-colors hover:bg-[var(--raised)]"
                     >
                       {/* Sticky Left Column: Habit Info + Streak + Actions */}
-                      <td className="sticky left-0 z-20 px-3 py-2 bg-[var(--bg-card)] border-r border-[var(--border)] group-hover:bg-[var(--bg-elevated)] transition-colors shadow-[4px_0_12px_rgba(0,0,0,0.18)]">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2.5 min-w-0">
+                      <td className="sticky left-0 z-20 px-4 py-3 bg-[var(--panel)] border-r border-[var(--line)] group-hover:bg-[var(--raised)] transition-colors shadow-[4px_0_12px_rgba(0,0,0,0.18)]">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
                             <div
-                              className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
-                              style={{ background: (habit.color || 'var(--electric)') + '25', color: habit.color || 'var(--electric)' }}
+                              className="w-[30px] h-[30px] flex items-center justify-center shrink-0 border border-[var(--line-strong)] bg-[var(--blue-soft)]"
+                              style={{ color: habit.color || 'var(--blue)' }}
                             >
-                              <HabitIcon icon={habit.icon || 'target'} size={14} />
+                              <HabitIcon icon={habit.icon || 'target'} size={16} />
                             </div>
                             <div className="min-w-0">
-                              <span className="text-xs font-semibold block truncate" style={{ color: 'var(--text-primary)' }} title={getHabitDisplayName(habit, language)}>
+                              <span className="text-sm sm:text-[15px] font-medium block truncate text-[var(--text)]" title={getHabitDisplayName(habit, language)}>
                                 {getHabitDisplayName(habit, language)}
                               </span>
                               {habitStreak > 0 && (
-                                <span className="text-xs font-mono text-[var(--accent-gold)] flex items-center gap-0.5 mt-0.5">
-                                  <Flame size={10} className="animate-flame" />
+                                <span className="text-xs text-[var(--text2)] flex items-center gap-1 mt-0.5">
+                                  <Flame size={12} className="text-[var(--blue-text)] animate-flame" />
                                   <span>{formatDays(habitStreak, language)}</span>
                                 </span>
                               )}
@@ -637,19 +429,19 @@ export default function UltimateMonthlyTracker() {
                               type="button"
                               onClick={() => handleMoveHabit(hIdx, 'up')}
                               disabled={hIdx === 0}
-                              className="p-1 rounded hover:bg-[var(--bg-card)] disabled:opacity-20"
+                              className="p-1 rounded hover:bg-[var(--panel)] disabled:opacity-20"
                               title={tr.tracker.moveUp}
                             >
-                              <ChevronUp size={11} />
+                              <ChevronUp size={12} />
                             </button>
                             <button
                               type="button"
                               onClick={() => handleMoveHabit(hIdx, 'down')}
                               disabled={hIdx === habits.length - 1}
-                              className="p-1 rounded hover:bg-[var(--bg-card)] disabled:opacity-20"
+                              className="p-1 rounded hover:bg-[var(--panel)] disabled:opacity-20"
                               title={tr.tracker.moveDown}
                             >
-                              <ChevronDown size={11} />
+                              <ChevronDown size={12} />
                             </button>
                             <button
                               type="button"
@@ -657,10 +449,10 @@ export default function UltimateMonthlyTracker() {
                                 setEditingHabit(habit);
                                 setShowModal(true);
                               }}
-                              className="p-1 rounded hover:text-[var(--electric)]"
+                              className="p-1 rounded hover:text-[var(--blue-text)]"
                               title={tr.tracker.editHabit}
                             >
-                              <Edit2 size={11} />
+                              <Edit2 size={12} />
                             </button>
                             <button
                               type="button"
@@ -668,59 +460,63 @@ export default function UltimateMonthlyTracker() {
                               className="p-1 rounded hover:text-[var(--accent-red)]"
                               title={tr.tracker.deleteHabit}
                             >
-                              <Trash2 size={11} />
+                              <Trash2 size={12} />
                             </button>
                           </div>
                         </div>
                       </td>
 
-                      {/* Day Checkboxes */}
-                      {allDays.map((day) => {
+                      {/* Day Checkboxes with Streak Connectors */}
+                      {allDays.map((day, dIdx) => {
                         const dateStr = toDateString(day);
                         const checked = isHabitCompletedOnDate(completions, habit.id, dateStr);
-                        const today   = isToday(day);
-                        const isPast  = day < new Date(new Date().setHours(0, 0, 0, 0));
+                        const today = isToday(day);
+                        const isPast = day < new Date(new Date().setHours(0, 0, 0, 0));
+                        const isFuture = day > new Date();
+
+                        const prevDay = dIdx > 0 ? allDays[dIdx - 1] : null;
+                        const nextDay = dIdx < allDays.length - 1 ? allDays[dIdx + 1] : null;
+                        const prevDone = prevDay ? isHabitCompletedOnDate(completions, habit.id, toDateString(prevDay)) : false;
+                        const nextDone = nextDay ? isHabitCompletedOnDate(completions, habit.id, toDateString(nextDay)) : false;
 
                         return (
                           <td
                             key={dateStr}
-                            className={`p-0 text-center border-r border-[var(--border-subtle)] ${
-                              today ? 'bg-[var(--electric-glow)]' : ''
+                            className={`p-0 text-center border-r border-[var(--line)] ${
+                              today ? 'bg-[var(--blue-soft)]' : ''
                             }`}
                           >
                             <HabitCell
                               checked={checked}
+                              linkL={prevDone}
+                              linkR={nextDone}
                               isToday={today}
                               isPast={isPast && !checked}
+                              isFuture={isFuture}
                               habitName={habit.name}
                               dateStr={dateStr}
-                              habitColor={habit.color || 'var(--electric)'}
+                              habitColor={habit.color || 'var(--blue)'}
                               onToggle={() => handleToggleHabit(habit.id, dateStr)}
                             />
                           </td>
                         );
                       })}
 
-                      {/* Right Summary Columns */}
-                      <td className="text-center font-mono text-xs tabular-nums px-2 border-l border-[var(--border)] font-semibold" style={{ color: 'var(--text-secondary)' }}>
-                        {goal}
-                      </td>
-                      <td className="text-center font-mono text-xs tabular-nums px-2 border-r border-[var(--border)] font-bold" style={{ color: 'var(--electric)' }}>
-                        {fact}
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-300"
+                      {/* Right Done Column */}
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex flex-col items-end gap-1.5">
+                          <span className="font-display text-sm sm:text-[15px] font-semibold text-[var(--text)]">
+                            {fact}
+                            <span className="text-xs text-[var(--muted)] font-normal">/{goal}</span>
+                          </span>
+                          <span className="block w-[84px] h-1 bg-[var(--off)]">
+                            <span
+                              className="block h-full bg-[var(--blue)] transition-all duration-300"
                               style={{
-                                width: `${Math.min(100, Math.max(0, pct))}%`,
-                                background: habit.color || 'var(--electric)',
+                                width: `${Math.min(100, Math.round((fact / Math.max(1, goal)) * 100))}%`,
+                                boxShadow: fact > 0 ? '0 0 8px var(--blue-glow)' : 'none',
                               }}
                             />
-                          </div>
-                          <span className="font-mono text-xs font-bold tabular-nums w-8 text-right" style={{ color: habit.color || 'var(--electric)' }}>
-                            {pct}%
                           </span>
                         </div>
                       </td>
@@ -732,45 +528,58 @@ export default function UltimateMonthlyTracker() {
               {/* Bottom Summary Rows */}
               {habits.length > 0 && (
                 <>
-                  {/* Daily Completion % Row */}
-                  <tr className="border-t-2 border-[var(--border-bright)] bg-[var(--bg-elevated)]">
-                    <td className="sticky left-0 z-20 px-3 py-1.5 font-bold font-mono text-xs bg-[var(--bg-elevated)] border-r border-[var(--border)]" style={{ color: 'var(--electric)' }}>
+                  {/* PROGRESS % ROW */}
+                  <tr className="border-t border-[var(--line)] bg-[var(--raised)]">
+                    <td className="sticky left-0 z-20 px-4 py-2 font-display text-xs font-semibold tracking-[0.16em] uppercase bg-[var(--raised)] border-r border-[var(--line)] text-[var(--blue-text)]">
                       {tr.tracker.progressPct}
                     </td>
                     {allDays.map((day) => {
+                      const isFuture = day > new Date();
                       const stat = dayStats.find((d) => d.day === day.getDate());
-                      const pct  = stat?.pct ?? 0;
+                      const pct = stat?.pct ?? 0;
                       return (
                         <td
                           key={`pct-${day.getDate()}`}
-                          className="text-center font-mono font-bold text-xs tabular-nums border-r border-[var(--border-subtle)]"
+                          className={`text-center font-display text-xs font-semibold tabular-nums border-r border-[var(--line)] py-2 ${
+                            isToday(day) ? 'bg-[var(--blue-soft)]' : ''
+                          }`}
                           style={{
-                            color: pct === 100 ? 'var(--accent-green)' : pct >= 50 ? 'var(--electric)' : pct > 0 ? 'var(--text-primary)' : 'var(--text-muted)',
+                            color: isFuture ? 'var(--muted)' : pct > 0 ? 'var(--text)' : 'var(--muted)',
                           }}
                         >
-                          {pct > 0 ? `${pct}%` : '—'}
+                          {isFuture ? '—' : `${pct}%`}
                         </td>
                       );
                     })}
-                    <td colSpan={3} className="text-right px-3 text-xs font-mono font-bold text-[var(--electric)]">
-                      {overallPct.toFixed(1)}% {tr.tracker.progress}
+                    <td className="text-right px-4 py-2 font-display text-xs font-bold tracking-[0.08em] text-[var(--blue-text)]">
+                      {overallPct.toFixed(0)}% MONTH
                     </td>
                   </tr>
 
-                  {/* Completed Count Row */}
-                  <tr className="bg-[var(--bg-elevated)] border-t border-[var(--border-subtle)]">
-                    <td className="sticky left-0 z-20 px-3 py-1 font-bold font-mono text-xs bg-[var(--bg-elevated)] border-r border-[var(--border)]" style={{ color: 'var(--electric)' }}>
-                      ✓ {tr.tracker.completed}
+                  {/* ✓ COMPLETED ROW */}
+                  <tr className="border-t border-[var(--line)] bg-[var(--raised)]">
+                    <td className="sticky left-0 z-20 px-4 py-2 font-display text-xs font-semibold tracking-[0.16em] uppercase bg-[var(--raised)] border-r border-[var(--line)] text-[var(--blue-text)] flex items-center gap-1.5">
+                      <Check size={14} strokeWidth={3} />
+                      <span>{tr.tracker.completed.toUpperCase()}</span>
                     </td>
                     {allDays.map((day) => {
+                      const isFuture = day > new Date();
                       const stat = dayStats.find((d) => d.day === day.getDate());
                       return (
-                        <td key={`done-${day.getDate()}`} className="text-center font-mono text-xs tabular-nums font-semibold text-[var(--electric)] border-r border-[var(--border-subtle)]">
-                          {stat?.done ?? 0}
+                        <td
+                          key={`done-${day.getDate()}`}
+                          className={`text-center font-display text-xs font-semibold tabular-nums border-r border-[var(--line)] py-2 ${
+                            isToday(day) ? 'bg-[var(--blue-soft)]' : ''
+                          }`}
+                          style={{
+                            color: isFuture ? 'var(--muted)' : (stat?.done ?? 0) > 0 ? 'var(--blue-text)' : 'var(--muted)',
+                          }}
+                        >
+                          {isFuture ? '—' : (stat?.done ?? 0)}
                         </td>
                       );
                     })}
-                    <td colSpan={3} />
+                    <td />
                   </tr>
                 </>
               )}

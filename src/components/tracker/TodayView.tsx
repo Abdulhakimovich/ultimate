@@ -66,7 +66,7 @@ export default function TodayView({
   return (
     <div className="space-y-4 md:hidden">
       {/* Top Banner Card: Progress Ring + Summary & Toggle */}
-      <div className="surface-card p-4 rounded-2xl border-hairline flex items-center justify-between gap-4 shadow-sm">
+      <div className="cyber-card p-4 flex items-center justify-between gap-4 shadow-sm border border-[var(--border)] bg-[var(--bg-card)]">
         <div className="flex items-center gap-3.5">
           {/* Progress Ring */}
           <div className="relative w-20 h-20 flex-shrink-0 flex items-center justify-center">
@@ -93,19 +93,19 @@ export default function TodayView({
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="font-mono font-bold text-sm text-[var(--electric)] tabular-nums">
+              <span className="font-mono font-bold text-base text-[var(--electric)] tabular-nums">
                 {pct}%
               </span>
             </div>
           </div>
 
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+            <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[var(--text-muted)]">
               {tr.greeting?.todayView || 'Сегодня'}
             </div>
-            <div className="text-base font-bold text-[var(--text-primary)]">
+            <div className="text-base font-bold font-mono text-[var(--text-primary)]">
               {completedTodayCount} / {totalCount}{' '}
-              <span className="text-xs font-normal text-[var(--text-secondary)]">
+              <span className="text-xs font-normal text-[var(--text-secondary)] font-sans">
                 {tr.tracker.completed.toLowerCase()}
               </span>
             </div>
@@ -116,7 +116,7 @@ export default function TodayView({
         <button
           type="button"
           onClick={onSwitchToGrid}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all border border-[var(--border)] bg-[var(--bg-elevated)] hover:bg-[var(--electric-glow)] text-[var(--text-primary)] active:scale-95"
+          className="clip-chamfer-btn flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-bold font-mono tracking-wide transition-all border border-[var(--border)] bg-[var(--bg-elevated)] hover:bg-[var(--electric-glow)] text-[var(--text-primary)] active:scale-95"
           aria-label={tr.greeting?.switchToGrid || 'Сетка месяца'}
         >
           <Calendar size={14} className="text-[var(--electric)]" />
@@ -134,16 +134,20 @@ export default function TodayView({
           return (
             <div
               key={habit.id}
-              className="surface-card p-4 rounded-2xl border-hairline flex items-center justify-between gap-3 shadow-sm hover:border-[var(--border-bright)] transition-all"
+              className="cyber-card p-4 border border-[var(--border)] bg-[var(--bg-card)] flex items-center justify-between gap-3 shadow-sm hover:border-[var(--border-bright)] transition-all"
             >
               {/* Left Column: Habit Info & 7-Day Dots */}
               <div className="flex-1 min-w-0 pr-2">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2.5">
                   <div
-                    className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
-                    style={{ background: habitColor + '25', color: habitColor }}
+                    className="w-7 h-7 rounded-lg border flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: habitColor + '20',
+                      borderColor: habitColor + '40',
+                      color: habitColor,
+                    }}
                   >
-                    <HabitIcon icon={habit.icon} size={12} />
+                    <HabitIcon icon={habit.icon} size={15} />
                   </div>
                   <span className="font-semibold text-sm truncate text-[var(--text-primary)]">
                     {habit.name}
@@ -151,27 +155,27 @@ export default function TodayView({
                 </div>
 
                 {/* 7-Day Dot Strip */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   {last7Days.map((day) => {
                     const done = isHabitCompletedOnDate(completions, habit.id, day.dateStr);
                     return (
                       <div
                         key={day.dateStr}
-                        className="flex flex-col items-center gap-0.5"
+                        className="flex flex-col items-center gap-1"
                         title={`${day.dateStr}: ${done ? 'Done' : 'Incomplete'}`}
                       >
                         <div
-                          className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-all ${
-                            day.isToday ? 'ring-1 ring-[var(--electric)]' : ''
+                          className={`w-4 h-4 rounded-md flex items-center justify-center transition-all ${
+                            day.isToday ? 'ring-1 ring-[var(--electric)] ring-offset-1 ring-offset-[var(--bg-card)]' : ''
                           }`}
                           style={{
                             background: done ? habitColor : 'var(--bg-elevated)',
                             border: done ? 'none' : '1px solid var(--border)',
                           }}
                         >
-                          {done && <Check size={8} className="text-white stroke-[3]" />}
+                          {done && <Check size={10} className="text-white stroke-[3]" />}
                         </div>
-                        <span className="text-[10px] font-mono text-[var(--text-muted)]">
+                        <span className="text-xs font-mono text-[var(--text-muted)]">
                           {day.label}
                         </span>
                       </div>
@@ -187,11 +191,11 @@ export default function TodayView({
                 aria-checked={isDoneToday}
                 aria-label={`${habit.name}: ${isDoneToday ? tr.tracker.cellDone : tr.tracker.checkHabit}`}
                 onClick={() => handleToggle(habit.id)}
-                className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-2xl flex items-center justify-center cursor-pointer transition-all active:scale-90 shadow-sm"
+                className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-xl flex items-center justify-center cursor-pointer transition-all active:scale-90 shadow-sm"
                 style={{
                   background: isDoneToday ? habitColor : 'var(--bg-elevated)',
                   border: isDoneToday ? `2px solid ${habitColor}` : '2px solid var(--border)',
-                  boxShadow: isDoneToday ? `0 0 12px ${habitColor}66` : 'none',
+                  boxShadow: isDoneToday ? `0 0 14px ${habitColor}66` : 'none',
                 }}
               >
                 {isDoneToday ? (

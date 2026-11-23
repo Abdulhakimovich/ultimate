@@ -6,8 +6,11 @@ import { triggerFeedback } from '@/lib/feedback';
 
 export interface HabitCellProps {
   checked: boolean;
+  linkL?: boolean;
+  linkR?: boolean;
   isToday?: boolean;
   isPast?: boolean;
+  isFuture?: boolean;
   habitName: string;
   dateStr: string;
   habitColor?: string;
@@ -38,8 +41,11 @@ function getLuminance(color: string): number {
 
 export default function HabitCell({
   checked,
+  linkL = false,
+  linkR = false,
   isToday = false,
   isPast = false,
+  isFuture = false,
   habitName,
   dateStr,
   habitColor,
@@ -47,18 +53,32 @@ export default function HabitCell({
   onToggle,
   disabled = false,
 }: HabitCellProps) {
-  const activeColor = color || habitColor || 'var(--electric)';
+  const activeColor = color || habitColor || 'var(--blue)';
   const checkColor = getLuminance(activeColor) > 0.42 ? '#0A1428' : '#FFFFFF';
-  const stateLabel = checked ? 'Done' : isPast ? 'Missed' : 'Not recorded';
+  const stateLabel = checked ? 'Done' : isFuture ? 'Upcoming' : isPast ? 'Missed' : 'Not recorded';
 
   const handleToggle = () => {
-    if (disabled) return;
+    if (disabled || isFuture) return;
     triggerFeedback(!checked ? 'check' : 'uncheck');
     onToggle();
   };
 
   return (
-    <div className="flex items-center justify-center p-0.5">
+    <div className={`relative flex items-center justify-center h-12 w-full ${isToday ? 'bg-[var(--blue-soft)]' : ''}`}>
+      {/* Streak connectors */}
+      {checked && linkL && (
+        <div
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] w-1/2 pointer-events-none z-0"
+          style={{ background: activeColor, opacity: 0.55 }}
+        />
+      )}
+      {checked && linkR && (
+        <div
+          className="absolute right-0 top-1/2 -translate-y-1/2 h-[2px] w-1/2 pointer-events-none z-0"
+          style={{ background: activeColor, opacity: 0.55 }}
+        />
+      )}
+
       <button
         type="button"
         role="checkbox"
@@ -73,24 +93,32 @@ export default function HabitCell({
           }
         }}
         className={`
-          relative w-[26px] h-[26px] sm:w-[22px] sm:h-[22px] rounded-md flex items-center justify-center
-          transition-all duration-150 cursor-pointer focus-visible:ring-2 focus-visible:ring-[var(--electric)]
+          relative z-10 w-[24px] h-[24px] sm:w-[22px] sm:h-[22px] rounded-[4px] flex items-center justify-center
+          transition-all duration-150 focus-visible:ring-2 focus-visible:ring-[var(--blue)]
           touch-manipulation select-none
           before:content-[''] before:absolute before:-inset-2 before:min-w-[40px] before:min-h-[40px] before:pointer-events-auto
-          ${isToday && !checked ? 'ring-1 ring-[var(--electric)]' : ''}
+          ${isFuture ? 'cursor-default' : 'cursor-pointer active:scale-90'}
         `}
         style={{
           background: checked
             ? activeColor
             : isToday
-            ? 'var(--electric-glow)'
-            : 'var(--bg-elevated)',
+            ? 'var(--blue-soft)'
+            : isFuture
+            ? 'transparent'
+            : 'var(--off)',
           border: checked
             ? `1.5px solid ${activeColor}`
             : isToday
-            ? '1.5px solid var(--electric)'
-            : '1px solid var(--border)',
-          boxShadow: checked ? `0 0 8px ${activeColor}55` : 'none',
+            ? '1.5px solid var(--blue)'
+            : isFuture
+            ? '1px dashed var(--line)'
+            : '1px solid var(--line)',
+          boxShadow: checked
+            ? `0 0 12px ${activeColor}80`
+            : isToday
+            ? '0 0 10px var(--blue-glow)'
+            : 'none',
         }}
       >
         {checked ? (
@@ -99,14 +127,7 @@ export default function HabitCell({
             className="animate-check-pop stroke-[3]"
             style={{ color: checkColor }}
           />
-        ) : isPast ? (
-          <div
-            className="w-1.5 h-1.5 rounded-full"
-            style={{ background: 'var(--text-muted)', opacity: 0.35 }}
-          />
-        ) : (
-          <span className="sr-only">Empty</span>
-        )}
+        ) : null}
       </button>
     </div>
   );
